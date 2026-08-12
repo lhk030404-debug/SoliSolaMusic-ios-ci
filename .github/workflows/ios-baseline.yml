@@ -97,8 +97,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: package-lock.json
       - run: npm install --global npm@${{ env.NPM_VERSION }}
       - uses: ruby/setup-ruby@v1
         with:
@@ -120,7 +118,9 @@ jobs:
           SKIP_POD_INSTALL: 'true'
           SKIP_ANDROID_INSTALL: 'true'
           NODE_OPTIONS: --max-old-space-size=8192
+          NPM_CONFIG_CACHE: ${{ runner.temp }}/npm-cache
         run: |
+          mkdir -p "${NPM_CONFIG_CACHE}"
           soft_limit="$(ulimit -Sn)"
           hard_limit="$(ulimit -Hn)"
           echo "open-files soft=${soft_limit} hard=${hard_limit}"
