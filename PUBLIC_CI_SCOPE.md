@@ -14,7 +14,10 @@ repository-wide hardcoded-copy scanner can evaluate
 its complete native source scope. It otherwise contains only the G01
 non-sensitive product/build inputs needed to compile brand, design-token,
 localization, navigation, feature-policy, and offline Settings changes. The
-sole workflow is manual, read-only, unsigned, and uploads only build/test logs.
+redacted Gate 00 third-party notice is included because the offline Licenses
+regression verifies the shipped snapshot against that exact audited source.
+The sole workflow is manual, read-only, unsigned, and uploads only build/test
+logs.
 
 This mirror is not a product release, fork-of-record, deployment source, or
 replacement for the private `SoliSolaMusic` repository. Its Actions run URL,
