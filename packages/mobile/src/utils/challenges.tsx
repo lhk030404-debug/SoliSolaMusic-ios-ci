@@ -35,9 +35,8 @@ import Trophy from 'app/assets/images/emojis/trophy.png'
 import type { SummaryTableItem } from 'app/components/summary-table/SummaryTable'
 
 export type ChallengesParamList = {
-  trending: undefined
-  explore: undefined
-  library: undefined
+  music: undefined
+  discover: undefined
   Upload: undefined
   params: { screen: string }
 }
@@ -73,7 +72,7 @@ const mobileChallengeConfig: Partial<
     icon: Headphone,
     buttonInfo: {
       navigation: {
-        screen: 'trending'
+        screen: 'music'
       },
       iconRight: IconArrowRight
     }
@@ -82,7 +81,7 @@ const mobileChallengeConfig: Partial<
     icon: Headphone,
     buttonInfo: {
       navigation: {
-        screen: 'trending'
+        screen: 'music'
       },
       iconRight: IconArrowRight
     }
@@ -124,8 +123,8 @@ const mobileChallengeConfig: Partial<
     icon: TrebleClef,
     buttonInfo: {
       navigation: {
-        screen: 'explore',
-        params: { screen: 'Explore' }
+        screen: 'discover',
+        params: { screen: 'SearchExplore' }
       },
       iconRight: IconArrowRight
     }
@@ -134,8 +133,8 @@ const mobileChallengeConfig: Partial<
     icon: TrebleClef,
     buttonInfo: {
       navigation: {
-        screen: 'explore',
-        params: { screen: 'Explore' }
+        screen: 'discover',
+        params: { screen: 'SearchExplore' }
       }
     }
   },
@@ -181,7 +180,7 @@ const mobileChallengeConfig: Partial<
     icon: Cart,
     buttonInfo: {
       navigation: {
-        screen: 'explore',
+        screen: 'discover',
         params: { screen: 'PremiumTracks' }
       },
       iconRight: IconArrowRight

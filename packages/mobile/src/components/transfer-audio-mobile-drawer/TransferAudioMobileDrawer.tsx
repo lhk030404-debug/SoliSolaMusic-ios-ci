@@ -4,6 +4,7 @@ import { IconTokenGold } from '@audius/harmony-native'
 import { GradientText } from 'app/components/core'
 import { AppDrawer } from 'app/components/drawer'
 import Text from 'app/components/text'
+import { fontByWeight } from 'app/styles'
 
 const TRANSFER_AUDIO_MODAL_NAME = 'TransferAudioMobileWarning'
 
@@ -20,13 +21,13 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: 'AvenirNextLTPro-Heavy',
+    fontFamily: fontByWeight.heavy,
     fontSize: 28,
     marginBottom: 24
   },
 
   subtitle: {
-    fontFamily: 'AvenirNextLTPro-Regular',
+    fontFamily: fontByWeight.regular,
     textAlign: 'center',
     fontSize: 24,
     maxWidth: 300,

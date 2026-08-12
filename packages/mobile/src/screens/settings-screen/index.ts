@@ -1,5 +1,7 @@
 export * from './SettingsScreen'
 export * from './AboutScreen'
+export * from './LanguageSettingsScreen'
+export * from './LicensesScreen'
 export * from './AccountSettingsScreen'
 export * from './DownloadSettingsScreen'
 export * from './InboxSettingsScreen'

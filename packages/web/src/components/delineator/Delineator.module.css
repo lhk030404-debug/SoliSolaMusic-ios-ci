@@ -65,7 +65,7 @@
   letter-spacing: 1.13px;
 }
 
-/** TODO: Figure out why Avenir when all caps causes line-height v-align issues */
+/** Keep the all-caps label vertically centered across system font stacks. */
 @-moz-document url-prefix() {
   .large .text {
     line-height: 20px;

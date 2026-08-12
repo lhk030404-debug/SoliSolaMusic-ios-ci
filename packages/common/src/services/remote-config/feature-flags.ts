@@ -2,6 +2,14 @@ import { Environment } from '../env'
 
 /* FeatureFlags must be lowercase snake case */
 export enum FeatureFlags {
+  MUSIC_FEED = 'music_feed',
+  SINGING_UPLOADS = 'singing_uploads',
+  FORMAL_UPLOADS = 'formal_uploads',
+  COMMENTS = 'comments',
+  RECOMMENDATIONS = 'recommendations',
+  OFFLINE_DOWNLOADS = 'offline_downloads',
+  CREATOR_WEB = 'creator_web',
+  ADMIN_ACTIONS = 'admin_actions',
   VERIFY_HANDLE_WITH_TIKTOK = 'verify_handle_with_tiktok',
   VERIFY_HANDLE_WITH_TWITTER = 'verify_handle_with_twitter',
   VERIFY_HANDLE_WITH_INSTAGRAM = 'verify_handle_with_instagram',
@@ -35,6 +43,14 @@ export const environmentFlagDefaults: Record<
  * If optimizely errors, these default values are used.
  */
 export const flagDefaults: FlagDefaults = {
+  [FeatureFlags.MUSIC_FEED]: true,
+  [FeatureFlags.SINGING_UPLOADS]: true,
+  [FeatureFlags.FORMAL_UPLOADS]: true,
+  [FeatureFlags.COMMENTS]: true,
+  [FeatureFlags.RECOMMENDATIONS]: true,
+  [FeatureFlags.OFFLINE_DOWNLOADS]: true,
+  [FeatureFlags.CREATOR_WEB]: true,
+  [FeatureFlags.ADMIN_ACTIONS]: true,
   [FeatureFlags.VERIFY_HANDLE_WITH_TIKTOK]: false,
   [FeatureFlags.VERIFY_HANDLE_WITH_TWITTER]: false,
   [FeatureFlags.VERIFY_HANDLE_WITH_INSTAGRAM]: false,
@@ -50,4 +66,16 @@ export const flagDefaults: FlagDefaults = {
   [FeatureFlags.LAUNCHPAD_VERIFICATION]: true,
   [FeatureFlags.FAN_CLUB_TEXT_POST_POSTING]: false,
   [FeatureFlags.QUEUE_NEW_FEATURE_BADGE]: false
+}
+
+/** SoliSola launch kill switches may only move from enabled to disabled. */
+export const failClosedFlags: Partial<Record<FeatureFlags, true>> = {
+  [FeatureFlags.MUSIC_FEED]: true,
+  [FeatureFlags.SINGING_UPLOADS]: true,
+  [FeatureFlags.FORMAL_UPLOADS]: true,
+  [FeatureFlags.COMMENTS]: true,
+  [FeatureFlags.RECOMMENDATIONS]: true,
+  [FeatureFlags.OFFLINE_DOWNLOADS]: true,
+  [FeatureFlags.CREATOR_WEB]: true,
+  [FeatureFlags.ADMIN_ACTIONS]: true
 }

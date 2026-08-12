@@ -7,25 +7,26 @@ import { usePhantomConnect } from '../external-wallets/usePhantomConnect'
 import { AppTabBar } from './AppTabBar'
 import type { ExploreTabScreenParamList } from './ExploreTabScreen'
 import { ExploreTabScreen } from './ExploreTabScreen'
-import type { FavoritesTabScreenParamList } from './FavoritesTabScreen'
-import { FavoritesTabScreen } from './FavoritesTabScreen'
 import type { FeedTabScreenParamList } from './FeedTabScreen'
 import { FeedTabScreen } from './FeedTabScreen'
-import { NotificationsTabScreen } from './NotificationsTabScreen'
 import type { ProfileTabScreenParamList } from './ProfileTabScreen'
+import { ProfileTabScreen } from './ProfileTabScreen'
+import type { SingTabScreenParamList } from './SingTabScreen'
+import { SingTabScreen } from './SingTabScreen'
 import type { TrendingTabScreenParamList } from './TrendingTabScreen'
 import { TrendingTabScreen } from './TrendingTabScreen'
+import { DEFAULT_SOLISOLA_TAB } from './navigationContract'
 import { usePrefetchNotifications } from './usePrefetchNotifications'
 
 export type AppScreenParamList = {
+  discover: NavigatorScreenParams<ExploreTabScreenParamList>
+  sing: NavigatorScreenParams<SingTabScreenParamList>
+  music: NavigatorScreenParams<TrendingTabScreenParamList>
   feed: NavigatorScreenParams<FeedTabScreenParamList>
-  trending: NavigatorScreenParams<TrendingTabScreenParamList>
-  explore: NavigatorScreenParams<ExploreTabScreenParamList>
-  favorites: NavigatorScreenParams<FavoritesTabScreenParamList>
-  profile: NavigatorScreenParams<ProfileTabScreenParamList>
+  me: NavigatorScreenParams<ProfileTabScreenParamList>
 }
 
-const Tab = createBottomTabNavigator()
+const Tab = createBottomTabNavigator<AppScreenParamList>()
 
 const screenOptions = { headerShown: false }
 const tabBar = (props: BottomTabBarProps) => <AppTabBar {...props} />
@@ -38,13 +39,13 @@ export const AppTabsScreen = () => {
     <Tab.Navigator
       tabBar={tabBar}
       screenOptions={screenOptions}
-      initialRouteName='feed'
+      initialRouteName={DEFAULT_SOLISOLA_TAB}
     >
+      <Tab.Screen name='discover' component={ExploreTabScreen} />
+      <Tab.Screen name='sing' component={SingTabScreen} />
+      <Tab.Screen name='music' component={TrendingTabScreen} />
       <Tab.Screen name='feed' component={FeedTabScreen} />
-      <Tab.Screen name='trending' component={TrendingTabScreen} />
-      <Tab.Screen name='explore' component={ExploreTabScreen} />
-      <Tab.Screen name='library' component={FavoritesTabScreen} />
-      <Tab.Screen name='notifications' component={NotificationsTabScreen} />
+      <Tab.Screen name='me' component={ProfileTabScreen} />
     </Tab.Navigator>
   )
 }

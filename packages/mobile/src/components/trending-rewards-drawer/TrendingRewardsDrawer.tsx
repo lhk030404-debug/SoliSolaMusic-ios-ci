@@ -175,11 +175,11 @@ export const TrendingRewardsDrawer = (titleIcon) => {
   const handleGoToTrending = useCallback(() => {
     switch (modalType) {
       case 'tracks': {
-        navigation.navigate('trending', { screen: 'Trending' })
+        navigation.navigate('music', { screen: 'Trending' })
         break
       }
       case 'underground': {
-        navigation.navigate('trending', { screen: 'Trending' })
+        navigation.navigate('music', { screen: 'Trending' })
         break
       }
     }

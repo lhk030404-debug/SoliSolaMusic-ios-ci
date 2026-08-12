@@ -52,7 +52,7 @@ export const AccountLoadingScreen = () => {
     if (isAccountReady) {
       // Mark sign up as finished so RootScreen shows HomeStack
       dispatch(finishSignUp())
-      navigation.navigate('HomeStack', { screen: 'Trending' })
+      navigation.navigate('HomeStack')
     }
   }, [isAccountReady, dispatch, navigation])
 

@@ -4,7 +4,7 @@
 @import './ant-overrides.css';
 @import './shadows.css';
 
-/* Exclude landing page 2026 and download page so Dust Bucer / Urbanist can apply */
+/* Landing and download pages own their system-font presentation. */
 #root *:not(#landing-page-2026 *):not(#download-page *),
 body *:not(#landing-page-2026 *):not(#download-page *) {
   font-family: var(--harmony-font-family);

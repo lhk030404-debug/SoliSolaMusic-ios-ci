@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { AccessibilityState, StyleProp, ViewStyle } from 'react-native'
 import { View, TouchableOpacity } from 'react-native'
 
 import { IconCaretRight } from '@audius/harmony-native'
@@ -37,10 +37,22 @@ type SettingsRowProps = {
   children: ReactNode
   firstItem?: boolean
   style?: StyleProp<ViewStyle>
+  accessibilityLabel?: string
+  accessibilityState?: AccessibilityState
+  hideCaret?: boolean
 }
 
 export const SettingsRow = (props: SettingsRowProps) => {
-  const { onPress, children, firstItem, style, url } = props
+  const {
+    onPress,
+    children,
+    firstItem,
+    style,
+    url,
+    accessibilityLabel,
+    accessibilityState,
+    hideCaret
+  } = props
   const styles = useStyles()
   const { neutralLight4 } = useThemeColors()
 
@@ -49,9 +61,16 @@ export const SettingsRow = (props: SettingsRowProps) => {
   return (
     <View style={[styles.root, firstItem && styles.firstItem]}>
       {/* @ts-ignore */}
-      <Row url={url as string} onPress={onPress} style={[styles.row, style]}>
+      <Row
+        url={url as string}
+        onPress={onPress}
+        style={[styles.row, style]}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole={onPress || url ? 'button' : undefined}
+        accessibilityState={accessibilityState}
+      >
         <View style={styles.content}>{children}</View>
-        {onPress || url ? (
+        {(onPress || url) && !hideCaret ? (
           <IconCaretRight fill={neutralLight4} height={16} width={16} />
         ) : null}
       </Row>

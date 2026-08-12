@@ -1,5 +1,5 @@
 export const typography = {
-  font: "'Avenir Next LT Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  font: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   weight: {
     ultraLight: 100,
     thin: 200,

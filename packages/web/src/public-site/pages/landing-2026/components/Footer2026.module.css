@@ -71,7 +71,7 @@
 }
 
 .columnHeading {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -94,7 +94,7 @@
 }
 
 .footerLinkText {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 600;
   font-size: 16px;
   line-height: 20px;
@@ -135,7 +135,7 @@
 }
 
 .copyright {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
@@ -150,7 +150,7 @@
 }
 
 .legalLink {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;

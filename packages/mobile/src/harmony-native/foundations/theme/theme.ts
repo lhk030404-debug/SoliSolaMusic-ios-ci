@@ -1,20 +1,26 @@
 import { themes as harmonyThemes } from '@audius/harmony/src/foundations/theme/theme'
 import { mapValues } from 'lodash'
+import { Platform } from 'react-native'
 
 import { colorTheme } from '../color/color'
 import { motion } from '../motion/motion'
+import { soliSolaTokens } from '../solisola'
 import { shadows } from '../shadows/shadows'
+
+const systemFontByWeight = {
+  ultraLight: Platform.select({ ios: 'System', android: 'sans-serif-thin' }),
+  thin: Platform.select({ ios: 'System', android: 'sans-serif-thin' }),
+  light: Platform.select({ ios: 'System', android: 'sans-serif-light' }),
+  regular: Platform.select({ ios: 'System', android: 'sans-serif' }),
+  medium: Platform.select({ ios: 'System', android: 'sans-serif-medium' }),
+  demiBold: Platform.select({ ios: 'System', android: 'sans-serif-medium' }),
+  bold: Platform.select({ ios: 'System', android: 'sans-serif' }),
+  heavy: Platform.select({ ios: 'System', android: 'sans-serif-black' })
+}
 
 const typographyOverrides = {
   fontByWeight: {
-    ultraLight: 'AvenirNextLTPro-UltLt',
-    thin: 'AvenirNextLTPro-Thin',
-    light: 'AvenirNextLTPro-Light',
-    regular: 'AvenirNextLTPro-Regular',
-    medium: 'AvenirNextLTPro-Medium',
-    demiBold: 'AvenirNextLTPro-DemiBold',
-    bold: 'AvenirNextLTPro-Bold',
-    heavy: 'AvenirNextLTPro-Heavy'
+    ...systemFontByWeight
   },
   lineHeight: mapValues(harmonyThemes.day.typography.lineHeight, (pxSize) =>
     parseInt(pxSize)
@@ -39,7 +45,8 @@ const commonFoundations = {
   cornerRadius: harmonyThemes.day.cornerRadius,
   spacing: harmonyThemes.day.spacing,
   iconSizes: harmonyThemes.day.iconSizes,
-  motion
+  motion,
+  soliSola: soliSolaTokens
 }
 
 export const theme = {

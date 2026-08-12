@@ -22,6 +22,10 @@ import type { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import { FilterButtonScreen } from '@audius/harmony-native'
 import type { FilterButtonScreenParams } from '@audius/harmony-native'
+import {
+  evaluateRoutePolicy,
+  useRuntimeKillSwitchOverrides
+} from 'app/feature-policy'
 import { useDrawer } from 'app/hooks/useDrawer'
 import { setLastNavAction } from 'app/hooks/useNavigation'
 import { AppDrawerContext } from 'app/screens/app-drawer-screen'
@@ -50,6 +54,8 @@ import {
   DownloadSettingsScreen,
   InboxSettingsScreen,
   CommentSettingsScreen,
+  LanguageSettingsScreen,
+  LicensesScreen,
   NotificationSettingsScreen,
   SettingsScreen
 } from 'app/screens/settings-screen'
@@ -107,6 +113,8 @@ export type AppTabScreenParamList = {
   }
   SettingsScreen: undefined
   AboutScreen: undefined
+  LanguageSettingsScreen: undefined
+  LicensesScreen: undefined
   ListeningHistoryScreen: undefined
   AccountSettingsScreen: undefined
   ChangeEmail: undefined
@@ -182,6 +190,9 @@ type AppTabScreenProps = {
  */
 export const AppTabScreen = ({ baseScreen, Stack }: AppTabScreenProps) => {
   const screenOptions = useAppScreenOptions()
+  const runtimeOverrides = useRuntimeKillSwitchOverrides()
+  const isDirectRouteAllowed = (routeName: string) =>
+    evaluateRoutePolicy(routeName, 'direct', runtimeOverrides).isAllowed
   const { drawerNavigation, setIsAtStackRoot } = useContext(AppDrawerContext)
   const { isOpen: isNowPlayingDrawerOpen } = useDrawer('NowPlaying')
   const { setNavigation } = useContext(SetAppTabNavigationContext)
@@ -271,10 +282,19 @@ export const AppTabScreen = ({ baseScreen, Stack }: AppTabScreenProps) => {
         />
       </Stack.Group>
       <Stack.Screen name='Reposts' component={RepostsScreen} />
-      <Stack.Screen name='CoinLeaderboard' component={CoinLeaderboardScreen} />
+      {isDirectRouteAllowed('CoinLeaderboard') ? (
+        <Stack.Screen
+          name='CoinLeaderboard'
+          component={CoinLeaderboardScreen}
+        />
+      ) : null}
 
-      <Stack.Screen name='AudioScreen' component={AudioScreen} />
-      <Stack.Screen name='RewardsScreen' component={RewardsScreen} />
+      {isDirectRouteAllowed('AudioScreen') ? (
+        <Stack.Screen name='AudioScreen' component={AudioScreen} />
+      ) : null}
+      {isDirectRouteAllowed('RewardsScreen') ? (
+        <Stack.Screen name='RewardsScreen' component={RewardsScreen} />
+      ) : null}
       <Stack.Screen
         name='Contests'
         component={ContestsScreen}
@@ -289,21 +309,49 @@ export const AppTabScreen = ({ baseScreen, Stack }: AppTabScreenProps) => {
         name='ContestFollowers'
         component={ContestFollowersScreen}
       />
-      <Stack.Screen name='wallet' component={WalletScreen} />
-      <Stack.Screen name='CashScreen' component={CashScreen} />
-      <Stack.Screen name='CoinDetailsScreen' component={CoinDetailsScreen} />
-      <Stack.Screen name='CoinRedeemScreen' component={CoinRedeemScreen} />
-      <Stack.Screen
-        name='EditCoinDetailsScreen'
-        component={EditCoinDetailsScreen}
-      />
-      <Stack.Screen name='FanClubsExplore' component={FanClubsExploreScreen} />
-      <Stack.Screen name='FanClubSort' component={FanClubSortScreen} />
+      {isDirectRouteAllowed('wallet') ? (
+        <Stack.Screen name='wallet' component={WalletScreen} />
+      ) : null}
+      {isDirectRouteAllowed('CashScreen') ? (
+        <Stack.Screen name='CashScreen' component={CashScreen} />
+      ) : null}
+      {isDirectRouteAllowed('CoinDetailsScreen') ? (
+        <Stack.Screen name='CoinDetailsScreen' component={CoinDetailsScreen} />
+      ) : null}
+      {isDirectRouteAllowed('CoinRedeemScreen') ? (
+        <Stack.Screen name='CoinRedeemScreen' component={CoinRedeemScreen} />
+      ) : null}
+      {isDirectRouteAllowed('EditCoinDetailsScreen') ? (
+        <Stack.Screen
+          name='EditCoinDetailsScreen'
+          component={EditCoinDetailsScreen}
+        />
+      ) : null}
+      {isDirectRouteAllowed('FanClubsExplore') ? (
+        <Stack.Screen
+          name='FanClubsExplore'
+          component={FanClubsExploreScreen}
+        />
+      ) : null}
+      {isDirectRouteAllowed('FanClubSort') ? (
+        <Stack.Screen name='FanClubSort' component={FanClubSortScreen} />
+      ) : null}
 
       <Stack.Group>
         <Stack.Screen name='EditProfile' component={EditProfileScreen} />
         <Stack.Screen name='SettingsScreen' component={SettingsScreen} />
-        <Stack.Screen name='AboutScreen' component={AboutScreen} />
+        {isDirectRouteAllowed('AboutScreen') ? (
+          <Stack.Screen name='AboutScreen' component={AboutScreen} />
+        ) : null}
+        {isDirectRouteAllowed('LanguageSettingsScreen') ? (
+          <Stack.Screen
+            name='LanguageSettingsScreen'
+            component={LanguageSettingsScreen}
+          />
+        ) : null}
+        {isDirectRouteAllowed('LicensesScreen') ? (
+          <Stack.Screen name='LicensesScreen' component={LicensesScreen} />
+        ) : null}
         <Stack.Screen
           name='ListeningHistoryScreen'
           component={ListeningHistoryScreen}
@@ -320,10 +368,12 @@ export const AppTabScreen = ({ baseScreen, Stack }: AppTabScreenProps) => {
           name='CommentSettingsScreen'
           component={CommentSettingsScreen}
         />
-        <Stack.Screen
-          name='DownloadSettingsScreen'
-          component={DownloadSettingsScreen}
-        />
+        {isDirectRouteAllowed('DownloadSettingsScreen') ? (
+          <Stack.Screen
+            name='DownloadSettingsScreen'
+            component={DownloadSettingsScreen}
+          />
+        ) : null}
         <Stack.Screen
           name='NotificationSettingsScreen'
           component={NotificationSettingsScreen}
@@ -339,10 +389,12 @@ export const AppTabScreen = ({ baseScreen, Stack }: AppTabScreenProps) => {
       <Stack.Group>
         <Stack.Screen name='ChatList' component={ChatListScreen} />
         <Stack.Screen name='ChatUserList' component={ChatUserListScreen} />
-        <Stack.Screen
-          name='SendTokensUserSelection'
-          component={SendTokensUserSelectionScreen}
-        />
+        {isDirectRouteAllowed('SendTokensUserSelection') ? (
+          <Stack.Screen
+            name='SendTokensUserSelection'
+            component={SendTokensUserSelectionScreen}
+          />
+        ) : null}
         <Stack.Screen
           name='Chat'
           component={ChatScreen}

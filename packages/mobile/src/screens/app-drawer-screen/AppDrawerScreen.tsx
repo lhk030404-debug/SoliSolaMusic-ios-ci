@@ -5,7 +5,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer'
 import { useNavigation } from '@react-navigation/native'
 import { Dimensions, Platform, View, StyleSheet } from 'react-native'
 
-import { IconAudiusLogoHorizontal } from '@audius/harmony-native'
+import { SoliSolaWordmark } from 'app/branding'
 import { AudioPlayer } from 'app/components/audio/AudioPlayer'
 import { RepeatListener } from 'app/components/audio/RepeatListener'
 import { useDrawer } from 'app/hooks/useDrawer'
@@ -121,7 +121,7 @@ export const AppDrawerScreen = memo(() => {
       */}
       {Platform.OS === 'ios' ? (
         <View pointerEvents='none' style={styles.dynamicIslandLogo}>
-          <IconAudiusLogoHorizontal height={25} width={120} color='subdued' />
+          <SoliSolaWordmark height={25} />
         </View>
       ) : null}
     </>

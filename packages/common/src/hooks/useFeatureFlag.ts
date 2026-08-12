@@ -6,7 +6,11 @@ import { useHasAccount } from '~/api'
 import { useAppContext } from '~/context/appContext'
 import { Maybe } from '~/utils/typeUtils'
 
-import { FeatureFlags, RemoteConfigInstance } from '../services'
+import {
+  failClosedFlags,
+  FeatureFlags,
+  RemoteConfigInstance
+} from '../services'
 
 import { useHasConfigLoaded } from './helpers'
 
@@ -130,7 +134,11 @@ export const createUseFeatureFlagHook =
 
     return {
       isLoaded: configLoaded && hasReadOverride,
-      isEnabled: isLocallyEnabled ?? isEnabled,
+      isEnabled: resolveFlagWithLocalOverride(
+        flag,
+        isEnabled,
+        isLocallyEnabled
+      ),
       setOverride
     }
   }
@@ -142,6 +150,21 @@ export const createUseFeatureFlagHook =
  * toggles; remove when remote config is updated.
  */
 const HARDCODED_ENABLED_FLAGS: Partial<Record<FeatureFlags, true>> = {}
+
+/**
+ * SoliSola launch kill switches are one-way safety controls. A local
+ * developer override may close them, but may never reopen a remotely closed
+ * switch. Removed and Phase 2 routes are enforced separately by the immutable
+ * route policy and do not use remote flags at all.
+ */
+export const resolveFlagWithLocalOverride = (
+  flag: FeatureFlags,
+  remoteEnabled: boolean,
+  localEnabled: Maybe<boolean>
+) =>
+  failClosedFlags[flag]
+    ? remoteEnabled && localEnabled !== false
+    : (localEnabled ?? remoteEnabled)
 
 /** Fetches enabled status of a given feature flag with fallback. Result is memoized. */
 export const useFeatureFlag = (
@@ -201,7 +224,7 @@ export const useFeatureFlag = (
 
   return {
     isLoaded: configLoaded && hasReadOverride,
-    isEnabled: isLocallyEnabled ?? isEnabled,
+    isEnabled: resolveFlagWithLocalOverride(flag, isEnabled, isLocallyEnabled),
     setOverride
   }
 }

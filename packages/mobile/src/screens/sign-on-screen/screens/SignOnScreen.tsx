@@ -14,13 +14,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   Divider,
   Flex,
-  IconAudiusLogoHorizontalNew,
   Text,
   TextLink,
   ThemeProvider as HarmonyThemeProvider
 } from '@audius/harmony-native'
+import { SoliSolaWordmark } from 'app/branding'
 import type { NonLinkProps } from 'app/harmony-native/components/TextLink/types'
 import { dispatch } from 'app/store'
+
+import brand from '../../../../../../config/BRAND.json'
 
 import type { SignOnScreenParamList } from '../types'
 
@@ -29,7 +31,7 @@ import { SignInScreen } from './SignInScreen'
 import type { SignOnScreenType } from './types'
 
 const messages = {
-  newToAudius: 'New to Audius?',
+  newToSoliSola: brand.localized.en.new_user_prompt,
   createAccount: 'Create an Account'
 }
 
@@ -43,7 +45,7 @@ const CreateAccountLink = (props: NonLinkProps) => {
       style={css({ flexGrow: 1 })}
     >
       <Text variant='title' strength='weak' textAlign='center' color='subdued'>
-        {messages.newToAudius}{' '}
+        {messages.newToSoliSola}{' '}
         <TextLink showUnderline onPress={onPress}>
           {messages.createAccount}
         </TextLink>
@@ -109,11 +111,9 @@ export const SignOnScreen = (props: SignOnScreenProps) => {
           alignItems='stretch'
           style={css({ gap: 48, paddingHorizontal: 16, paddingVertical: 80 })}
         >
-          <IconAudiusLogoHorizontalNew
+          <SoliSolaWordmark
             style={css({ alignSelf: 'center' })}
             height={48}
-            width={236}
-            color='default'
           />
           {screen === 'sign-up' ? (
             <CreateEmailScreen onChangeScreen={setScreen} />

@@ -1,0 +1,5 @@
+"CFBundleDisplayName" = "SoliSola Music";
+"NSCameraUsageDescription" = "允许 SoliSola Music 使用相机拍摄头像和封面。";
+"NSPhotoLibraryAddUsageDescription" = "允许 SoliSola Music 选择照片，用于头像、封面和分享音乐。";
+"NSPhotoLibraryUsageDescription" = "允许 SoliSola Music 选择照片，用于头像和封面。";
+"NSLocalNetworkUsageDescription" = "允许 SoliSola Music 在本地网络中查找支持 Cast 的设备。";

@@ -29,6 +29,8 @@
     "redux-devtools": "redux-devtools --port=8000 --open",
     "start": "react-native start",
     "test": "jest src",
+    "test:navigation-foundation": "jest --config jest.navigation.config.js --runInBand",
+    "test:settings-foundation": "jest --config jest.settings.config.js --runInBand",
     "typecheck:trace": "tsc --generateTrace tsc_trace",
     "typecheck:watch": "tsc --watch",
     "typecheck": "tsc",
@@ -42,6 +44,7 @@
     "ota:show-history": "code-push show-history"
   },
   "dependencies": {
+    "@solisola/localization": "*",
     "@amplitude/analytics-react-native": "1.4.11",
     "@audius/common": "*",
     "@audius/fetch-nft": "0.2.8",
@@ -126,6 +129,7 @@
     "react-native-haptic-feedback": "2.3.3",
     "react-native-image-crop-picker": "0.42.0",
     "react-native-image-picker": "7.2.3",
+    "react-native-localize": "3.7.0",
     "react-native-in-app-review": "4.3.3",
     "react-native-inset-shadow": "1.0.3",
     "react-native-intersection-observer": "0.2.1",

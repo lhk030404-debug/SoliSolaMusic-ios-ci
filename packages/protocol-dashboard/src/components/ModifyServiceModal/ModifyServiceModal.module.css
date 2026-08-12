@@ -27,7 +27,7 @@
 
 .warningContainer {
   margin-top: 24px;
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-xl);
   text-align: center;
@@ -40,7 +40,7 @@
 
 .subtext {
   margin-top: 4px;
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: 500;
   font-size: var(--font-l);
   line-height: 22px;

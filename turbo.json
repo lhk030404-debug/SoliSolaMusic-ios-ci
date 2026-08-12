@@ -30,6 +30,10 @@
       "outputLogs": "new-only",
       "dependsOn": ["^build", "^rebuild"]
     },
+    "check": {
+      "outputLogs": "new-only",
+      "dependsOn": ["^build"]
+    },
     "verify": {
       "outputLogs": "new-only",
       "dependsOn": ["^build", "^rebuild"]

@@ -18,7 +18,7 @@ export const EmptyTileCTA = (props: EmptyTabProps) => {
   const navigation = useNavigation()
 
   const onPress = useCallback(() => {
-    navigation.navigate('trending')
+    navigation.navigate('music')
   }, [navigation])
 
   return (

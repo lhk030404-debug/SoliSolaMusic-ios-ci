@@ -50,7 +50,7 @@
 
 /* Stake */
 .stakeHeader {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-s);
   text-align: center;
@@ -60,7 +60,7 @@
 }
 
 .stakeValue {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-2xl);
   text-align: center;
@@ -121,7 +121,7 @@
 /* standalone */
 .standalone {
   margin: 24px auto;
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-m);
   text-align: center;

@@ -1,4 +1,5 @@
 import type { TextStyle } from 'react-native'
+import { Platform } from 'react-native'
 
 export type FontWeight =
   | 'heavy' // 900
@@ -10,15 +11,18 @@ export type FontWeight =
   | 'thin' // 200
   | 'ultraLight' // 100
 
+const systemFont = (android: string) =>
+  Platform.select({ ios: 'System', android, default: 'system-ui' }) ?? 'System'
+
 export const fontByWeight: Record<FontWeight, string> = {
-  heavy: 'AvenirNextLTPro-Heavy',
-  bold: 'AvenirNextLTPro-Bold',
-  demiBold: 'AvenirNextLTPro-DemiBold',
-  medium: 'AvenirNextLTPro-Medium',
-  regular: 'AvenirNextLTPro-Regular',
-  light: 'AvenirNextLTPro-Light',
-  thin: 'AvenirNextLTPro-Thin',
-  ultraLight: 'AvenirNextLTPro-UltLt'
+  heavy: systemFont('sans-serif-black'),
+  bold: systemFont('sans-serif'),
+  demiBold: systemFont('sans-serif-medium'),
+  medium: systemFont('sans-serif-medium'),
+  regular: systemFont('sans-serif'),
+  light: systemFont('sans-serif-light'),
+  thin: systemFont('sans-serif-thin'),
+  ultraLight: systemFont('sans-serif-thin')
 }
 
 const fontSize = {

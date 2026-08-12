@@ -15,6 +15,7 @@ import {
 } from './defaults'
 import {
   environmentFlagDefaults,
+  failClosedFlags,
   FeatureFlags,
   flagDefaults
 } from './feature-flags'
@@ -258,11 +259,21 @@ export const remoteConfig = <
 
     try {
       if (state.didInitialize) {
-        return (
-          (isFeatureEnabled(flag) ||
-            (fallbackFlag && isFeatureEnabled(fallbackFlag))) ??
-          defaultVal
-        )
+        if (!failClosedFlags[flag]) {
+          return (
+            (isFeatureEnabled(flag) ||
+              (fallbackFlag && isFeatureEnabled(fallbackFlag))) ??
+            defaultVal
+          )
+        }
+        const primaryValue = isFeatureEnabled(flag)
+        if (primaryValue === true) return true
+        if (primaryValue === false) {
+          return fallbackFlag
+            ? (isFeatureEnabled(fallbackFlag) ?? defaultVal)
+            : false
+        }
+        return defaultVal
       }
       return defaultVal
     } catch (err) {

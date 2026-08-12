@@ -51,7 +51,7 @@
 }
 
 .headline {
-  font-family: 'Dust Bucer', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: normal;
   font-style: normal;
   font-size: 140px;
@@ -63,7 +63,7 @@
 }
 
 .subline {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 400;
   font-size: 28px;
   line-height: 1.5;
@@ -158,7 +158,7 @@
 }
 
 .title {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 400;
   font-size: 16px;
   line-height: 1.5;

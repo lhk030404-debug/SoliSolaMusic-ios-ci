@@ -1,16 +1,19 @@
-# Temporary public iOS CI scope
+# Temporary public G01 integration CI scope
 
 This repository is a disposable, source-only CI mirror for validating the
-unsigned iOS simulator build inherited from Audius apps commit
+unsigned iOS simulator build and non-production Web/Mobile quality checks for
+the SoliSola G01 foundation based on Audius apps commit
 `57144304c433abdd344c0d07c37c26c31c71da9b`.
 
 It intentionally contains a new Git history and excludes the private SoliSola
 project plan, prompts, evidence, Android sources/signing fixtures, private
 configuration, production credentials, deployment jobs, and store publishing
-steps. The only source change from the selected Audius tree is the reconciled
-iOS `Podfile.lock`; the only added automation is the manual, unsigned simulator
-workflow in `.github/workflows/ios-baseline.yml`.
+steps. It contains only the G01 non-sensitive product/build inputs needed to
+compile brand, design-token, localization, navigation, feature-policy, and
+offline Settings changes. The sole workflow is manual, read-only, unsigned,
+and uploads only build/test logs.
 
 This mirror is not a product release, fork-of-record, deployment source, or
 replacement for the private `SoliSolaMusic` repository. Its Actions run URL,
-tested commit, and relevant hashes are copied back to private Gate 00 evidence.
+tested commit, and relevant hashes are copied back to private Gate evidence.
+G01 screenshot specimens and private evidence are not copied here.

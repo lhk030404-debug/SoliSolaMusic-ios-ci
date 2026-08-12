@@ -1,0 +1,56 @@
+{
+  "common": {
+    "languageName": "English"
+  },
+  "navigation": {
+    "tabs": {
+      "discover": "Discover",
+      "sing": "Sing",
+      "music": "Music",
+      "feed": "Feed",
+      "me": "Me"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageDescription": "Choose the language used by SoliSola.",
+    "about": "About",
+    "licenses": "Licenses",
+    "inbox": "Inbox Settings",
+    "inboxDescription": "Configure who is able to send messages to your inbox.",
+    "notifications": "Configure Notifications",
+    "notificationsDescription": "Review your notification preferences.",
+    "comment": "Comment Settings",
+    "commentDescription": "Prevent certain users from commenting on your tracks.",
+    "downloads": "Download Settings",
+    "history": "Listening History"
+  },
+  "languageSettings": {
+    "title": "Language",
+    "followSystem": "Follow System",
+    "english": "English",
+    "simplifiedChinese": "Simplified Chinese",
+    "traditionalChinese": "Traditional Chinese",
+    "selectedAnnouncement": "{language} selected"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version {version}",
+    "ota": "OTA {version}",
+    "copyright": "Copyright © {year} SoliSola.",
+    "licenses": "Licenses",
+    "noticeSummary": "Open-source notices and third-party licenses."
+  },
+  "licenses": {
+    "title": "Licenses",
+    "applicationSourceLicenseTitle": "Application source license",
+    "applicationSourceLicenseBody": "This application is an Audius fork. Its preserved upstream source license is {license}.",
+    "thirdPartyTitle": "Third-Party Software",
+    "thirdPartySummary": "Review the licenses and notices for third-party software included with this app.",
+    "offlineNotice": "License information is available offline."
+  },
+  "test": {
+    "englishFallbackOnly": "English fallback"
+  }
+}

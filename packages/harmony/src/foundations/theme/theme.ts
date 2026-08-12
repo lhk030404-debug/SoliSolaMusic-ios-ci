@@ -4,6 +4,7 @@ import { CornerRadius, cornerRadius } from '../corner-radius'
 import { Motion, motion, Spring, spring } from '../motion'
 import { Shadows, shadows } from '../shadows'
 import { Spacing, spacing, iconSizes } from '../spacing'
+import { soliSolaTokens } from '../solisola'
 import { typography } from '../typography'
 import type { Typography } from '../typography'
 
@@ -16,7 +17,8 @@ const commonFoundations = {
   spacing,
   motion,
   spring,
-  iconSizes
+  iconSizes,
+  soliSola: soliSolaTokens
 }
 
 export type HarmonyTheme = {
@@ -29,6 +31,7 @@ export type HarmonyTheme = {
   motion: Motion
   spring: Spring
   iconSizes: typeof iconSizes
+  soliSola: typeof soliSolaTokens
 }
 
 export const defaultLightTheme: HarmonyTheme = {

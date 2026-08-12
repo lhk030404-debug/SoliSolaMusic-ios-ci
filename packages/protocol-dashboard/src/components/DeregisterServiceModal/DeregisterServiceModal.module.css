@@ -45,7 +45,7 @@
 
 .deregisterConfirm {
   margin: 24px auto;
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-m);
   line-height: 20px;
@@ -59,7 +59,7 @@
 }
 
 .confirmTitle {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-m);
   line-height: 20px;
@@ -69,7 +69,7 @@
 }
 
 .confirmEndpoint {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: 500;
   font-size: var(--font-l);
   line-height: 22px;

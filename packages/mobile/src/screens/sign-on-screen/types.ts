@@ -16,5 +16,5 @@ export type SignOnScreenParamList = {
   AccountLoading: undefined
 
   // For leaving signup
-  HomeStack: { screen: 'Trending' }
+  HomeStack: undefined
 }

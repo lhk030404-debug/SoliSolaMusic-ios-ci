@@ -1,22 +1,23 @@
 import { useCallback } from 'react'
 
-import { Image } from 'react-native'
+import { useTranslation } from '@solisola/localization'
 
 import {
   IconCloudDownload,
   IconInfo,
+  IconNote,
   IconMessage,
   IconNotificationOn,
   IconSettings,
   IconUserUnfollow,
   IconListeningHistory
 } from '@audius/harmony-native'
-import audiusLogoHorizontal from 'app/assets/images/Horizontal-Logo-Full-Color.png'
+import { SoliSolaWordmark } from 'app/branding'
 import { Screen, ScreenContent, ScrollView } from 'app/components/core'
 import { useShowManagerModeNotAvailable } from 'app/components/manager-mode-drawer/useShowManagerModeNotAvailable'
 import { useNavigation } from 'app/hooks/useNavigation'
+import { useLocalization } from 'app/localization'
 import { makeStyles } from 'app/styles'
-import { Theme } from 'app/utils/theme'
 
 import type { ProfileTabScreenParamList } from '../app-screen/ProfileTabScreen'
 
@@ -27,27 +28,10 @@ import { SettingsDivider } from './SettingsDivider'
 import { SettingsRow } from './SettingsRow'
 import { SettingsRowDescription } from './SettingsRowDescription'
 
-const messages = {
-  title: 'Settings',
-  inbox: 'Inbox Settings',
-  inboxDescription: 'Configure who is able to send messages to your inbox.',
-  notifications: 'Configure Notifications',
-  comment: 'Comment Settings',
-  commentDescription: 'Prevent certain users from commenting on your tracks.',
-  notificationsDescription: 'Review your notification preferences.',
-  downloads: 'Download Settings',
-  history: 'Listening History',
-  about: 'About'
-}
-
-const useStyles = makeStyles(({ spacing, palette, type }) => ({
+const useStyles = makeStyles(({ spacing }) => ({
   logo: {
-    width: 200,
-    height: 48,
     marginVertical: spacing(6),
-    alignSelf: 'center',
-    resizeMode: 'contain',
-    tintColor: type === Theme.LIGHT ? undefined : palette.staticWhite
+    alignSelf: 'center'
   }
 }))
 
@@ -56,6 +40,8 @@ const IconProps = { height: 28, width: 28, style: { marginRight: 4 } }
 export const SettingsScreen = () => {
   const styles = useStyles()
   const navigation = useNavigation<ProfileTabScreenParamList>()
+  const { t } = useTranslation()
+  const { preference } = useLocalization()
 
   useShowManagerModeNotAvailable()
 
@@ -79,6 +65,14 @@ export const SettingsScreen = () => {
     navigation.push('AboutScreen')
   }, [navigation])
 
+  const handlePressLanguage = useCallback(() => {
+    navigation.push('LanguageSettingsScreen')
+  }, [navigation])
+
+  const handlePressLicenses = useCallback(() => {
+    navigation.push('LicensesScreen')
+  }, [navigation])
+
   const handlePressHistory = useCallback(() => {
     navigation.push('ListeningHistoryScreen')
   }, [navigation])
@@ -86,7 +80,7 @@ export const SettingsScreen = () => {
   return (
     <Screen
       variant='secondary'
-      title={messages.title}
+      title={t('settings.title')}
       icon={IconSettings}
       IconProps={IconProps}
       url='/settings'
@@ -94,49 +88,61 @@ export const SettingsScreen = () => {
     >
       <ScreenContent isOfflineCapable>
         <ScrollView>
-          <Image source={audiusLogoHorizontal} style={styles.logo} />
+          <SoliSolaWordmark height={48} style={styles.logo} />
           <AccountSettingsRow />
           <SettingsDivider />
           <AppearanceSettingsRow />
           <SettingsRow onPress={handlePressInbox}>
-            <SettingsRowLabel label={messages.inbox} icon={IconMessage} />
+            <SettingsRowLabel label={t('settings.inbox')} icon={IconMessage} />
             <SettingsRowDescription>
-              {messages.inboxDescription}
+              {t('settings.inboxDescription')}
             </SettingsRowDescription>
           </SettingsRow>
           <SettingsRow onPress={handlePressNotifications}>
             <SettingsRowLabel
-              label={messages.notifications}
+              label={t('settings.notifications')}
               icon={IconNotificationOn}
             />
             <SettingsRowDescription>
-              {messages.notificationsDescription}
+              {t('settings.notificationsDescription')}
             </SettingsRowDescription>
           </SettingsRow>
           <SettingsRow onPress={handlePressCommentSettings}>
             <SettingsRowLabel
-              label={messages.comment}
+              label={t('settings.comment')}
               icon={IconUserUnfollow}
             />
             <SettingsRowDescription>
-              {messages.commentDescription}
+              {t('settings.commentDescription')}
             </SettingsRowDescription>
           </SettingsRow>
           <SettingsRow onPress={handlePressDownloads}>
             <SettingsRowLabel
-              label={messages.downloads}
+              label={t('settings.downloads')}
               icon={IconCloudDownload}
             />
           </SettingsRow>
           <SettingsRow onPress={handlePressHistory}>
             <SettingsRowLabel
-              label={messages.history}
+              label={t('settings.history')}
               icon={IconListeningHistory}
             />
           </SettingsRow>
           <SettingsDivider />
+          <SettingsRow onPress={handlePressLanguage}>
+            <SettingsRowLabel
+              label={t('settings.language')}
+              icon={IconSettings}
+            />
+            <SettingsRowDescription>
+              {t('settings.languageDescription', { preference })}
+            </SettingsRowDescription>
+          </SettingsRow>
           <SettingsRow onPress={handlePressAbout}>
-            <SettingsRowLabel label={messages.about} icon={IconInfo} />
+            <SettingsRowLabel label={t('settings.about')} icon={IconInfo} />
+          </SettingsRow>
+          <SettingsRow onPress={handlePressLicenses}>
+            <SettingsRowLabel label={t('settings.licenses')} icon={IconNote} />
           </SettingsRow>
           <SettingsDivider />
         </ScrollView>

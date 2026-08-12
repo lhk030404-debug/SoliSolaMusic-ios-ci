@@ -1,5 +1,5 @@
 .title {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-style: normal;
   font-weight: var(--font-bold);
   font-size: var(--font-xl);
@@ -25,7 +25,7 @@
 }
 
 .delegationValue {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: 800;
   font-size: 48px;
   background: -webkit-linear-gradient(315deg, #7652CC 2.04%, #B05CE6 100%);
@@ -36,7 +36,7 @@
 
 .delegationLabel {
   margin-top: 8px;
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-s);
   line-height: 17px;

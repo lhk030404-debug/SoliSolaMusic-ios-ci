@@ -57,4 +57,47 @@ describe('getNavigationStateFromDeeplinkPath', () => {
 
     expect(getLeafRouteName(state)).toBe('Collection')
   })
+
+  test.each([
+    '/wallet',
+    '/wallets',
+    '/wallet-connect',
+    '/wallet-sign-message',
+    '/cash',
+    '/rewards',
+    '/coins',
+    '/coins/AUDIO',
+    '/app-redirect/wallet',
+    '/app-redirect/coins'
+  ])(
+    'blocks frozen inherited route %s before navigation state is created',
+    (path) => {
+      const state = getNavigationStateFromDeeplinkPath({
+        path,
+        options: undefined,
+        hasAccount: true,
+        accountHandle: 'someone',
+        routeName: '/trending',
+        getStateFromPath: stubGetStateFromPath as any
+      })
+
+      expect(getLeafRouteName(state)).toBe('/feed')
+    }
+  )
+
+  test('honors a disabled formal upload runtime kill switch', () => {
+    const state = getNavigationStateFromDeeplinkPath({
+      path: '/upload',
+      options: undefined,
+      hasAccount: true,
+      accountHandle: 'someone',
+      routeName: '/trending',
+      runtimeOverrides: {
+        formal_uploads: { remoteOverride: false }
+      },
+      getStateFromPath: stubGetStateFromPath as any
+    })
+
+    expect(getLeafRouteName(state)).toBe('/feed')
+  })
 })

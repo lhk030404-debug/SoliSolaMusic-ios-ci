@@ -123,8 +123,6 @@ describe('AccountLoadingScreen', () => {
     render(<AccountLoadingScreen />)
 
     expect(mockDispatch).toHaveBeenCalledWith(mockFinishSignUpAction)
-    expect(mockNavigate).toHaveBeenCalledWith('HomeStack', {
-      screen: 'Trending'
-    })
+    expect(mockNavigate).toHaveBeenCalledWith('HomeStack')
   })
 })

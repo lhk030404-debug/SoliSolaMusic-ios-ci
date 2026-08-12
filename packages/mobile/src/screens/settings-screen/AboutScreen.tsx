@@ -1,82 +1,54 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { route } from '@audius/common/utils'
-import { COPYRIGHT_TEXT } from '@audius/web/src/utils/copyright'
+import { useTranslation } from '@solisola/localization'
 import CodePush from '@bravemobile/react-native-code-push'
-import { View, Image, Pressable } from 'react-native'
+import { View } from 'react-native'
 
-import {
-  IconMessage,
-  IconDiscord,
-  IconInstagram,
-  IconX,
-  IconUserGroup
-} from '@audius/harmony-native'
-import appIcon from 'app/assets/images/appIcon.png'
-import { Screen, ScreenContent, Text } from 'app/components/core'
-import { OtaAboutDiagnostics } from 'app/components/ota-about-diagnostics/OtaAboutDiagnostics'
+import { IconInfo } from '@audius/harmony-native'
+import { SoliSolaMark } from 'app/branding'
+import { Screen, ScreenContent, ScrollView, Text } from 'app/components/core'
+import { useNavigation } from 'app/hooks/useNavigation'
 import { makeStyles } from 'app/styles'
 
 import packageInfo from '../../../package.json'
+import brand from '../../../../../config/BRAND.json'
+import type { ProfileTabScreenParamList } from '../app-screen/ProfileTabScreen'
 
-import { SettingsRowLabel } from './SettingRowLabel'
 import { SettingsDivider } from './SettingsDivider'
+import { SettingsRowLabel } from './SettingRowLabel'
 import { SettingsRow } from './SettingsRow'
 
 const { version: appVersion } = packageInfo
 
-const messages = {
-  title: 'About',
-  appName: 'Audius Music',
-  version: 'Audius Version',
-  /** Shown after app version when a CodePush OTA bundle is running (e.g. " · OTA v3"). */
-  ota: 'OTA',
-  copyright: COPYRIGHT_TEXT,
-  discord: 'Join our community on Discord',
-  x: 'Follow us on X',
-  instagram: 'Follow us on Instagram',
-  contact: 'Contact Us',
-  careers: 'Careers at Audius',
-  help: 'Help / FAQ',
-  terms: 'Terms of Service',
-  privacy: 'Privacy Policy'
-}
-
 const useStyles = makeStyles(({ spacing }) => ({
+  content: {
+    paddingBottom: spacing(6)
+  },
   header: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
+    gap: spacing(4),
+    paddingHorizontal: spacing(5),
     paddingVertical: spacing(6)
   },
-  appIcon: {
-    height: 84,
-    width: 84,
-    marginRight: spacing(4)
+  identity: {
+    flexShrink: 1,
+    minWidth: 180,
+    gap: spacing(1)
+  },
+  notice: {
+    paddingHorizontal: spacing(5),
+    paddingBottom: spacing(5)
   }
 }))
 
-const VERSION_TAP_WINDOW_MS = 2500
-const VERSION_TAPS_TO_TOGGLE_OTA = 7
-
 export const AboutScreen = () => {
+  const { t } = useTranslation()
   const styles = useStyles()
+  const navigation = useNavigation<ProfileTabScreenParamList>()
   const [otaLabel, setOtaLabel] = useState<string | null>(null)
-  const [showOtaDiagnostics, setShowOtaDiagnostics] = useState(false)
-  const versionTapRef = useRef({ count: 0, at: 0 })
-
-  const onVersionLinePress = () => {
-    const now = Date.now()
-    if (now - versionTapRef.current.at > VERSION_TAP_WINDOW_MS) {
-      versionTapRef.current.count = 0
-    }
-    versionTapRef.current.at = now
-    versionTapRef.current.count += 1
-    if (versionTapRef.current.count >= VERSION_TAPS_TO_TOGGLE_OTA) {
-      versionTapRef.current.count = 0
-      setShowOtaDiagnostics((v) => !v)
-    }
-  }
 
   useEffect(() => {
     let cancelled = false
@@ -85,63 +57,47 @@ export const AboutScreen = () => {
         const pkg = await CodePush.getUpdateMetadata(
           CodePush.UpdateState.RUNNING
         )
-        if (!cancelled && pkg?.label) {
-          setOtaLabel(pkg.label)
-        }
+        if (!cancelled && pkg?.label) setOtaLabel(pkg.label)
       } catch {
-        // CodePush may be unavailable in some environments; keep base version only.
+        // CodePush is optional in local/offline builds; the base version remains valid.
       }
     }
-    loadOtaLabel().catch(() => {})
+    void loadOtaLabel()
     return () => {
       cancelled = true
     }
   }, [])
 
-  const versionLine =
-    otaLabel != null
-      ? `${messages.version} ${appVersion} · ${messages.ota} ${otaLabel}`
-      : `${messages.version} ${appVersion}`
+  const openLicenses = useCallback(() => {
+    navigation.push('LicensesScreen')
+  }, [navigation])
+
+  const versionLine = otaLabel
+    ? `${t('about.version', { version: appVersion })} · ${t('about.ota', {
+        version: otaLabel
+      })}`
+    : t('about.version', { version: appVersion })
 
   return (
-    <Screen variant='secondary' title={messages.title} topbarRight={null}>
+    <Screen variant='secondary' title={t('about.title')} topbarRight={null}>
       <ScreenContent isOfflineCapable>
-        <View style={styles.header}>
-          <Image source={appIcon} style={styles.appIcon} />
-          <View>
-            <Text variant='h2'>{messages.appName}</Text>
-            <Pressable onPress={onVersionLinePress} accessibilityRole='text'>
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.header}>
+            <SoliSolaMark size={84} accessible={false} />
+            <View style={styles.identity}>
+              <Text variant='h2'>{brand.product_name}</Text>
               <Text variant='body2'>{versionLine}</Text>
-            </Pressable>
-            <Text variant='body2'>{messages.copyright}</Text>
+            </View>
           </View>
-        </View>
-        {showOtaDiagnostics ? <OtaAboutDiagnostics /> : null}
-        <SettingsRow url={route.AUDIUS_DISCORD_LINK} firstItem>
-          <SettingsRowLabel label={messages.discord} icon={IconDiscord} />
-        </SettingsRow>
-        <SettingsRow url={route.AUDIUS_X_LINK}>
-          <SettingsRowLabel label={messages.x} icon={IconX} />
-        </SettingsRow>
-        <SettingsRow url={route.AUDIUS_INSTAGRAM_LINK}>
-          <SettingsRowLabel label={messages.instagram} icon={IconInstagram} />
-        </SettingsRow>
-        <SettingsRow url={route.AUDIUS_HELP_LINK}>
-          <SettingsRowLabel label={messages.contact} icon={IconMessage} />
-        </SettingsRow>
-        <SettingsRow url={route.AUDIUS_CAREERS_LINK}>
-          <SettingsRowLabel label={messages.careers} icon={IconUserGroup} />
-        </SettingsRow>
-        <SettingsDivider />
-        <SettingsRow url={route.AUDIUS_HELP_LINK}>
-          <SettingsRowLabel label={messages.help} />
-        </SettingsRow>
-        <SettingsRow url={`https://audius.co${route.TERMS_OF_SERVICE}`}>
-          <SettingsRowLabel label={messages.terms} />
-        </SettingsRow>
-        <SettingsRow url={`https://audius.co${route.PRIVACY_POLICY}`}>
-          <SettingsRowLabel label={messages.privacy} />
-        </SettingsRow>
+          <Text variant='body' allowNewline style={styles.notice}>
+            {t('about.noticeSummary')}
+          </Text>
+          <SettingsDivider />
+          <SettingsRow onPress={openLicenses} firstItem>
+            <SettingsRowLabel label={t('about.licenses')} icon={IconInfo} />
+          </SettingsRow>
+          <SettingsDivider />
+        </ScrollView>
       </ScreenContent>
     </Screen>
   )

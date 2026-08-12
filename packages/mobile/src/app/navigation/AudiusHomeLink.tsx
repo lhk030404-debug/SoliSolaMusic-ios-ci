@@ -1,13 +1,13 @@
 import { Link } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
-import { IconAudiusLogoHorizontal } from '@audius/harmony-native'
+import { SoliSolaWordmark } from 'app/branding'
 
 export const AudiusHomeLink = () => {
   return (
     <TouchableOpacity>
-      <Link screen='trending' params={{}}>
-        <IconAudiusLogoHorizontal height={24} width={100} color='subdued' />
+      <Link screen='music' params={{}}>
+        <SoliSolaWordmark height={24} />
       </Link>
     </TouchableOpacity>
   )

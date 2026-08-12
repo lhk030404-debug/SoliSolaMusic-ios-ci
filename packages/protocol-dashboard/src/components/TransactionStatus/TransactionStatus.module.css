@@ -32,13 +32,13 @@
 }
 
 .primaryText {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-xl);
 }
 
 .secondaryText {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: 500;
   font-size: var(--font-m);
   color: #9399b3;
@@ -66,7 +66,7 @@
 
 .subtext {
   margin-top: 4px;
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-style: normal;
   font-weight: 500;
   font-size: var(--font-l);

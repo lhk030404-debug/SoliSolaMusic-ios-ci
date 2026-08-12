@@ -27,6 +27,7 @@ import { Toasts } from 'app/components/toasts'
 import { PlaybackPositionPersistence } from 'app/hooks/usePlaybackPositionPersistence'
 import { PlaybackRatePersistence } from 'app/hooks/usePlaybackRatePersistence'
 import { incrementSessionCount } from 'app/hooks/useSessionCount'
+import { LocalizationProvider } from 'app/localization'
 import { RootScreen } from 'app/screens/root-screen'
 import {
   localStorage,
@@ -102,6 +103,7 @@ const App = () => {
   if (!preloaded) return null
 
   return (
+    <LocalizationProvider>
     <AppContextProvider>
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <KeyboardProvider
@@ -174,6 +176,7 @@ const App = () => {
         </KeyboardProvider>
       </SafeAreaProvider>
     </AppContextProvider>
+    </LocalizationProvider>
   )
 }
 

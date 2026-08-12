@@ -10,11 +10,11 @@ import { CardStyleInterpolators } from '@react-navigation/stack'
 import { Text, View } from 'react-native'
 
 import {
-  IconAudiusLogoHorizontal,
   IconButton,
   IconCaretLeft,
   IconSearch
 } from '@audius/harmony-native'
+import { SoliSolaWordmark } from 'app/branding'
 import { useDrawer } from 'app/hooks/useDrawer'
 import type { ContextualParams } from 'app/hooks/useNavigation'
 import { useNavigation } from 'app/hooks/useNavigation'
@@ -69,7 +69,7 @@ export const useAppScreenOptions = <
   }, [drawerHelpers, isNowPlayingDrawerOpen])
 
   const handlePressSearch = useCallback(() => {
-    navigation.navigate('explore', {
+    navigation.navigate('discover', {
       screen: 'SearchExplore',
       params: { autoFocus: true }
     })
@@ -134,11 +134,7 @@ export const useAppScreenOptions = <
           }
           return (
             <View>
-              <IconAudiusLogoHorizontal
-                height={24}
-                width={100}
-                color='subdued'
-              />
+              <SoliSolaWordmark height={24} />
             </View>
           )
         },

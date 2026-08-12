@@ -66,7 +66,7 @@
 }
 
 .headline {
-  font-family: 'Dust Bucer', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: normal;
   font-style: normal;
   font-size: 140px;
@@ -116,7 +116,7 @@
 }
 
 .ctaLabel {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 700;
   font-size: 18px;
   line-height: 1;

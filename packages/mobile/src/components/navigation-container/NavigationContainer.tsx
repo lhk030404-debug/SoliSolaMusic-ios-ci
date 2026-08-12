@@ -9,6 +9,7 @@ import {
 } from '@react-navigation/native'
 
 import { AppTabNavigationProvider } from 'app/screens/app-screen'
+import { useRuntimeKillSwitchOverrides } from 'app/feature-policy'
 import { screen } from 'app/services/analytics'
 import { getPrimaryRoute } from 'app/utils/navigation'
 import { useThemeVariant } from 'app/utils/theme'
@@ -34,6 +35,7 @@ const NavigationContainer = (props: NavigationContainerProps) => {
     select: (user) => user?.handle
   })
   const hasAccount = useHasAccount()
+  const runtimeOverrides = useRuntimeKillSwitchOverrides()
 
   const routeNameRef = useRef<string | undefined>(undefined)
 
@@ -70,7 +72,13 @@ const NavigationContainer = (props: NavigationContainerProps) => {
                         Feed: 'feed'
                       }
                     },
-                    trending: {
+                    sing: {
+                      initialRouteName: 'Sing',
+                      screens: {
+                        Sing: 'sing'
+                      }
+                    },
+                    music: {
                       initialRouteName: 'Trending',
                       screens: {
                         Trending: 'trending',
@@ -110,10 +118,10 @@ const NavigationContainer = (props: NavigationContainerProps) => {
                         }
                       }
                     },
-                    explore: {
-                      initialRouteName: 'Explore',
+                    discover: {
+                      initialRouteName: 'SearchExplore',
                       screens: {
-                        Explore: 'explore',
+                        SearchExplore: 'explore',
                         PremiumTracks: 'explore/premium-tracks',
                         LetThemDJ: 'explore/let-them-dj',
                         TopAlbums: 'explore/top-albums',
@@ -130,12 +138,7 @@ const NavigationContainer = (props: NavigationContainerProps) => {
                         UpbeatPlaylists: 'explore/upbeat'
                       }
                     },
-                    library: {
-                      screens: {
-                        Library: 'library'
-                      }
-                    },
-                    profile: {
+                    me: {
                       screens: {
                         UserProfile: {
                           path: 'profile',
@@ -179,6 +182,7 @@ const NavigationContainer = (props: NavigationContainerProps) => {
         hasAccount,
         accountHandle,
         routeName: routeNameRef.current,
+        runtimeOverrides,
         getStateFromPath
       })
     }

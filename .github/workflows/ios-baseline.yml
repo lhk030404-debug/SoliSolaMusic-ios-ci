@@ -1,4 +1,4 @@
-name: Public iOS Baseline
+name: Public G01 Integration
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: public-ios-baseline-${{ github.ref }}
+  group: public-g01-integration-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -16,6 +16,44 @@ env:
   RUBY_VERSION: '3.1.6'
 
 jobs:
+  web-mobile-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm install --global npm@${{ env.NPM_VERSION }}
+      - name: Install Python compatibility shim for node-gyp
+        run: python3 -m pip install --break-system-packages --upgrade setuptools
+      - name: Install JavaScript dependencies from lockfile
+        env:
+          CI: 'true'
+          SKIP_POD_INSTALL: 'true'
+          SKIP_ANDROID_INSTALL: 'true'
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm ci --prefer-offline --no-audit --no-fund
+      - name: Verify localization, navigation, settings and Mobile
+        run: |
+          npm test -w @solisola/localization -- --runInBand
+          npm run verify -w @solisola/localization
+          npm run test:navigation-foundation -w @audius/mobile
+          npm run test:settings-foundation -w @audius/mobile
+          npx turbo run verify --filter=@audius/mobile
+      - name: Lint and typecheck Web
+        run: |
+          npx turbo run lint --filter=@audius/web
+          npm run stylelint -w @audius/web
+          npx turbo run typecheck --filter=@audius/web
+      - name: Test Web
+        run: npm run web:test -- -- run --reporter=default
+      - name: Build development Web
+        working-directory: packages/web
+        run: npm run build:dev
+
   ios:
     runs-on: macos-26
     timeout-minutes: 120
@@ -87,6 +125,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: g00-ios-build-log
+          name: g01-ios-build-log
           path: g00-ios-build.log
           if-no-files-found: warn

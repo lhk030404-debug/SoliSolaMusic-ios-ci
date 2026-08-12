@@ -47,7 +47,7 @@
 }
 
 .headline {
-  font-family: 'Dust Bucer', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: normal;
   font-style: normal;
   font-size: 140px;
@@ -58,7 +58,7 @@
 }
 
 .subline {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 400;
   font-size: 28px;
   line-height: 1.5;
@@ -108,7 +108,7 @@
 }
 
 .featureTitle {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 700;
   font-size: 24px;
   line-height: 24px;
@@ -117,7 +117,7 @@
 }
 
 .featureBody {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 500;
   font-size: 18px;
   line-height: 32px;

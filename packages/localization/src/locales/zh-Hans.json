@@ -1,0 +1,56 @@
+{
+  "common": {
+    "languageName": "简体中文"
+  },
+  "navigation": {
+    "tabs": {
+      "discover": "发现",
+      "sing": "唱歌",
+      "music": "音乐",
+      "feed": "动态",
+      "me": "我"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "language": "语言",
+    "languageDescription": "选择 SoliSola 使用的语言。",
+    "about": "关于",
+    "licenses": "许可证",
+    "inbox": "收件箱设置",
+    "inboxDescription": "设置哪些人可以向你的收件箱发送消息。",
+    "notifications": "通知设置",
+    "notificationsDescription": "查看你的通知偏好。",
+    "comment": "评论设置",
+    "commentDescription": "阻止特定用户评论你的曲目。",
+    "downloads": "下载设置",
+    "history": "收听历史"
+  },
+  "languageSettings": {
+    "title": "语言",
+    "followSystem": "跟随系统",
+    "english": "English",
+    "simplifiedChinese": "简体中文",
+    "traditionalChinese": "繁體中文",
+    "selectedAnnouncement": "已选择{language}"
+  },
+  "about": {
+    "title": "关于",
+    "version": "版本 {version}",
+    "ota": "OTA {version}",
+    "copyright": "Copyright © {year} SoliSola。",
+    "licenses": "许可证",
+    "noticeSummary": "开源声明与第三方许可证。"
+  },
+  "licenses": {
+    "title": "许可证",
+    "applicationSourceLicenseTitle": "应用源代码许可证",
+    "applicationSourceLicenseBody": "本应用是 Audius 分支，保留的上游源代码许可证为 {license}。",
+    "thirdPartyTitle": "第三方软件",
+    "thirdPartySummary": "查看本应用所含第三方软件的许可证与声明。",
+    "offlineNotice": "许可证信息可离线查看。"
+  },
+  "test": {
+    "englishFallbackOnly": "英文回退测试"
+  }
+}

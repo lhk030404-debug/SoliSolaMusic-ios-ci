@@ -1,5 +1,10 @@
 import queryString from 'query-string'
 
+import {
+  isDeeplinkAllowed,
+  type RuntimeKillSwitchOverrides
+} from 'app/feature-policy'
+
 const parseOptionalHashId = (raw: string | undefined) => {
   return raw == null || raw === '' ? null : raw
 }
@@ -13,6 +18,7 @@ type GetNavigationStateFromDeeplinkPathArgs = {
   accountHandle?: string
   routeName?: string
   getStateFromPath: GetStateFromPath
+  runtimeOverrides?: RuntimeKillSwitchOverrides
 }
 
 const isProfilePathForHandle = (path: string, handle: string) => {
@@ -53,7 +59,7 @@ const createTrendingStackState = (route): any =>
   createAppTabState({
     routes: [
       {
-        name: 'trending',
+        name: 'music',
         state: {
           index: 1,
           routes: [
@@ -71,12 +77,12 @@ const createExploreStackState = (route): any =>
   createAppTabState({
     routes: [
       {
-        name: 'explore',
+        name: 'discover',
         state: {
           index: 1,
           routes: [
             {
-              name: 'Explore'
+              name: 'SearchExplore'
             },
             route
           ]
@@ -91,7 +97,8 @@ export const getNavigationStateFromDeeplinkPath = ({
   hasAccount,
   accountHandle,
   routeName,
-  getStateFromPath
+  getStateFromPath,
+  runtimeOverrides = {}
 }: GetNavigationStateFromDeeplinkPathArgs) => {
   const pathPart = (path: string) => (index: number) => {
     const rawResult = path.split('/')[index]
@@ -112,6 +119,10 @@ export const getNavigationStateFromDeeplinkPath = ({
   }
 
   path = path.replace('#embed', '')
+
+  if (!isDeeplinkAllowed(path, runtimeOverrides)) {
+    return getStateFromPath(hasAccount ? '/feed' : '/sign-on', options)
+  }
 
   // OAuth authorization URLs (e.g. /oauth/authorize?...) are intercepted by
   // the app via Universal Links. Route them to the OAuth screen instead of

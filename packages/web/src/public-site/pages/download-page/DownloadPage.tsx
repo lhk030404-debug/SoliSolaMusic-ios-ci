@@ -76,7 +76,7 @@ const MobileDownloadLink = ({ os, label }: { os: MobileOS; label: string }) => {
 const DownloadPage = (props: DownloadPageProps) => {
   const [isMobileOrNarrow, setIsMobileOrNarrow] = useState(props.isMobile)
   const [showCookieBanner, setShowCookieBanner] = useState(false)
-  const [fontsReady, setFontsReady] = useState(false)
+  const fontsReady = true
 
   useEffect(() => {
     if (MOBILE_MEDIA_QUERY) {
@@ -112,52 +112,6 @@ const DownloadPage = (props: DownloadPageProps) => {
     shouldShowCookieBanner().then((show) => {
       setShowCookieBanner(show)
     })
-  }, [])
-
-  useEffect(() => {
-    const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '') || ''
-    const fontsCssHref = `${base}/fonts-landing-2026.css`
-    const urbanistHref =
-      'https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap'
-
-    const linkFonts = document.createElement('link')
-    linkFonts.rel = 'stylesheet'
-    linkFonts.href = fontsCssHref
-
-    const linkUrbanist = document.createElement('link')
-    linkUrbanist.rel = 'stylesheet'
-    linkUrbanist.href = urbanistHref
-
-    const maxWait = 1500
-    const finish = () => {
-      const ready = document.fonts?.ready
-        ? Promise.race([
-            document.fonts.ready,
-            new Promise<void>((resolve) => setTimeout(resolve, maxWait))
-          ])
-        : Promise.resolve()
-      ready.then(() => setFontsReady(true))
-    }
-
-    let loaded = 0
-    const maybeFinish = () => {
-      loaded += 1
-      if (loaded >= 2) finish()
-    }
-    linkFonts.onload = maybeFinish
-    linkFonts.onerror = maybeFinish
-    linkUrbanist.onload = maybeFinish
-    linkUrbanist.onerror = maybeFinish
-
-    document.head.appendChild(linkFonts)
-    document.head.appendChild(linkUrbanist)
-
-    const fallback = setTimeout(() => setFontsReady(true), maxWait + 500)
-    return () => {
-      clearTimeout(fallback)
-      linkFonts.remove()
-      linkUrbanist.remove()
-    }
   }, [])
 
   const onDismissCookiePolicy = useCallback(() => {

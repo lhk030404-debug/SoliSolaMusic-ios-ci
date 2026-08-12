@@ -1,0 +1,56 @@
+{
+  "common": {
+    "languageName": "繁體中文"
+  },
+  "navigation": {
+    "tabs": {
+      "discover": "發現",
+      "sing": "唱歌",
+      "music": "音樂",
+      "feed": "動態",
+      "me": "我"
+    }
+  },
+  "settings": {
+    "title": "設定",
+    "language": "語言",
+    "languageDescription": "選擇 SoliSola 使用的語言。",
+    "about": "關於",
+    "licenses": "授權條款",
+    "inbox": "收件匣設定",
+    "inboxDescription": "設定哪些人可以向你的收件匣傳送訊息。",
+    "notifications": "通知設定",
+    "notificationsDescription": "查看你的通知偏好。",
+    "comment": "留言設定",
+    "commentDescription": "防止特定使用者在你的曲目下留言。",
+    "downloads": "下載設定",
+    "history": "收聽記錄"
+  },
+  "languageSettings": {
+    "title": "語言",
+    "followSystem": "跟隨系統",
+    "english": "English",
+    "simplifiedChinese": "简体中文",
+    "traditionalChinese": "繁體中文",
+    "selectedAnnouncement": "已選擇{language}"
+  },
+  "about": {
+    "title": "關於",
+    "version": "版本 {version}",
+    "ota": "OTA {version}",
+    "copyright": "Copyright © {year} SoliSola。",
+    "licenses": "授權條款",
+    "noticeSummary": "開源聲明與第三方授權條款。"
+  },
+  "licenses": {
+    "title": "授權條款",
+    "applicationSourceLicenseTitle": "應用程式原始碼授權",
+    "applicationSourceLicenseBody": "本應用程式是 Audius 分支，保留的上游原始碼授權為 {license}。",
+    "thirdPartyTitle": "第三方軟體",
+    "thirdPartySummary": "查看本應用程式所含第三方軟體的授權條款與聲明。",
+    "offlineNotice": "授權資訊可離線查看。"
+  },
+  "test": {
+    "englishFallbackOnly": "英文備援測試"
+  }
+}

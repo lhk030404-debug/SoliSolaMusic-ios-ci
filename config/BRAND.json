@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "product_name": "SoliSola Music",
+  "short_name": "SoliSola",
+  "application_id": "com.solisola.music",
+  "url_scheme": "solisola",
+  "font_strategy": "system",
+  "localized": {
+    "en": {
+      "tagline": "Music, singing, and community",
+      "logo_accessibility_label": "SoliSola Music home",
+      "new_user_prompt": "New to SoliSola?",
+      "version_label": "SoliSola Music Version",
+      "camera_permission": "Allow SoliSola Music to use the camera for profile photos and cover art.",
+      "photo_library_permission": "Allow SoliSola Music to choose photos for profile images, cover art, and sharing music.",
+      "local_network_permission": "Allow SoliSola Music to find Cast-enabled devices on your local network."
+    },
+    "zh-Hans": {
+      "tagline": "音乐、歌唱与社群",
+      "logo_accessibility_label": "SoliSola Music 首页",
+      "new_user_prompt": "初次使用 SoliSola？",
+      "version_label": "SoliSola Music 版本",
+      "camera_permission": "允许 SoliSola Music 使用相机拍摄头像和封面。",
+      "photo_library_permission": "允许 SoliSola Music 选择照片，用于头像、封面和分享音乐。",
+      "local_network_permission": "允许 SoliSola Music 在本地网络中查找支持 Cast 的设备。"
+    },
+    "zh-Hant": {
+      "tagline": "音樂、歌唱與社群",
+      "logo_accessibility_label": "SoliSola Music 首頁",
+      "new_user_prompt": "初次使用 SoliSola？",
+      "version_label": "SoliSola Music 版本",
+      "camera_permission": "允許 SoliSola Music 使用相機拍攝頭像和封面。",
+      "photo_library_permission": "允許 SoliSola Music 選擇照片，用於頭像、封面和分享音樂。",
+      "local_network_permission": "允許 SoliSola Music 在本機網路中尋找支援 Cast 的裝置。"
+    }
+  }
+}

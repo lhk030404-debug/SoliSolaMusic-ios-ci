@@ -30,7 +30,7 @@ export const TrendingGenres = () => {
   const handleGenrePress = useCallback(
     (genre: string) => {
       dispatch(setTrendingGenre(toTrendingGenreValue(genre)))
-      navigation.navigate('trending', { screen: 'Trending' })
+      navigation.navigate('music', { screen: 'Trending' })
     },
     [dispatch, navigation]
   )

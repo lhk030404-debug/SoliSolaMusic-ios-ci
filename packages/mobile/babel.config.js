@@ -21,7 +21,8 @@ module.exports = (api) => {
           '@audius/common/schemas': '../common/src/schemas',
           '@audius/common/services': '../common/src/services',
           '@audius/common/api': '../common/src/api',
-          '@audius/common/store': '../common/src/store'
+          '@audius/common/store': '../common/src/store',
+          '@solisola/localization': '../localization/src'
         }
       }
     ]

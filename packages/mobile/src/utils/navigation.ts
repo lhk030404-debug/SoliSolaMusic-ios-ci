@@ -20,7 +20,7 @@ export const getRoutePath = (
 
 /**
  * Navigation state selector that selects the primary route
- * e.g. 'feed', 'trending', 'profile', etc
+ * e.g. 'discover', 'music', 'feed', etc
  */
 export const getPrimaryRoute = (state: NavigationState) => {
   // The route at index 2 is the primary route

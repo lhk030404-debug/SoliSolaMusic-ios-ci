@@ -1,0 +1,5 @@
+"CFBundleDisplayName" = "SoliSola Music";
+"NSCameraUsageDescription" = "Allow SoliSola Music to use the camera for profile photos and cover art.";
+"NSPhotoLibraryAddUsageDescription" = "Allow SoliSola Music to choose photos for profile images, cover art, and sharing music.";
+"NSPhotoLibraryUsageDescription" = "Allow SoliSola Music to choose photos for profile images and cover art.";
+"NSLocalNetworkUsageDescription" = "Allow SoliSola Music to find Cast-enabled devices on your local network.";

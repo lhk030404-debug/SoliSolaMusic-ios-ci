@@ -4,6 +4,10 @@ import { MobileOS } from '@audius/common/models'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Platform } from 'react-native'
 
+import {
+  evaluateRoutePolicy,
+  useRuntimeKillSwitchOverrides
+} from 'app/feature-policy'
 import { setLastNavAction } from 'app/hooks/useNavigation'
 
 import { BuySellModalScreen } from '../buy-sell-screen'
@@ -21,6 +25,10 @@ import { AppTabsScreen } from './AppTabsScreen'
 const Stack = createNativeStackNavigator()
 
 export const AppScreen = () => {
+  const runtimeOverrides = useRuntimeKillSwitchOverrides()
+  const isDirectRouteAllowed = (routeName: string) =>
+    evaluateRoutePolicy(routeName, 'direct', runtimeOverrides).isAllowed
+
   /**
    * Reset lastNavAction on transitionEnd
    * Need to do this via screenListeners on the Navigator because listening
@@ -38,8 +46,12 @@ export const AppScreen = () => {
     >
       <Stack.Screen name='AppTabs' component={AppTabsScreen} />
       <Stack.Group screenOptions={{ presentation: 'fullScreenModal' }}>
-        <Stack.Screen name='Upload' component={UploadModalScreen} />
-        <Stack.Screen name='BuySell' component={BuySellModalScreen} />
+        {isDirectRouteAllowed('Upload') ? (
+          <Stack.Screen name='Upload' component={UploadModalScreen} />
+        ) : null}
+        {isDirectRouteAllowed('BuySell') ? (
+          <Stack.Screen name='BuySell' component={BuySellModalScreen} />
+        ) : null}
         <Stack.Screen
           name='EditTrack'
           component={EditTrackModalScreen}
@@ -52,10 +64,12 @@ export const AppScreen = () => {
           name='CreateChatBlast'
           component={CreateChatBlastNavigator}
         />
-        <Stack.Screen
-          name='ExternalWallets'
-          component={ExternalWalletsModalScreen}
-        />
+        {isDirectRouteAllowed('ExternalWallets') ? (
+          <Stack.Screen
+            name='ExternalWallets'
+            component={ExternalWalletsModalScreen}
+          />
+        ) : null}
         <Stack.Screen
           name='FeatureFlagOverride'
           component={FeatureFlagOverrideScreen}

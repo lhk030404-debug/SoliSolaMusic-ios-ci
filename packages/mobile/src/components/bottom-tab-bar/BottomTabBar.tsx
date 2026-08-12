@@ -5,27 +5,46 @@ import type {
   BottomTabBarProps as RNBottomTabBarProps
 } from '@react-navigation/bottom-tabs'
 import type { NavigationHelpers, ParamListBase } from '@react-navigation/native'
+import { playbackActions, playbackSelectors } from '@audius/common/store'
 import { Animated } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { Flex } from '@audius/harmony-native'
+import {
+  Flex,
+  IconExplore,
+  IconFeed,
+  IconNote,
+  IconPause,
+  IconPlay,
+  IconUser
+} from '@audius/harmony-native'
+import type { IconComponent } from '@audius/harmony-native'
+import { useTranslation } from '@solisola/localization'
 import { FULL_DRAWER_HEIGHT } from 'app/components/drawer'
 import { PLAY_BAR_HEIGHT } from 'app/components/now-playing-drawer'
+import {
+  SOLISOLA_TAB_LABEL_KEYS,
+  createSoliSolaTabMap,
+  getCenterMusicAction,
+  isSoliSolaTabRoute,
+  type SoliSolaTabRoute
+} from 'app/screens/app-screen/navigationContract'
 
-import { ExploreButton } from './bottom-tab-bar-buttons/ExploreButton'
-import { FeedButton } from './bottom-tab-bar-buttons/FeedButton'
-import { LibraryButton } from './bottom-tab-bar-buttons/LibraryButton'
-import { NotificationsButton } from './bottom-tab-bar-buttons/NotificationsButton'
-import { TrendingButton } from './bottom-tab-bar-buttons/TrendingButton'
+import { SoliSolaTabButton } from './bottom-tab-bar-buttons/SoliSolaTabButton'
 import { BOTTOM_BAR_HEIGHT } from './constants'
 
-export const bottomTabBarButtons = {
-  feed: FeedButton,
-  trending: TrendingButton,
-  explore: ExploreButton,
-  library: LibraryButton,
-  notifications: NotificationsButton
-}
+const { togglePlay } = playbackActions
+const { getPlaying } = playbackSelectors
+
+export const bottomTabBarButtons: Record<SoliSolaTabRoute, IconComponent> =
+  createSoliSolaTabMap({
+    discover: IconExplore,
+    sing: IconNote,
+    music: IconPlay,
+    feed: IconFeed,
+    me: IconUser
+  })
 
 const interpolatePostion = (
   translationAnim: Animated.Value,
@@ -69,6 +88,13 @@ export const BottomTabBar = (props: BottomTabBarProps) => {
   const { translationAnim, navigation, state } = props
   const { routes, index: activeIndex } = state
   const insets = useSafeAreaInsets()
+  const { t } = useTranslation()
+  const dispatch = useDispatch()
+  const isPlaying = useSelector(getPlaying)
+  const centerMusicAction = getCenterMusicAction(
+    routes[activeIndex]?.name,
+    isPlaying
+  )
 
   const handlePress = useCallback(
     (isFocused: boolean, routeName: string, routeKey: string) => {
@@ -85,9 +111,12 @@ export const BottomTabBar = (props: BottomTabBarProps) => {
         navigation.emit({
           type: 'scrollToTop'
         })
+        if (routeName === 'music' && !event.defaultPrevented) {
+          dispatch(togglePlay())
+        }
       }
     },
-    [navigation]
+    [dispatch, navigation]
   )
 
   const handleLongPress = useCallback(() => {
@@ -111,15 +140,34 @@ export const BottomTabBar = (props: BottomTabBarProps) => {
         wrap='nowrap'
         justifyContent='space-evenly'
         pb={insets.bottom}
+        style={{ minHeight: BOTTOM_BAR_HEIGHT + insets.bottom }}
       >
         {routes.map(({ name, key }, index) => {
-          const BottomTabBarButton = bottomTabBarButtons[name]
+          // React Navigation state is runtime data. Fail safely if a stale or
+          // restored navigator contains a route outside the frozen contract.
+          if (!isSoliSolaTabRoute(name)) return null
+
+          const routeName = name
+          const icon =
+            routeName === 'music' && centerMusicAction === 'pause'
+              ? IconPause
+              : bottomTabBarButtons[routeName]
+          const label = t(SOLISOLA_TAB_LABEL_KEYS[routeName])
 
           return (
-            <BottomTabBarButton
+            <SoliSolaTabButton
               key={key}
+              routeName={routeName}
               routeKey={key}
+              label={label}
+              icon={icon}
               isActive={index === activeIndex}
+              isCenter={routeName === 'music'}
+              isPlaying={
+                routeName === 'music' && index === activeIndex
+                  ? isPlaying
+                  : undefined
+              }
               onPress={handlePress}
               onLongPress={handleLongPress}
             />

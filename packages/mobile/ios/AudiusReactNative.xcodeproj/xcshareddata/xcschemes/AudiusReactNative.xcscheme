@@ -24,7 +24,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Audius Music.app"
+               BuildableName = "SoliSola Music.app"
                BlueprintName = "AudiusReactNative"
                ReferencedContainer = "container:AudiusReactNative.xcodeproj">
             </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Audius Music.app"
+            BuildableName = "SoliSola Music.app"
             BlueprintName = "AudiusReactNative"
             ReferencedContainer = "container:AudiusReactNative.xcodeproj">
          </BuildableReference>
@@ -81,7 +81,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Audius Music.app"
+            BuildableName = "SoliSola Music.app"
             BlueprintName = "AudiusReactNative"
             ReferencedContainer = "container:AudiusReactNative.xcodeproj">
          </BuildableReference>

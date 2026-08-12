@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "name": "SoliSola Harmony",
+  "description": "Cross-platform brand foundations. Product and Web3 semantics are intentionally excluded.",
+  "tokens": {
+    "color": {
+      "light": {
+        "background": "#F8FAFC",
+        "surface": "#FFFFFF",
+        "surface_subdued": "#EEF2F7",
+        "text": "#172033",
+        "text_subdued": "#4D586D",
+        "text_inverse": "#FFFFFF",
+        "brand_primary": "#5145CD",
+        "brand_secondary": "#087F72",
+        "brand_accent": "#9A6500",
+        "border": "#CBD3E1",
+        "focus": "#5145CD",
+        "success": "#087F48",
+        "warning": "#9A6500",
+        "danger": "#C4314B"
+      },
+      "dark": {
+        "background": "#0B1020",
+        "surface": "#141B2D",
+        "surface_subdued": "#202A40",
+        "text": "#F8FAFC",
+        "text_subdued": "#B6C0D4",
+        "text_inverse": "#111827",
+        "brand_primary": "#AAA4FF",
+        "brand_secondary": "#52D6C2",
+        "brand_accent": "#F1C66B",
+        "border": "#3B465E",
+        "focus": "#C4BFFF",
+        "success": "#62D895",
+        "warning": "#F1C66B",
+        "danger": "#FF8296"
+      }
+    },
+    "typography": {
+      "strategy": "system",
+      "bundled_font_files": [],
+      "font_family": {
+        "web": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "ios": "System",
+        "android": "sans-serif"
+      },
+      "roles": {
+        "caption": { "font_size": 12, "line_height": 16, "font_weight": 400 },
+        "body": { "font_size": 16, "line_height": 24, "font_weight": 400 },
+        "label": { "font_size": 14, "line_height": 20, "font_weight": 600 },
+        "title": { "font_size": 20, "line_height": 28, "font_weight": 700 },
+        "display": { "font_size": 32, "line_height": 40, "font_weight": 700 }
+      }
+    },
+    "spacing": {
+      "none": 0,
+      "2xs": 2,
+      "xs": 4,
+      "s": 8,
+      "m": 12,
+      "l": 16,
+      "xl": 24,
+      "2xl": 32,
+      "3xl": 48,
+      "4xl": 64
+    },
+    "radius": {
+      "none": 0,
+      "xs": 2,
+      "s": 4,
+      "m": 8,
+      "l": 12,
+      "xl": 16,
+      "2xl": 32,
+      "circle": 1000
+    },
+    "motion": {
+      "duration_ms": {
+        "instant": 0,
+        "quick": 80,
+        "standard": 160,
+        "deliberate": 240,
+        "calm": 480
+      },
+      "reduced_duration_ms": {
+        "instant": 0,
+        "quick": 0,
+        "standard": 0,
+        "deliberate": 0,
+        "calm": 0
+      },
+      "easing": {
+        "standard": "cubic-bezier(0.2, 0, 0, 1)",
+        "emphasized": "cubic-bezier(0.2, 0, 0, 1.2)"
+      }
+    },
+    "elevation": {
+      "flat": {
+        "web_box_shadow": "none",
+        "native": { "elevation": 0, "shadow_opacity": 0, "shadow_radius": 0, "offset_y": 0 }
+      },
+      "raised": {
+        "web_box_shadow": "0 2px 8px rgba(23, 32, 51, 0.12)",
+        "native": { "elevation": 2, "shadow_opacity": 0.12, "shadow_radius": 4, "offset_y": 2 }
+      },
+      "overlay": {
+        "web_box_shadow": "0 8px 24px rgba(23, 32, 51, 0.18)",
+        "native": { "elevation": 6, "shadow_opacity": 0.18, "shadow_radius": 12, "offset_y": 8 }
+      }
+    },
+    "iconography": {
+      "style": "rounded-outline",
+      "stroke_width": 1.75,
+      "sizes": { "xs": 12, "s": 16, "m": 20, "l": 24, "xl": 32, "2xl": 48 },
+      "minimum_touch_target": 44
+    }
+  }
+}

@@ -5,7 +5,7 @@
   min-width: 100%;
   background: #111;
   color: #fff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-feature-settings:
     'liga' 0,
     'clig' 0;
@@ -23,7 +23,7 @@
 }
 
 /*
- * Hero headline only (Dust Bucer): `.landing2026-text` on Hero2026 `h1`.
+ * Hero headline uses the shared system-font stack.
  * Nav, hero image, and “Get Started” stay visible immediately for LCP.
  */
 .page:not([data-fonts-ready]) :global(.landing2026-text) {

@@ -44,7 +44,7 @@ export default defineConfig({
       },
       fontFamily: {
         default:
-          "'Avenir Next LT Pro', system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+          "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
       },
     },
   },

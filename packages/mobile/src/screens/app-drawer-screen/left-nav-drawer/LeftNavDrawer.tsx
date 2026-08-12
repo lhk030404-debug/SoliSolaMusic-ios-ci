@@ -1,11 +1,12 @@
 import { useHasAccount } from '@audius/common/api'
 import type { DrawerContentComponentProps } from '@react-navigation/drawer'
 
+import { Flex } from '@audius/harmony-native'
+import { SoliSolaWordmark } from 'app/branding'
 import {
-  Flex,
-  IconAudiusLogoHorizontalNew,
-  useTheme
-} from '@audius/harmony-native'
+  getDrawerRouteNames,
+  useRuntimeKillSwitchOverrides
+} from 'app/feature-policy'
 
 import { AppDrawerContextProvider } from '../AppDrawerContext'
 
@@ -42,29 +43,28 @@ export const LeftNavDrawer = (props: AccountDrawerProps) => {
 }
 
 const WrappedLeftNavDrawer = () => {
-  const { spacing } = useTheme()
+  const runtimeOverrides = useRuntimeKillSwitchOverrides()
+  const allowedRoutes = new Set(getDrawerRouteNames(runtimeOverrides))
 
   return (
     <Flex h='100%' pv='unit16' justifyContent='space-between'>
       <Flex>
         <AccountDetails />
         <VanityMetrics />
-        <ProfileNavItem />
-        <ContestsNavItem />
-        <MessagesNavItem />
-        <WalletNavItem />
-        <FanClubsNavItem />
-        <RewardsNavItem />
-        <UploadNavItem />
-        <SettingsNavItem />
-        <FeatureFlagsNavItem />
+        {allowedRoutes.has('Profile') ? <ProfileNavItem /> : null}
+        {allowedRoutes.has('Contests') ? <ContestsNavItem /> : null}
+        {allowedRoutes.has('ChatList') ? <MessagesNavItem /> : null}
+        {allowedRoutes.has('wallet') ? <WalletNavItem /> : null}
+        {allowedRoutes.has('FanClubsExplore') ? <FanClubsNavItem /> : null}
+        {allowedRoutes.has('RewardsScreen') ? <RewardsNavItem /> : null}
+        {allowedRoutes.has('Upload') ? <UploadNavItem /> : null}
+        {allowedRoutes.has('SettingsScreen') ? <SettingsNavItem /> : null}
+        {allowedRoutes.has('FeatureFlagOverride') ? (
+          <FeatureFlagsNavItem />
+        ) : null}
       </Flex>
       <Flex ph='xl'>
-        <IconAudiusLogoHorizontalNew
-          color='subdued'
-          height={spacing.unit6}
-          width={spacing['5xl']}
-        />
+        <SoliSolaWordmark height={24} />
       </Flex>
     </Flex>
   )

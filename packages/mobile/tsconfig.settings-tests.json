@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "es2020",
+    "typeRoots": [
+      "../localization/node_modules/@types",
+      "../../node_modules/@types"
+    ],
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "src/screens/settings-screen/settingsExperience.ts",
+    "src/screens/settings-screen/settingsExperience.test.ts"
+  ]
+}

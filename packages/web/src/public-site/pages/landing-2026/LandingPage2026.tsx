@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import { ThemeProvider } from '@audius/harmony'
-import { Helmet } from 'react-helmet'
 
 import { CookieBanner } from 'components/cookie-banner/CookieBanner'
 import { MetaTags } from 'components/meta-tags/MetaTags'
@@ -25,13 +24,6 @@ const MOBILE_MEDIA_QUERY =
   typeof window !== 'undefined'
     ? window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`)
     : null
-const BASE_PUBLIC_PATH =
-  (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '') || ''
-const LANDING_FONTS_CSS_HREF = `${BASE_PUBLIC_PATH}/fonts-landing-2026.css`
-const URBANIST_HREF =
-  'https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap'
-const DUST_BUCER_OTF_HREF = `${BASE_PUBLIC_PATH}/fonts/DustBucer.otf`
-
 type LandingPage2026Props = {
   isMobile: boolean
   isAuthenticated: boolean
@@ -42,7 +34,7 @@ type LandingPage2026Props = {
 export const LandingPage2026 = (props: LandingPage2026Props) => {
   const [isMobileOrNarrow, setIsMobileOrNarrow] = useState(props.isMobile)
   const [showCookieBanner, setShowCookieBanner] = useState(false)
-  const [fontsReady, setFontsReady] = useState(false)
+  const fontsReady = true
 
   useEffect(() => {
     if (MOBILE_MEDIA_QUERY) {
@@ -62,65 +54,6 @@ export const LandingPage2026 = (props: LandingPage2026Props) => {
     document.body.style.background = '#111'
     return () => {
       document.body.style.background = prev
-    }
-  }, [])
-
-  useEffect(() => {
-    const linkFonts = document.createElement('link')
-    linkFonts.rel = 'stylesheet'
-    linkFonts.href = LANDING_FONTS_CSS_HREF
-
-    const linkUrbanist = document.createElement('link')
-    linkUrbanist.rel = 'stylesheet'
-    linkUrbanist.href = URBANIST_HREF
-
-    const maxWaitMs = 2500
-    let revealed = false
-    let cancelled = false
-    const reveal = () => {
-      if (cancelled || revealed) return
-      revealed = true
-      window.clearTimeout(timeoutId)
-      setFontsReady(true)
-    }
-
-    const timeoutId = window.setTimeout(() => reveal(), maxWaitMs)
-
-    const loadDustBucerForHero = async () => {
-      try {
-        if (document.fonts?.load) {
-          await document.fonts.load('normal 200px "Dust Bucer"')
-        }
-      } catch {
-        /* empty */
-      } finally {
-        reveal()
-      }
-    }
-
-    linkFonts.addEventListener(
-      'load',
-      () => {
-        loadDustBucerForHero().catch(() => {})
-      },
-      { once: true }
-    )
-    linkFonts.addEventListener('error', () => reveal(), { once: true })
-    linkUrbanist.addEventListener('error', () => reveal(), { once: true })
-
-    // Register listeners before append to avoid missing cached stylesheet load events.
-    document.head.appendChild(linkFonts)
-    document.head.appendChild(linkUrbanist)
-
-    if (linkFonts.sheet) {
-      loadDustBucerForHero().catch(() => {})
-    }
-
-    return () => {
-      cancelled = true
-      window.clearTimeout(timeoutId)
-      linkFonts.remove()
-      linkUrbanist.remove()
     }
   }, [])
 
@@ -152,22 +85,6 @@ export const LandingPage2026 = (props: LandingPage2026Props) => {
         canonicalUrl={`${homepageUrl}/`}
         structuredData={faqPageStructuredData}
       />
-      <Helmet>
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link
-          rel='preconnect'
-          href='https://fonts.gstatic.com'
-          crossOrigin=''
-        />
-        <link rel='preload' as='style' href={LANDING_FONTS_CSS_HREF} />
-        <link
-          rel='preload'
-          as='font'
-          href={DUST_BUCER_OTF_HREF}
-          type='font/otf'
-          crossOrigin=''
-        />
-      </Helmet>
       <div
         id='landing-page-2026'
         className={styles.page}

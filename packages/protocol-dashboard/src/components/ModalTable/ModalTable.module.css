@@ -3,7 +3,7 @@
 }
 
 .modalHeader {
-  font-family: Avenir Next LT Pro;
+  font-family: system-ui;
   font-weight: var(--font-bold);
   font-size: var(--font-s);
   line-height: 17px;

@@ -85,7 +85,7 @@ const getOptions = (id: string, labels: string[], max: number) => ({
           z: 10,
           autoSkip: false,
           fontColor: 'rgba(190,197,224,1)',
-          fontFamily: 'Avenir Next LT Pro',
+          fontFamily: 'system-ui',
           fontSize: 12,
           fontStyle: 'bold'
         }

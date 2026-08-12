@@ -7,6 +7,7 @@ export const ENTROPY_KEY = 'hedgehog-entropy-key'
 export const THEME_STORAGE_KEY = 'theme'
 export const THEME_PALETTE_KEY = 'themePalette'
 export const THEME_MODE_KEY = 'themeMode'
+export const LOCALE_PREFERENCE_KEY = '@solisola-locale-preference'
 export const SEARCH_HISTORY_KEY = '@search-history'
 // Tracks which blast chat threads the user has viewed so the
 // `Chat Blast: Message Viewed` analytics event fires only once per blast.

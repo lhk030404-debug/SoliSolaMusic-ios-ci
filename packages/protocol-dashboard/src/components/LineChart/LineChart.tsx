@@ -90,7 +90,7 @@ const getOptions = (
           maxTicksLimit: chartSize === 'large' ? 12 : 6,
           padding: 13,
           fontColor: 'rgba(119,124,150,1)',
-          fontFamily: 'Avenir Next LT Pro',
+          fontFamily: 'system-ui',
           fontSize: 12,
           fontStyle: 'bold',
           callback: (value: any, index: any, values: any) => {
@@ -121,7 +121,7 @@ const getOptions = (
           padding: 10,
           beginAtZero: true,
           fontColor: 'rgba(119,124,150,1)',
-          fontFamily: 'Avenir Next LT Pro',
+          fontFamily: 'system-ui',
           fontSize: 12,
           fontStyle: 'bold',
           callback: (value: any, index: any, values: any) => {
@@ -136,13 +136,13 @@ const getOptions = (
   },
   tooltips: {
     enabled: false,
-    titleFontFamily: 'Avenir Next LT Pro',
+    titleFontFamily: 'system-ui',
     titleFontSize: 10,
     titleFontStyle: 500,
     titleFontColor: '#FFFFFF',
     titleSpacing: 0,
     titleMarginBottom: 7,
-    bodyFontFamily: 'Avenir Next LT Pro',
+    bodyFontFamily: 'system-ui',
     bodyFontSize: 16,
     bodyFontStyle: 'bold',
     bodyFontColor: '#FFFFFF',

@@ -18,7 +18,7 @@
 }
 
 .headline {
-  font-family: 'Dust Bucer', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: normal;
   font-style: normal;
   font-size: 140px;
@@ -65,7 +65,7 @@
 
 .faqQuestion {
   flex: 1 0 0;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 600;
   font-size: 28px;
   line-height: 1.5;
@@ -153,7 +153,7 @@
 }
 
 .faqAnswer {
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--harmony-font-family);
   font-weight: 400;
   font-size: 20px;
   line-height: 1.5;
