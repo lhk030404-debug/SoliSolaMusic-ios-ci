@@ -4,7 +4,6 @@ import { Pressable, StyleSheet, View } from 'react-native'
 
 import type { IconComponent } from '@audius/harmony-native'
 import { Text, useTheme } from '@audius/harmony-native'
-
 import type { SoliSolaTabRoute } from 'app/screens/app-screen/navigationContract'
 
 import { BOTTOM_BAR_BUTTON_HEIGHT } from '../constants'

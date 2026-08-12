@@ -188,7 +188,8 @@ export const getDrawerRouteNames = (
   overrides: RuntimeKillSwitchOverrides = {}
 ) =>
   DRAWER_ROUTE_NAMES.filter(
-    routeName => evaluateRoutePolicy(routeName, 'drawer', overrides).isAllowed
+    (routeName) =>
+      evaluateRoutePolicy(routeName, 'drawer', overrides).isAllowed
   )
 
 const getRouteNameForDeeplink = (path: string) => {

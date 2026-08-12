@@ -21,8 +21,8 @@ import {
 import { SoliSolaWordmark } from 'app/branding'
 import type { NonLinkProps } from 'app/harmony-native/components/TextLink/types'
 import { dispatch } from 'app/store'
-import brand from '../../../../../../config/BRAND.json'
 
+import brand from '../../../../../../config/BRAND.json'
 import type { SignOnScreenParamList } from '../types'
 
 import { CreateEmailScreen } from './CreateEmailScreen'

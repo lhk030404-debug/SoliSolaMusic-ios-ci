@@ -22,7 +22,7 @@ const typographyOverrides = {
   fontByWeight: {
     ...systemFontByWeight
   },
-  lineHeight: mapValues(harmonyThemes.day.typography.lineHeight, pxSize =>
+  lineHeight: mapValues(harmonyThemes.day.typography.lineHeight, (pxSize) =>
     parseInt(pxSize)
   ),
   shadow: {

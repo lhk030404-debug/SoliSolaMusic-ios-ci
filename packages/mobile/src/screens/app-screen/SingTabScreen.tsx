@@ -35,5 +35,5 @@ const SingRootScreen = () => {
  * lands in G06. This preserves one navigation/player foundation in G01.
  */
 export const SingTabScreen = createAppTabScreenStack<SingTabScreenParamList>(
-  Stack => <Stack.Screen name='Sing' component={SingRootScreen} />
+  (Stack) => <Stack.Screen name='Sing' component={SingRootScreen} />
 )

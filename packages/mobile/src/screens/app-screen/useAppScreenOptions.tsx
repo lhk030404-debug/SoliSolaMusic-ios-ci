@@ -74,7 +74,7 @@ export const useAppScreenOptions = <
   const screenOptions: (
     options: Options<ParamList>
   ) => NativeStackNavigationOptions = useCallback(
-    options => {
+    (options) => {
       const { navigation, route } = options
       const { params } = route
       const isFromAppLeftDrawer =
@@ -97,7 +97,7 @@ export const useAppScreenOptions = <
         headerShadowVisible: false,
         headerTitleAlign: 'center',
         headerBackVisible: false,
-        headerLeft: props => {
+        headerLeft: (props) => {
           const { canGoBack, ...other } = props
           if (canGoBack) {
             return (

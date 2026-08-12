@@ -48,7 +48,7 @@ export const LanguageSettingsScreen = () => {
           <Text variant='body' color='neutral' style={styles.description}>
             {t('settings.languageDescription')}
           </Text>
-          {LANGUAGE_OPTIONS.map(option => {
+          {LANGUAGE_OPTIONS.map((option) => {
             const label = t(optionKeys[option])
             const isSelected = preference === option
             const selected = t('languageSettings.selectedAnnouncement', {

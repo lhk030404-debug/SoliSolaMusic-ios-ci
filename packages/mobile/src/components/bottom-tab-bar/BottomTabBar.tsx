@@ -1,15 +1,16 @@
 import { useCallback } from 'react'
 
-import { playbackActions, playbackSelectors } from '@audius/common/store'
 import type {
   BottomTabNavigationEventMap,
   BottomTabBarProps as RNBottomTabBarProps
 } from '@react-navigation/bottom-tabs'
 import type { NavigationHelpers, ParamListBase } from '@react-navigation/native'
+import { useTranslation } from '@solisola/localization'
 import { Animated } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { playbackActions, playbackSelectors } from '@audius/common/store'
 import {
   Flex,
   IconExplore,
@@ -20,7 +21,6 @@ import {
   IconUser
 } from '@audius/harmony-native'
 import type { IconComponent } from '@audius/harmony-native'
-import { useTranslation } from '@solisola/localization'
 import { FULL_DRAWER_HEIGHT } from 'app/components/drawer'
 import { PLAY_BAR_HEIGHT } from 'app/components/now-playing-drawer'
 import {

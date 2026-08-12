@@ -32,7 +32,7 @@ const NavigationContainer = (props: NavigationContainerProps) => {
   const { children } = props
   const theme = useThemeVariant()
   const { data: accountHandle } = useCurrentAccountUser({
-    select: user => user?.handle
+    select: (user) => user?.handle
   })
   const hasAccount = useHasAccount()
   const runtimeOverrides = useRuntimeKillSwitchOverrides()
