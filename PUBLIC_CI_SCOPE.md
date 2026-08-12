@@ -6,12 +6,15 @@ the SoliSola G01 foundation based on Audius apps commit
 `57144304c433abdd344c0d07c37c26c31c71da9b`.
 
 It intentionally contains a new Git history and excludes the private SoliSola
-project plan, prompts, evidence, Android sources/signing fixtures, private
-configuration, production credentials, deployment jobs, and store publishing
-steps. It contains only the G01 non-sensitive product/build inputs needed to
-compile brand, design-token, localization, navigation, feature-policy, and
-offline Settings changes. The sole workflow is manual, read-only, unsigned,
-and uploads only build/test logs.
+project plan, prompts, evidence, Android build/configuration files and signing
+fixtures, private configuration, production credentials, deployment jobs, and
+store publishing steps. Two source-equivalent upstream Kotlin application
+files (one trailing-whitespace line normalized) are included only so the
+repository-wide hardcoded-copy scanner can evaluate
+its complete native source scope. It otherwise contains only the G01
+non-sensitive product/build inputs needed to compile brand, design-token,
+localization, navigation, feature-policy, and offline Settings changes. The
+sole workflow is manual, read-only, unsigned, and uploads only build/test logs.
 
 This mirror is not a product release, fork-of-record, deployment source, or
 replacement for the private `SoliSolaMusic` repository. Its Actions run URL,
