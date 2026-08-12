@@ -12,6 +12,7 @@ on:
           - all
           - quality
           - ios
+          - bundle-delta
 
 permissions:
   contents: read
@@ -27,7 +28,7 @@ env:
 
 jobs:
   web-mobile-quality:
-    if: ${{ inputs.scope != 'ios' }}
+    if: ${{ inputs.scope == 'all' || inputs.scope == 'quality' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -87,7 +88,7 @@ jobs:
         run: npm run build:dev
 
   ios:
-    if: ${{ inputs.scope != 'quality' }}
+    if: ${{ inputs.scope == 'all' || inputs.scope == 'ios' }}
     runs-on: macos-26
     timeout-minutes: 120
     steps:
@@ -166,3 +167,61 @@ jobs:
           name: g01-ios-build-log
           path: g00-ios-build.log
           if-no-files-found: warn
+
+  bundle-delta:
+    if: ${{ inputs.scope == 'bundle-delta' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm install --global npm@${{ env.NPM_VERSION }}
+      - name: Install Python compatibility shim for node-gyp
+        run: python3 -m pip install --break-system-packages --upgrade setuptools
+      - name: Prefetch locked sharp libvips with transport retries
+        run: |
+          sharp_cache="$(npm config get cache)/_libvips"
+          mkdir -p "${sharp_cache}"
+          curl --fail --location \
+            --retry 8 \
+            --retry-all-errors \
+            --retry-delay 3 \
+            --retry-max-time 240 \
+            --output "${sharp_cache}/libvips-8.14.5-linux-x64.tar.br" \
+            https://github.com/lovell/sharp-libvips/releases/download/v8.14.5/libvips-8.14.5-linux-x64.tar.br
+      - name: Measure G00 and G01 release bundles
+        env:
+          CI: 'true'
+          SKIP_POD_INSTALL: 'true'
+          SKIP_ANDROID_INSTALL: 'true'
+          NODE_OPTIONS: --max-old-space-size=8192
+          G00_MIRROR_SHA: 1231a72fe6e8bdf8e147da11e3e9a2ca880367f6
+          G01_MIRROR_SHA: ${{ github.sha }}
+        run: |
+          measure_bundle() {
+            label="$1"
+            npm ci --prefer-offline --no-audit --no-fund
+            npx turbo run build --filter=@audius/mobile
+            npm run bundle:ios -w @audius/mobile
+            wc -c < packages/mobile/ios/main.jsbundle > "${RUNNER_TEMP}/${label}-bytes.txt"
+          }
+
+          git checkout --detach "${G00_MIRROR_SHA}"
+          measure_bundle g00
+          git clean -fdx
+
+          git checkout --detach "${G01_MIRROR_SHA}"
+          measure_bundle g01
+
+          node -e "const fs=require('fs');const base=Number(fs.readFileSync(process.env.RUNNER_TEMP+'/g00-bytes.txt','utf8'));const current=Number(fs.readFileSync(process.env.RUNNER_TEMP+'/g01-bytes.txt','utf8'));const result={schema_version:1,g00_mirror_sha:process.env.G00_MIRROR_SHA,g01_mirror_sha:process.env.G01_MIRROR_SHA,g00_bundle_bytes:base,g01_bundle_bytes:current,delta_bytes:current-base,delta_percent:Number((((current-base)/base)*100).toFixed(4))};fs.writeFileSync('g01-bundle-delta.json',JSON.stringify(result,null,2)+'\n');console.log(result)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g01-bundle-delta
+          path: g01-bundle-delta.json
+          if-no-files-found: error
