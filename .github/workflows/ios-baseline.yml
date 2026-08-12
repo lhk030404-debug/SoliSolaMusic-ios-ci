@@ -40,7 +40,19 @@ jobs:
       - run: npm install --global npm@${{ env.NPM_VERSION }}
       - name: Install Python compatibility shim for node-gyp
         run: python3 -m pip install --break-system-packages --upgrade setuptools
+      - name: Prefetch locked sharp libvips with transport retries
+        run: |
+          sharp_cache="$(npm config get cache)/_libvips"
+          mkdir -p "${sharp_cache}"
+          curl --fail --location \
+            --retry 8 \
+            --retry-all-errors \
+            --retry-delay 3 \
+            --retry-max-time 240 \
+            --output "${sharp_cache}/libvips-8.14.5-linux-x64.tar.br" \
+            https://github.com/lovell/sharp-libvips/releases/download/v8.14.5/libvips-8.14.5-linux-x64.tar.br
       - name: Install JavaScript dependencies from lockfile
+        id: dependencies
         env:
           CI: 'true'
           SKIP_POD_INSTALL: 'true'
@@ -52,25 +64,25 @@ jobs:
           npm test -w @solisola/localization -- --runInBand
           npm run verify -w @solisola/localization
       - name: Test navigation foundation
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run test:navigation-foundation -w @audius/mobile
       - name: Test Settings foundation
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run test:settings-foundation -w @audius/mobile
       - name: Verify Mobile
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npx turbo run verify --filter=@audius/mobile
       - name: Lint and typecheck Web
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: |
           npx turbo run lint --filter=@audius/web
           npm run stylelint -w @audius/web
           npx turbo run typecheck --filter=@audius/web
       - name: Test Web
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run web:test -- -- run --reporter=default
       - name: Build development Web
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         working-directory: packages/web
         run: npm run build:dev
 
