@@ -40,7 +40,7 @@ class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     // Disable React Native inspector to workaround RN 0.77 crash
     System.setProperty("react.native.inspector.disable", "true")
-
+    
     RNBootSplash.init(this, R.style.BootTheme)
     super.onCreate(null)
     RNBars.init(this, "light-content")

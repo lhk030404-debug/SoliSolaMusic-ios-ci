@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">SoliSola Music Staging</string>
+    <string name="blob_provider_authority">com.solisola.music.staging.blob</string>
+</resources>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SoliSola Music</string>
+    <string name="blob_provider_authority">com.solisola.music.blob</string>
+    <string name="tiktok_app_id">awa9re2w7ec3xrn6</string>
+</resources>

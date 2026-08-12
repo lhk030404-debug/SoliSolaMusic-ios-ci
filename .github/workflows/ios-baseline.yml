@@ -12,6 +12,7 @@ on:
           - all
           - quality
           - ios
+          - android
           - bundle-delta
 
 permissions:
@@ -166,6 +167,87 @@ jobs:
         with:
           name: g01-ios-build-log
           path: g00-ios-build.log
+          if-no-files-found: warn
+
+  android:
+    if: ${{ inputs.scope == 'android' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk space for Android debug build
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" /opt/hostedtoolcache/CodeQL /opt/microsoft
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          npm cache clean --force || true
+          pip cache purge || true
+          df -h
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm install --global npm@${{ env.NPM_VERSION }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+      - name: Install frozen Android SDK and NDK
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager \
+            'platform-tools' \
+            'platforms;android-35' \
+            'build-tools;35.0.0' \
+            'ndk;27.1.12297006'
+          sudo apt-get update
+          sudo apt-get install --yes ninja-build
+      - name: Record Android toolchain
+        run: |
+          node --version
+          npm --version
+          java -version
+          packages/mobile/android/gradlew --version
+      - name: Install JavaScript dependencies from lockfile
+        env:
+          CI: 'true'
+          SKIP_POD_INSTALL: 'true'
+          SKIP_ANDROID_INSTALL: 'true'
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm ci --prefer-offline --no-audit --no-fund
+      - name: Prepare disposable Android debug inputs
+        run: |
+          keytool -genkeypair \
+            -storetype JKS \
+            -keystore packages/mobile/android/app/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -dname 'CN=Android Debug,O=SoliSola CI,C=US' \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000
+          npm run jetifier -w @audius/mobile
+          cd packages/mobile/android
+          ./gradlew :app:downloadAar --no-daemon
+          echo '87e37384ef5f8755d816212890775ba94d493a70d2eff4615a8d59780ac1fc5e  libs/ffmpeg-kit-full-gpl.aar' | sha256sum --check --strict
+      - name: Build shared mobile dependencies
+        run: npx turbo run build --filter=@audius/mobile
+      - name: Build Android debug baseline
+        working-directory: packages/mobile/android
+        run: |
+          set -o pipefail
+          ENVFILE=.env.dev ./gradlew :app:assembleProdDebug --no-daemon --stacktrace | tee ../../../g01-android-build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g01-android-build-log
+          path: g01-android-build.log
           if-no-files-found: warn
 
   bundle-delta:
