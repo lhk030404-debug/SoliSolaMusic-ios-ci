@@ -46,7 +46,7 @@ const EXCLUDED_PATH_SEGMENTS = new Set([
   'node_modules',
   'snapshots',
   'test',
-  'tests',
+  'tests'
 ])
 const JSX_ATTRIBUTES = new Set([
   'accessibilityHint',
@@ -62,14 +62,14 @@ const JSX_ATTRIBUTES = new Set([
   'label',
   'placeholder',
   'subtitle',
-  'title',
+  'title'
 ])
 const MESSAGE_PROPERTIES = new Set([
   ...JSX_ATTRIBUTES,
   'ariaLabel',
   'buttonText',
   'content',
-  'message',
+  'message'
 ])
 const UI_CALLS = new Set([
   'Alert.alert',
@@ -77,9 +77,10 @@ const UI_CALLS = new Set([
   'Toast.show',
   'alert',
   'showToast',
-  'toast',
+  'toast'
 ])
-const LOG_CALL_PATTERN = /^(?:console|logger|log)\.(?:debug|error|info|log|warn)$/
+const LOG_CALL_PATTERN =
+  /^(?:console|logger|log)\.(?:debug|error|info|log|warn)$/
 
 const normalizePath = (value: string) => value.replace(/\\/g, '/')
 const normalizeCopy = (value: string) => value.replace(/\s+/g, ' ').trim()
@@ -89,9 +90,7 @@ const isExcludedPath = (filePath: string) => {
   const lower = normalized.toLowerCase()
   if (lower.endsWith('.d.ts')) return true
   if (/\.(?:spec|test)\.[^.]+$/.test(lower)) return true
-  return lower
-    .split('/')
-    .some((segment) => EXCLUDED_PATH_SEGMENTS.has(segment))
+  return lower.split('/').some((segment) => EXCLUDED_PATH_SEGMENTS.has(segment))
 }
 
 const looksUserVisible = (value: string) => {
@@ -106,10 +105,12 @@ const fingerprintFor = (
   path: string,
   kind: string,
   context: string,
-  value: string,
+  value: string
 ) =>
   createHash('sha256')
-    .update(`${normalizePath(path)}\0${kind}\0${context}\0${normalizeCopy(value)}`)
+    .update(
+      `${normalizePath(path)}\0${kind}\0${context}\0${normalizeCopy(value)}`
+    )
     .digest('hex')
 
 const finding = (
@@ -117,7 +118,7 @@ const finding = (
   kind: string,
   context: string,
   value: string,
-  location?: { line?: number; column?: number } | null,
+  location?: { line?: number; column?: number } | null
 ): HardcodedFinding => {
   const normalized = normalizeCopy(value)
   return {
@@ -127,14 +128,15 @@ const finding = (
     kind,
     context,
     value: normalized,
-    fingerprint: fingerprintFor(path, kind, context, normalized),
+    fingerprint: fingerprintFor(path, kind, context, normalized)
   }
 }
 
 const nodeString = (node: any): string | undefined => {
   if (!node) return undefined
   if (node.type === 'StringLiteral') return node.value
-  if (node.type === 'Literal' && typeof node.value === 'string') return node.value
+  if (node.type === 'Literal' && typeof node.value === 'string')
+    return node.value
   if (node.type === 'TemplateLiteral' && node.expressions.length === 0) {
     return node.quasis.map((part: any) => part.value.cooked ?? '').join('')
   }
@@ -144,7 +146,8 @@ const nodeString = (node: any): string | undefined => {
 
 const propertyName = (node: any): string | undefined => {
   if (!node) return undefined
-  if (node.type === 'Identifier' || node.type === 'JSXIdentifier') return node.name
+  if (node.type === 'Identifier' || node.type === 'JSXIdentifier')
+    return node.name
   if (node.type === 'StringLiteral') return node.value
   return undefined
 }
@@ -158,7 +161,7 @@ const calleeName = (node: any): string => {
   ) {
     const object = calleeName(node.object)
     const property = propertyName(node.property)
-    return object && property ? `${object}.${property}` : property ?? object
+    return object && property ? `${object}.${property}` : (property ?? object)
   }
   return ''
 }
@@ -170,7 +173,7 @@ const addIfVisible = (
   filePath: string,
   node: any,
   kind: string,
-  context: string,
+  context: string
 ) => {
   const value = nodeString(node)
   if (value !== undefined && looksUserVisible(value)) {
@@ -180,19 +183,14 @@ const addIfVisible = (
 
 export const scanTypeScriptSource = (
   filePath: string,
-  source: string,
+  source: string
 ): HardcodedFinding[] => {
   if (isExcludedPath(filePath)) return []
 
   const ast = parse(source, {
     sourceType: 'unambiguous',
     errorRecovery: false,
-    plugins: [
-      'decorators-legacy',
-      'importAttributes',
-      'jsx',
-      'typescript',
-    ],
+    plugins: ['decorators-legacy', 'importAttributes', 'jsx', 'typescript']
   })
   const findings: HardcodedFinding[] = []
 
@@ -208,8 +206,8 @@ export const scanTypeScriptSource = (
             'jsx_text',
             'JSX child text',
             node.value,
-            locationOf(node),
-          ),
+            locationOf(node)
+          )
         )
       }
     } else if (node.type === 'JSXAttribute') {
@@ -220,16 +218,13 @@ export const scanTypeScriptSource = (
           filePath,
           node.value,
           `jsx_attribute:${name}`,
-          name,
+          name
         )
       }
-    } else if (
-      node.type === 'ObjectProperty' ||
-      node.type === 'Property'
-    ) {
+    } else if (node.type === 'ObjectProperty' || node.type === 'Property') {
       const name = propertyName(node.key)
       const insideEnum = ancestors.some((ancestor) =>
-        ['EnumDeclaration', 'TSEnumDeclaration'].includes(ancestor.type),
+        ['EnumDeclaration', 'TSEnumDeclaration'].includes(ancestor.type)
       )
       const callAncestor = [...ancestors]
         .reverse()
@@ -248,7 +243,7 @@ export const scanTypeScriptSource = (
           filePath,
           node.value,
           `object_property:${name}`,
-          name,
+          name
         )
       }
     } else if (node.type === 'CallExpression') {
@@ -260,8 +255,8 @@ export const scanTypeScriptSource = (
             filePath,
             argument,
             `ui_call:${name}`,
-            `argument:${index}`,
-          ),
+            `argument:${index}`
+          )
         )
       }
     }
@@ -285,7 +280,7 @@ type NativePattern = { kind: string; context: string; pattern: RegExp }
 const scanNativeSource = (
   filePath: string,
   source: string,
-  patterns: NativePattern[],
+  patterns: NativePattern[]
 ): HardcodedFinding[] => {
   if (isExcludedPath(filePath)) return []
   const findings: HardcodedFinding[] = []
@@ -299,8 +294,8 @@ const scanNativeSource = (
         findings.push(
           finding(filePath, kind, context, value, {
             line: lineIndex + 1,
-            column: (match.index ?? 0) + 1,
-          }),
+            column: (match.index ?? 0) + 1
+          })
         )
       }
     })
@@ -313,14 +308,14 @@ const swiftPatterns: NativePattern[] = [
     kind: 'swift_ui_literal',
     context: 'SwiftUI initializer',
     pattern:
-      /\b(?:Button|Label|Text|TextField|Toggle)\s*\(\s*"(?<copy>(?:\\.|[^"\\])*)"/g,
+      /\b(?:Button|Label|Text|TextField|Toggle)\s*\(\s*"(?<copy>(?:\\.|[^"\\])*)"/g
   },
   {
     kind: 'swift_ui_modifier',
     context: 'SwiftUI visible/a11y modifier',
     pattern:
-      /\.(?:accessibilityHint|accessibilityLabel|alert|navigationTitle)\s*\(\s*"(?<copy>(?:\\.|[^"\\])*)"/g,
-  },
+      /\.(?:accessibilityHint|accessibilityLabel|alert|navigationTitle)\s*\(\s*"(?<copy>(?:\\.|[^"\\])*)"/g
+  }
 ]
 
 const kotlinPatterns: NativePattern[] = [
@@ -328,20 +323,19 @@ const kotlinPatterns: NativePattern[] = [
     kind: 'kotlin_ui_literal',
     context: 'Compose UI initializer',
     pattern:
-      /\b(?:Button|Text)\s*\(\s*(?:text\s*=\s*)?"(?<copy>(?:\\.|[^"\\])*)"/g,
+      /\b(?:Button|Text)\s*\(\s*(?:text\s*=\s*)?"(?<copy>(?:\\.|[^"\\])*)"/g
   },
   {
     kind: 'kotlin_ui_property',
     context: 'Android visible/a11y property',
     pattern:
-      /\b(?:contentDescription|label|placeholder)\s*=\s*"(?<copy>(?:\\.|[^"\\])*)"/g,
+      /\b(?:contentDescription|label|placeholder)\s*=\s*"(?<copy>(?:\\.|[^"\\])*)"/g
   },
   {
     kind: 'kotlin_ui_toast',
     context: 'Android toast',
-    pattern:
-      /\bToast\.makeText\([^,]+,\s*"(?<copy>(?:\\.|[^"\\])*)"/g,
-  },
+    pattern: /\bToast\.makeText\([^,]+,\s*"(?<copy>(?:\\.|[^"\\])*)"/g
+  }
 ]
 
 export const scanSwiftSource = (filePath: string, source: string) =>
@@ -352,7 +346,7 @@ export const scanKotlinSource = (filePath: string, source: string) =>
 
 const compareFinding = (left: HardcodedFinding, right: HardcodedFinding) =>
   `${left.path}:${String(left.line).padStart(8, '0')}:${left.kind}:${left.value}`.localeCompare(
-    `${right.path}:${String(right.line).padStart(8, '0')}:${right.kind}:${right.value}`,
+    `${right.path}:${String(right.line).padStart(8, '0')}:${right.kind}:${right.value}`
   )
 
 const listSourceFiles = (root: string, current: string): string[] => {
@@ -378,12 +372,12 @@ export const DEFAULT_SCAN_SCOPE = [
   'packages/mobile/android',
   'packages/mobile/ios',
   'packages/mobile/src',
-  'packages/web/src',
+  'packages/web/src'
 ]
 
 export const scanRepository = (
   repositoryRoot: string,
-  scope = DEFAULT_SCAN_SCOPE,
+  scope = DEFAULT_SCAN_SCOPE
 ): HardcodedFinding[] => {
   const findings: HardcodedFinding[] = []
   for (const scopePath of scope) {
@@ -404,7 +398,7 @@ export const scanRepository = (
         throw new Error(
           `hardcoded-copy parse failed for ${filePath}: ${
             error instanceof Error ? error.message : String(error)
-          }`,
+          }`
         )
       }
     }
@@ -415,7 +409,7 @@ export const scanRepository = (
 export const toBaseline = (
   findings: HardcodedFinding[],
   sourceSha: string,
-  scope = DEFAULT_SCAN_SCOPE,
+  scope = DEFAULT_SCAN_SCOPE
 ): HardcodedBaseline => {
   const entries = new Map<string, HardcodedBaselineEntry>()
   for (const item of findings) {
@@ -428,7 +422,7 @@ export const toBaseline = (
         kind: item.kind,
         context: item.context,
         value: item.value,
-        count: 1,
+        count: 1
       })
     }
   }
@@ -439,22 +433,22 @@ export const toBaseline = (
     scope: [...scope],
     total: findings.length,
     entries: [...entries.values()].sort((left, right) =>
-      left.fingerprint.localeCompare(right.fingerprint),
-    ),
+      left.fingerprint.localeCompare(right.fingerprint)
+    )
   }
 }
 
 export const compareFindingsToBaseline = (
   findings: HardcodedFinding[],
-  baseline: HardcodedBaseline,
+  baseline: HardcodedBaseline
 ) => {
   if (baseline.scannerVersion !== HARDCODED_SCANNER_VERSION) {
     throw new Error(
-      `baseline scanner version ${baseline.scannerVersion} does not match ${HARDCODED_SCANNER_VERSION}`,
+      `baseline scanner version ${baseline.scannerVersion} does not match ${HARDCODED_SCANNER_VERSION}`
     )
   }
   const remaining = new Map(
-    baseline.entries.map((entry) => [entry.fingerprint, entry.count]),
+    baseline.entries.map((entry) => [entry.fingerprint, entry.count])
   )
   const newFindings: HardcodedFinding[] = []
   for (const item of findings) {

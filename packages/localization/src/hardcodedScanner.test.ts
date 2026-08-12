@@ -3,7 +3,7 @@ import {
   scanKotlinSource,
   scanSwiftSource,
   scanTypeScriptSource,
-  toBaseline,
+  toBaseline
 } from './hardcodedScanner'
 
 describe('hardcoded copy scanner', () => {
@@ -18,7 +18,7 @@ describe('hardcoded copy scanner', () => {
             <Button accessibilityLabel="Play track" aria-label="Open player" />
           </View>
         )
-      `,
+      `
     )
     expect(findings.map(({ kind }) => kind)).toEqual(
       expect.arrayContaining([
@@ -27,8 +27,8 @@ describe('hardcoded copy scanner', () => {
         'jsx_attribute:label',
         'jsx_attribute:placeholder',
         'jsx_attribute:accessibilityLabel',
-        'jsx_attribute:aria-label',
-      ]),
+        'jsx_attribute:aria-label'
+      ])
     )
   })
 
@@ -39,7 +39,7 @@ describe('hardcoded copy scanner', () => {
         const messages = { title: 'Upload failed', description: 'Try again' }
         Alert.alert('Microphone unavailable', 'Check system settings')
         toast({ content: 'Saved to your library' })
-      `,
+      `
     )
     expect(findings.map(({ value }) => value)).toEqual(
       expect.arrayContaining([
@@ -47,8 +47,8 @@ describe('hardcoded copy scanner', () => {
         'Try again',
         'Microphone unavailable',
         'Check system settings',
-        'Saved to your library',
-      ]),
+        'Saved to your library'
+      ])
     )
   })
 
@@ -62,16 +62,16 @@ describe('hardcoded copy scanner', () => {
     `
     expect(scanTypeScriptSource('screen.tsx', source)).toEqual([])
     expect(
-      scanTypeScriptSource('screen.test.tsx', '<Text>Fixture title</Text>'),
+      scanTypeScriptSource('screen.test.tsx', '<Text>Fixture title</Text>')
     ).toEqual([])
     expect(
-      scanTypeScriptSource('fixtures/post.tsx', '<Text>Fixture body</Text>'),
+      scanTypeScriptSource('fixtures/post.tsx', '<Text>Fixture body</Text>')
     ).toEqual([])
     expect(
       scanTypeScriptSource(
         'web-player/WebPlayer.d.ts',
-        'declare const playerTitle: "Visible type literal"',
-      ),
+        'declare const playerTitle: "Visible type literal"'
+      )
     ).toEqual([])
   })
 
@@ -79,34 +79,34 @@ describe('hardcoded copy scanner', () => {
     expect(
       scanSwiftSource(
         'Player.swift',
-        'Text("Play now")\n.navigationTitle("Music")\nprint("debug")',
-      ).map(({ value }) => value),
+        'Text("Play now")\n.navigationTitle("Music")\nprint("debug")'
+      ).map(({ value }) => value)
     ).toEqual(['Play now', 'Music'])
     expect(
       scanKotlinSource(
         'Player.kt',
-        'Text("Play now")\ncontentDescription = "Player"\nLog.d("tag", "debug")',
-      ).map(({ value }) => value),
+        'Text("Play now")\ncontentDescription = "Player"\nLog.d("tag", "debug")'
+      ).map(({ value }) => value)
     ).toEqual(['Play now', 'Player'])
   })
 
   test('baseline blocks additions and changed copy but permits removals', () => {
     const original = scanTypeScriptSource(
       'screen.tsx',
-      '<Text>Hello listener</Text>',
+      '<Text>Hello listener</Text>'
     )
     const baseline = toBaseline(original, 'test-sha')
     expect(compareFindingsToBaseline([], baseline).newFindings).toEqual([])
     expect(compareFindingsToBaseline(original, baseline).newFindings).toEqual(
-      [],
+      []
     )
 
     const changed = scanTypeScriptSource(
       'screen.tsx',
-      '<Text>Hello artist</Text>',
+      '<Text>Hello artist</Text>'
     )
     expect(compareFindingsToBaseline(changed, baseline).newFindings).toEqual(
-      changed,
+      changed
     )
   })
 })

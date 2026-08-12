@@ -10,7 +10,7 @@ export type LocalizationRuntime = i18n
 
 export const changeRuntimeLocale = async (
   runtime: LocalizationRuntime,
-  locale: LaunchLocale,
+  locale: LaunchLocale
 ): Promise<LaunchLocale> => {
   await runtime.changeLanguage(locale)
   return locale
@@ -19,11 +19,11 @@ export const changeRuntimeLocale = async (
 export const resources = {
   en: { translation: en },
   'zh-Hans': { translation: zhHans },
-  'zh-Hant': { translation: zhHant },
+  'zh-Hant': { translation: zhHant }
 } as const
 
 export const createLocalization = async (
-  locale: LaunchLocale,
+  locale: LaunchLocale
 ): Promise<i18n> => {
   const instance = i18next.createInstance()
   await instance.use(ICU).init({
@@ -35,7 +35,7 @@ export const createLocalization = async (
     lng: locale,
     interpolation: { escapeValue: false },
     resources,
-    returnNull: false,
+    returnNull: false
   })
   return instance
 }

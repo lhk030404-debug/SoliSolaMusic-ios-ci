@@ -29,7 +29,7 @@ const firstSupported = (tags: readonly string[] = []): LaunchLocale => {
 export const resolveLocale = ({
   manual,
   account,
-  device,
+  device
 }: LocaleInputs): LaunchLocale => {
   if (manual && manual !== 'system') return manual
   if (account) return mapLanguageTag(account)

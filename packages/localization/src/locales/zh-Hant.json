@@ -38,7 +38,6 @@
     "title": "關於",
     "version": "版本 {version}",
     "ota": "OTA {version}",
-    "copyright": "Copyright © {year} SoliSola。",
     "licenses": "授權條款",
     "noticeSummary": "開源聲明與第三方授權條款。"
   },

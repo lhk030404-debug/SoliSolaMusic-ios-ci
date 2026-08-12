@@ -1,14 +1,18 @@
+import {
+  flattenLocale,
+  validateLocaleResources,
+  type LocaleResourceMap
+} from './governance'
 import en from './locales/en.json'
 import zhHans from './locales/zh-Hans.json'
 import zhHant from './locales/zh-Hant.json'
 import { createLocalization } from './runtime'
-import {
-  flattenLocale,
-  validateLocaleResources,
-  type LocaleResourceMap,
-} from './governance'
 
-const resources: LocaleResourceMap = { en, 'zh-Hans': zhHans, 'zh-Hant': zhHant }
+const resources: LocaleResourceMap = {
+  en,
+  'zh-Hans': zhHans,
+  'zh-Hant': zhHant
+}
 
 describe('locale governance', () => {
   test('uses recursive leaf keys and has 100% launch-locale parity', () => {
@@ -24,15 +28,15 @@ describe('locale governance', () => {
       validateLocaleResources({
         en: { screen: { title: 'Title', count: 1 } },
         'zh-Hans': { screen: { title: '' } },
-        'zh-Hant': { screen: { title: '標題', extra: '額外' } },
-      } as unknown as LocaleResourceMap),
+        'zh-Hant': { screen: { title: '標題', extra: '額外' } }
+      } as unknown as LocaleResourceMap)
     ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ locale: 'en', code: 'non_string_value' }),
         expect.objectContaining({ locale: 'zh-Hans', code: 'empty_value' }),
         expect.objectContaining({ locale: 'zh-Hans', code: 'missing_key' }),
-        expect.objectContaining({ locale: 'zh-Hant', code: 'extra_key' }),
-      ]),
+        expect.objectContaining({ locale: 'zh-Hant', code: 'extra_key' })
+      ])
     )
   })
 
@@ -40,16 +44,16 @@ describe('locale governance', () => {
     const issues = validateLocaleResources({
       en: {
         greeting: 'Hello, {name}',
-        plays: '{count, plural, one {# play} other {# plays}}',
+        plays: '{count, plural, one {# play} other {# plays}}'
       },
       'zh-Hans': {
         greeting: '你好，{username}',
-        plays: '{count, plural, other {播放 # 次}}',
+        plays: '{count, plural, other {播放 # 次}}'
       },
       'zh-Hant': {
         greeting: '你好，{name}',
-        plays: '{count, plural, one {播放 # 次} other {播放 # 次}}',
-      },
+        plays: '{count, plural, one {播放 # 次} other {播放 # 次}}'
+      }
     })
 
     expect(issues).toEqual(
@@ -57,14 +61,14 @@ describe('locale governance', () => {
         expect.objectContaining({
           locale: 'zh-Hans',
           key: 'greeting',
-          code: 'icu_variable_mismatch',
+          code: 'icu_variable_mismatch'
         }),
         expect.objectContaining({
           locale: 'zh-Hans',
           key: 'plays',
-          code: 'icu_plural_mismatch',
-        }),
-      ]),
+          code: 'icu_plural_mismatch'
+        })
+      ])
     )
   })
 
@@ -72,12 +76,12 @@ describe('locale governance', () => {
     const issues = validateLocaleResources({
       en: { broken: '{count, plural, one {item}' },
       'zh-Hans': { broken: '项目' },
-      'zh-Hant': { broken: '項目' },
+      'zh-Hant': { broken: '項目' }
     })
     expect(issues).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ locale: 'en', code: 'invalid_icu' }),
-      ]),
+        expect.objectContaining({ locale: 'en', code: 'invalid_icu' })
+      ])
     )
   })
 

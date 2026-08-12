@@ -14,7 +14,7 @@ describe('locale mapping', () => {
     ['zh-Hant-CN', 'zh-Hant'],
     ['en-US', 'en'],
     ['fr-FR', 'en'],
-    ['', 'en'],
+    ['', 'en']
   ] as const)('%s maps to %s', (tag, expected) => {
     expect(mapLanguageTag(tag)).toBe(expected)
   })
@@ -23,10 +23,10 @@ describe('locale mapping', () => {
 describe('locale priority', () => {
   it('uses manual, then account, then device, then English', () => {
     expect(
-      resolveLocale({ manual: 'zh-Hant', account: 'zh-Hans', device: ['en'] }),
+      resolveLocale({ manual: 'zh-Hant', account: 'zh-Hans', device: ['en'] })
     ).toBe('zh-Hant')
     expect(resolveLocale({ account: 'zh-Hant', device: ['zh-CN'] })).toBe(
-      'zh-Hant',
+      'zh-Hant'
     )
     expect(resolveLocale({ device: ['fr-FR', 'zh-TW'] })).toBe('zh-Hant')
     expect(resolveLocale({ device: [] })).toBe('en')
@@ -37,8 +37,8 @@ describe('locale priority', () => {
       resolveLocale({
         manual: 'system',
         account: 'zh-Hant',
-        device: ['zh-CN'],
-      }),
+        device: ['zh-CN']
+      })
     ).toBe('zh-Hant')
   })
 })

@@ -30,7 +30,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 export const flattenLocale = (
   locale: unknown,
-  prefix = '',
+  prefix = ''
 ): Map<string, unknown> => {
   const result = new Map<string, unknown>()
 
@@ -91,17 +91,18 @@ const readIcuSignature = (message: string): IcuSignature => {
     plurals: Object.fromEntries(
       [...plurals.entries()]
         .sort(([left], [right]) => left.localeCompare(right))
-        .map(([key, selectors]) => [key, [...selectors].sort()]),
-    ),
+        .map(([key, selectors]) => [key, [...selectors].sort()])
+    )
   }
 }
 
 const sameStringArray = (left: string[], right: string[]) =>
-  left.length === right.length && left.every((value, index) => value === right[index])
+  left.length === right.length &&
+  left.every((value, index) => value === right[index])
 
 const samePluralShape = (
   left: Record<string, string[]>,
-  right: Record<string, string[]>,
+  right: Record<string, string[]>
 ) => {
   const leftKeys = Object.keys(left).sort()
   const rightKeys = Object.keys(right).sort()
@@ -112,11 +113,11 @@ const samePluralShape = (
 }
 
 export const validateLocaleResources = (
-  resources: LocaleResourceMap,
+  resources: LocaleResourceMap
 ): LocaleGovernanceIssue[] => {
   const locales: LaunchLocale[] = ['en', 'zh-Hans', 'zh-Hant']
   const flattened = Object.fromEntries(
-    locales.map((locale) => [locale, flattenLocale(resources[locale])]),
+    locales.map((locale) => [locale, flattenLocale(resources[locale])])
   ) as Record<LaunchLocale, Map<string, unknown>>
   const canonicalKeys = [...flattened.en.keys()].sort()
   const canonicalKeySet = new Set(canonicalKeys)
@@ -131,7 +132,7 @@ export const validateLocaleResources = (
           locale,
           key,
           code: 'missing_key',
-          detail: `missing key present in en: ${key}`,
+          detail: `missing key present in en: ${key}`
         })
       }
     }
@@ -141,7 +142,7 @@ export const validateLocaleResources = (
           locale,
           key,
           code: 'extra_key',
-          detail: `key is not present in en: ${key}`,
+          detail: `key is not present in en: ${key}`
         })
       }
 
@@ -151,7 +152,7 @@ export const validateLocaleResources = (
           locale,
           key,
           code: 'non_string_value',
-          detail: `leaf value must be a string, received ${typeof value}`,
+          detail: `leaf value must be a string, received ${typeof value}`
         })
         continue
       }
@@ -160,7 +161,7 @@ export const validateLocaleResources = (
           locale,
           key,
           code: 'empty_value',
-          detail: 'translation must not be empty or whitespace',
+          detail: 'translation must not be empty or whitespace'
         })
         continue
       }
@@ -172,7 +173,7 @@ export const validateLocaleResources = (
           locale,
           key,
           code: 'invalid_icu',
-          detail: error instanceof Error ? error.message : String(error),
+          detail: error instanceof Error ? error.message : String(error)
         })
       }
     }
@@ -189,7 +190,7 @@ export const validateLocaleResources = (
           locale,
           key,
           code: 'icu_variable_mismatch',
-          detail: `expected [${canonical.variables.join(', ')}], received [${candidate.variables.join(', ')}]`,
+          detail: `expected [${canonical.variables.join(', ')}], received [${candidate.variables.join(', ')}]`
         })
       }
       if (!samePluralShape(canonical.plurals, candidate.plurals)) {
@@ -197,7 +198,7 @@ export const validateLocaleResources = (
           locale,
           key,
           code: 'icu_plural_mismatch',
-          detail: `expected ${JSON.stringify(canonical.plurals)}, received ${JSON.stringify(candidate.plurals)}`,
+          detail: `expected ${JSON.stringify(canonical.plurals)}, received ${JSON.stringify(candidate.plurals)}`
         })
       }
     }
@@ -205,7 +206,7 @@ export const validateLocaleResources = (
 
   return issues.sort((left, right) =>
     `${left.locale}:${left.key}:${left.code}`.localeCompare(
-      `${right.locale}:${right.key}:${right.code}`,
-    ),
+      `${right.locale}:${right.key}:${right.code}`
+    )
   )
 }
