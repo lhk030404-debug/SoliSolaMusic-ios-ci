@@ -13,6 +13,8 @@
     "types": ["jest", "node"]
   },
   "include": [
+    "src/localization/deviceLocaleTags.ts",
+    "src/localization/deviceLocale.test.ts",
     "src/screens/settings-screen/settingsExperience.ts",
     "src/screens/settings-screen/settingsExperience.test.ts"
   ]

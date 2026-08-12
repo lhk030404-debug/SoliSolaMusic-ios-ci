@@ -8,7 +8,8 @@ module.exports = {
   rootDir: '.',
   testEnvironment: 'node',
   testMatch: [
-    '<rootDir>/src/screens/settings-screen/settingsExperience.test.ts'
+    '<rootDir>/src/screens/settings-screen/settingsExperience.test.ts',
+    '<rootDir>/src/localization/deviceLocale.test.ts'
   ],
   transform: {
     '^.+\\.tsx?$': [

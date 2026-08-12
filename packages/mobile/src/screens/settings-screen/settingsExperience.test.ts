@@ -3,12 +3,12 @@ import path from 'path'
 
 import { evaluateRoutePolicy } from '../../feature-policy/routePolicy'
 
+import licenseSnapshot from './licenses.snapshot.json'
 import {
   LANGUAGE_OPTIONS,
   OFFLINE_SETTINGS_ROUTES,
   selectSettingsLanguage
 } from './settingsExperience'
-import licenseSnapshot from './licenses.snapshot.json'
 
 const repositoryRoot = path.resolve(__dirname, '../../../../..')
 
@@ -89,7 +89,7 @@ describe('SoliSola settings experience', () => {
     expect(licenseSnapshot.thirdParty.status).toBe(
       'inventory-complete-compliance-not-clean'
     )
-    expect(licenseSnapshot.thirdParty.sbomComponents).toBe(5459)
+    expect(licenseSnapshot.thirdParty.sbomComponents).toBe(5475)
     expect(licenseSnapshot.thirdParty.npmOccurrences).toBe(10557)
     expect(licenseSnapshot.thirdParty.uniqueNpmPackages).toBe(6349)
     expect(

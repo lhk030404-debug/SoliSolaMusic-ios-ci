@@ -1,8 +1,20 @@
 import type { ComponentType } from 'react'
 
-import type { TooltipPlacement } from '@audius/harmony'
-
 export type BuySellTab = 'buy' | 'sell' | 'convert'
+
+export type TooltipPlacement =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'topLeft'
+  | 'topRight'
+  | 'bottomLeft'
+  | 'bottomRight'
+  | 'leftTop'
+  | 'leftBottom'
+  | 'rightTop'
+  | 'rightBottom'
 
 export type Screen = 'input' | 'confirm' | 'success'
 

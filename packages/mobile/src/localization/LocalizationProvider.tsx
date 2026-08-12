@@ -5,25 +5,24 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useRef,
+  useState
 } from 'react'
 
 import type {
   LaunchLocale,
   LocalePreference,
-  LocalizationRuntime,
+  LocalizationRuntime
 } from '@solisola/localization'
 import {
   changeRuntimeLocale,
   createLocalization,
   I18nextProvider,
-  resolveLocale,
+  resolveLocale
 } from '@solisola/localization'
+import { useLocalize } from 'react-native-localize'
 
-import {
-  getDeviceLanguageTags,
-  subscribeToDeviceLocaleChanges,
-} from './deviceLocale'
+import { getLanguageTagsFromLocales } from './deviceLocaleTags'
 import { readLocalePreference, writeLocalePreference } from './storage'
 
 type LocalizationContextValue = {
@@ -42,13 +41,22 @@ type LocalizationProviderProps = {
 
 export const LocalizationProvider = ({
   children,
-  accountLocale,
+  accountLocale
 }: LocalizationProviderProps) => {
+  const { getLocales } = useLocalize()
+  const deviceLocaleKey =
+    getLanguageTagsFromLocales(getLocales()).join('\u0000')
+  const deviceLanguageTags = useMemo(
+    () => (deviceLocaleKey ? deviceLocaleKey.split('\u0000') : []),
+    [deviceLocaleKey]
+  )
+  const deviceLanguageTagsRef = useRef(deviceLanguageTags)
+  deviceLanguageTagsRef.current = deviceLanguageTags
   const [runtime, setRuntime] = useState<LocalizationRuntime | null>(null)
   const [preference, setPreference] = useState<LocalePreference>('system')
   const [locale, setLocale] = useState<LaunchLocale>('en')
   const [initializationError, setInitializationError] = useState<Error | null>(
-    null,
+    null
   )
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export const LocalizationProvider = ({
       const locale = resolveLocale({
         manual,
         account: accountLocale,
-        device: getDeviceLanguageTags(),
+        device: deviceLanguageTagsRef.current
       })
       const instance = await createLocalization(locale)
       if (active) {
@@ -72,7 +80,7 @@ export const LocalizationProvider = ({
         setInitializationError(
           error instanceof Error
             ? error
-            : new Error('Localization initialization failed'),
+            : new Error('Localization initialization failed')
         )
       }
     })
@@ -87,32 +95,31 @@ export const LocalizationProvider = ({
       const locale = resolveLocale({
         manual: next,
         account: accountLocale,
-        device: getDeviceLanguageTags(),
+        device: deviceLanguageTags
       })
       if (runtime) await changeRuntimeLocale(runtime, locale)
       setLocale(locale)
       setPreference(next)
     },
-    [accountLocale, runtime],
+    [accountLocale, deviceLanguageTags, runtime]
   )
 
   useEffect(() => {
     if (!runtime || preference !== 'system') return undefined
-    return subscribeToDeviceLocaleChanges(() => {
-      const next = resolveLocale({
-        manual: 'system',
-        account: accountLocale,
-        device: getDeviceLanguageTags(),
-      })
-      changeRuntimeLocale(runtime, next)
-        .then(setLocale)
-        .catch((error: unknown) => {
-          setInitializationError(
-            error instanceof Error ? error : new Error('Locale change failed'),
-          )
-        })
+    const next = resolveLocale({
+      manual: 'system',
+      account: accountLocale,
+      device: deviceLanguageTags
     })
-  }, [accountLocale, preference, runtime])
+    changeRuntimeLocale(runtime, next)
+      .then(setLocale)
+      .catch((error: unknown) => {
+        setInitializationError(
+          error instanceof Error ? error : new Error('Locale change failed')
+        )
+      })
+    return undefined
+  }, [accountLocale, deviceLanguageTags, preference, runtime])
 
   const value = useMemo<LocalizationContextValue | null>(() => {
     if (!runtime) return null

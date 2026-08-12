@@ -9,11 +9,7 @@ import type {
 import { CardStyleInterpolators } from '@react-navigation/stack'
 import { Text, View } from 'react-native'
 
-import {
-  IconButton,
-  IconCaretLeft,
-  IconSearch
-} from '@audius/harmony-native'
+import { IconButton, IconCaretLeft, IconSearch } from '@audius/harmony-native'
 import { SoliSolaWordmark } from 'app/branding'
 import { useDrawer } from 'app/hooks/useDrawer'
 import type { ContextualParams } from 'app/hooks/useNavigation'
@@ -78,7 +74,7 @@ export const useAppScreenOptions = <
   const screenOptions: (
     options: Options<ParamList>
   ) => NativeStackNavigationOptions = useCallback(
-    (options) => {
+    options => {
       const { navigation, route } = options
       const { params } = route
       const isFromAppLeftDrawer =
@@ -101,7 +97,7 @@ export const useAppScreenOptions = <
         headerShadowVisible: false,
         headerTitleAlign: 'center',
         headerBackVisible: false,
-        headerLeft: (props) => {
+        headerLeft: props => {
           const { canGoBack, ...other } = props
           if (canGoBack) {
             return (

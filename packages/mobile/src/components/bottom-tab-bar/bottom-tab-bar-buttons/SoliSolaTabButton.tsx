@@ -1,8 +1,9 @@
 import { useCallback } from 'react'
 
+import { Pressable, StyleSheet, View } from 'react-native'
+
 import type { IconComponent } from '@audius/harmony-native'
 import { Text, useTheme } from '@audius/harmony-native'
-import { Pressable, StyleSheet, View } from 'react-native'
 
 import type { SoliSolaTabRoute } from 'app/screens/app-screen/navigationContract'
 

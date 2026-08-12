@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { useTranslation } from '@solisola/localization'
 import CodePush from '@bravemobile/react-native-code-push'
+import { useTranslation } from '@solisola/localization'
 import { View } from 'react-native'
 
 import { IconInfo } from '@audius/harmony-native'
@@ -10,12 +10,12 @@ import { Screen, ScreenContent, ScrollView, Text } from 'app/components/core'
 import { useNavigation } from 'app/hooks/useNavigation'
 import { makeStyles } from 'app/styles'
 
-import packageInfo from '../../../package.json'
 import brand from '../../../../../config/BRAND.json'
+import packageInfo from '../../../package.json'
 import type { ProfileTabScreenParamList } from '../app-screen/ProfileTabScreen'
 
-import { SettingsDivider } from './SettingsDivider'
 import { SettingsRowLabel } from './SettingRowLabel'
+import { SettingsDivider } from './SettingsDivider'
 import { SettingsRow } from './SettingsRow'
 
 const { version: appVersion } = packageInfo
@@ -62,7 +62,7 @@ export const AboutScreen = () => {
         // CodePush is optional in local/offline builds; the base version remains valid.
       }
     }
-    void loadOtaLabel()
+    loadOtaLabel().catch(() => undefined)
     return () => {
       cancelled = true
     }

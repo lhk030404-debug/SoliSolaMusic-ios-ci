@@ -1,7 +1,8 @@
 const fs = require('fs')
 const path = require('path')
-const ts = require('typescript')
 const vm = require('vm')
+
+const ts = require('typescript')
 
 const contractPath = path.join(__dirname, 'navigationContract.ts')
 const transpiled = ts.transpileModule(fs.readFileSync(contractPath, 'utf8'), {

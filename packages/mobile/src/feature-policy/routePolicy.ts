@@ -88,10 +88,7 @@ export const ROUTE_FEATURE_REQUIREMENTS = {
   LanguageSettingsScreen: ['profile_and_library'],
   LicensesScreen: ['profile_and_library'],
   Upload: ['formal_music_upload', 'formal_uploads'],
-  DownloadSettingsScreen: [
-    'compressed_offline_download',
-    'offline_downloads'
-  ],
+  DownloadSettingsScreen: ['compressed_offline_download', 'offline_downloads'],
 
   AudioScreen: ['membership'],
   BuySell: ['membership'],
@@ -134,9 +131,7 @@ const getFeatureOverride = (
   if ('localOverride' in overrides || 'remoteOverride' in overrides) {
     return overrides as FeatureOverride
   }
-  return (overrides as RuntimeKillSwitchOverrides)[
-    feature as RuntimeKillSwitch
-  ]
+  return (overrides as RuntimeKillSwitchOverrides)[feature as RuntimeKillSwitch]
 }
 
 export const evaluateRoutePolicy = (
@@ -193,7 +188,7 @@ export const getDrawerRouteNames = (
   overrides: RuntimeKillSwitchOverrides = {}
 ) =>
   DRAWER_ROUTE_NAMES.filter(
-    (routeName) => evaluateRoutePolicy(routeName, 'drawer', overrides).isAllowed
+    routeName => evaluateRoutePolicy(routeName, 'drawer', overrides).isAllowed
   )
 
 const getRouteNameForDeeplink = (path: string) => {

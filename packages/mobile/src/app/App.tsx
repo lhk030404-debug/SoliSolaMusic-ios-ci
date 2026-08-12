@@ -104,78 +104,80 @@ const App = () => {
 
   return (
     <LocalizationProvider>
-    <AppContextProvider>
-      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-        <KeyboardProvider
-          statusBarTranslucent={true}
-          navigationBarTranslucent={true}
-        >
-          <Provider store={store}>
-            <AudiusQueryProvider>
-              <PersistQueryClientProvider
-                client={queryClient}
-                persistOptions={queryClientPersistOptions}
-              >
-                <SyncLocalStorageUserProvider localStorage={localStorage}>
-                  <PersistGate
-                    loading={null}
-                    persistor={getOrCreatePersistor()}
-                    onBeforeLift={() => {
-                      // Reset the player before any children render so that
-                      // NowPlayingDrawer never sees isPlaying=true from a
-                      // previous session. Without this, the PlayBar slide-up
-                      // animation fires (child effects run before parent
-                      // useEffectOnce) and is visible through the fading
-                      // splash screen.
-                      dispatch(playbackActions.reset({ shouldAutoplay: false }))
-                    }}
-                  >
-                    <ThemeProvider>
-                      <GestureHandlerRootView style={{ flex: 1 }}>
-                        <PortalProvider>
-                          <ErrorBoundary>
-                            <ConnectivityManager />
-                            <NavigationContainer>
-                              <BottomSheetModalProvider>
-                                <CommentDrawerProvider>
-                                  {/* NiceModal-managed modals (e.g.
+      <AppContextProvider>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <KeyboardProvider
+            statusBarTranslucent={true}
+            navigationBarTranslucent={true}
+          >
+            <Provider store={store}>
+              <AudiusQueryProvider>
+                <PersistQueryClientProvider
+                  client={queryClient}
+                  persistOptions={queryClientPersistOptions}
+                >
+                  <SyncLocalStorageUserProvider localStorage={localStorage}>
+                    <PersistGate
+                      loading={null}
+                      persistor={getOrCreatePersistor()}
+                      onBeforeLift={() => {
+                        // Reset the player before any children render so that
+                        // NowPlayingDrawer never sees isPlaying=true from a
+                        // previous session. Without this, the PlayBar slide-up
+                        // animation fires (child effects run before parent
+                        // useEffectOnce) and is visible through the fading
+                        // splash screen.
+                        dispatch(
+                          playbackActions.reset({ shouldAutoplay: false })
+                        )
+                      }}
+                    >
+                      <ThemeProvider>
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                          <PortalProvider>
+                            <ErrorBoundary>
+                              <ConnectivityManager />
+                              <NavigationContainer>
+                                <BottomSheetModalProvider>
+                                  <CommentDrawerProvider>
+                                    {/* NiceModal-managed modals (e.g.
                                       ShareDrawer) call useNavigation(), so
                                       the Provider must mount inside
                                       NavigationContainer. */}
-                                  <NiceModal.Provider>
-                                    <PlaybackRatePersistence />
-                                    <PlaybackPositionPersistence />
-                                    <Toasts />
-                                    <Airplay />
-                                    <RootScreen />
-                                    <Drawers />
-                                    <NotificationReminder />
-                                    <RateCtaReminder />
-                                    <PortalHost name='ChatReactionsPortal' />
-                                    {/* DrawerPortal must live INSIDE
+                                    <NiceModal.Provider>
+                                      <PlaybackRatePersistence />
+                                      <PlaybackPositionPersistence />
+                                      <Toasts />
+                                      <Airplay />
+                                      <RootScreen />
+                                      <Drawers />
+                                      <NotificationReminder />
+                                      <RateCtaReminder />
+                                      <PortalHost name='ChatReactionsPortal' />
+                                      {/* DrawerPortal must live INSIDE
                                         BottomSheetModalProvider — its inner
                                         PortalProvider isolates the registry,
                                         so a <Portal hostName='DrawerPortal'>
                                         from within a bottom sheet (e.g. the
                                         comment kebab) would otherwise
                                         silently fail to find the host. */}
-                                    <PortalHost name='DrawerPortal' />
-                                  </NiceModal.Provider>
-                                </CommentDrawerProvider>
-                              </BottomSheetModalProvider>
-                            </NavigationContainer>
-                          </ErrorBoundary>
-                        </PortalProvider>
-                      </GestureHandlerRootView>
-                    </ThemeProvider>
-                  </PersistGate>
-                </SyncLocalStorageUserProvider>
-              </PersistQueryClientProvider>
-            </AudiusQueryProvider>
-          </Provider>
-        </KeyboardProvider>
-      </SafeAreaProvider>
-    </AppContextProvider>
+                                      <PortalHost name='DrawerPortal' />
+                                    </NiceModal.Provider>
+                                  </CommentDrawerProvider>
+                                </BottomSheetModalProvider>
+                              </NavigationContainer>
+                            </ErrorBoundary>
+                          </PortalProvider>
+                        </GestureHandlerRootView>
+                      </ThemeProvider>
+                    </PersistGate>
+                  </SyncLocalStorageUserProvider>
+                </PersistQueryClientProvider>
+              </AudiusQueryProvider>
+            </Provider>
+          </KeyboardProvider>
+        </SafeAreaProvider>
+      </AppContextProvider>
     </LocalizationProvider>
   )
 }

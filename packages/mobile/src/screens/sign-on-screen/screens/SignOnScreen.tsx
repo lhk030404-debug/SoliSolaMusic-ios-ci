@@ -21,7 +21,6 @@ import {
 import { SoliSolaWordmark } from 'app/branding'
 import type { NonLinkProps } from 'app/harmony-native/components/TextLink/types'
 import { dispatch } from 'app/store'
-
 import brand from '../../../../../../config/BRAND.json'
 
 import type { SignOnScreenParamList } from '../types'
@@ -111,10 +110,7 @@ export const SignOnScreen = (props: SignOnScreenProps) => {
           alignItems='stretch'
           style={css({ gap: 48, paddingHorizontal: 16, paddingVertical: 80 })}
         >
-          <SoliSolaWordmark
-            style={css({ alignSelf: 'center' })}
-            height={48}
-          />
+          <SoliSolaWordmark style={css({ alignSelf: 'center' })} height={48} />
           {screen === 'sign-up' ? (
             <CreateEmailScreen onChangeScreen={setScreen} />
           ) : (

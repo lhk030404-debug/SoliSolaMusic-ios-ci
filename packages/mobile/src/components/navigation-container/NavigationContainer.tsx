@@ -8,8 +8,8 @@ import {
   getStateFromPath
 } from '@react-navigation/native'
 
-import { AppTabNavigationProvider } from 'app/screens/app-screen'
 import { useRuntimeKillSwitchOverrides } from 'app/feature-policy'
+import { AppTabNavigationProvider } from 'app/screens/app-screen'
 import { screen } from 'app/services/analytics'
 import { getPrimaryRoute } from 'app/utils/navigation'
 import { useThemeVariant } from 'app/utils/theme'
@@ -32,7 +32,7 @@ const NavigationContainer = (props: NavigationContainerProps) => {
   const { children } = props
   const theme = useThemeVariant()
   const { data: accountHandle } = useCurrentAccountUser({
-    select: (user) => user?.handle
+    select: user => user?.handle
   })
   const hasAccount = useHasAccount()
   const runtimeOverrides = useRuntimeKillSwitchOverrides()

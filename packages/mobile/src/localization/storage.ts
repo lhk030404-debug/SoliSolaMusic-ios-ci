@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
 import type { LocalePreference } from '@solisola/localization'
 import { launchLocales } from '@solisola/localization'
+
 import { LOCALE_PREFERENCE_KEY } from 'app/constants/storage-keys'
 
 const isLocalePreference = (value: string): value is LocalePreference =>

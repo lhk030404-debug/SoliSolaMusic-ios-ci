@@ -4,8 +4,8 @@ import { Platform } from 'react-native'
 
 import { colorTheme } from '../color/color'
 import { motion } from '../motion/motion'
-import { soliSolaTokens } from '../solisola'
 import { shadows } from '../shadows/shadows'
+import { soliSolaTokens } from '../solisola'
 
 const systemFontByWeight = {
   ultraLight: Platform.select({ ios: 'System', android: 'sans-serif-thin' }),
@@ -22,7 +22,7 @@ const typographyOverrides = {
   fontByWeight: {
     ...systemFontByWeight
   },
-  lineHeight: mapValues(harmonyThemes.day.typography.lineHeight, (pxSize) =>
+  lineHeight: mapValues(harmonyThemes.day.typography.lineHeight, pxSize =>
     parseInt(pxSize)
   ),
   shadow: {

@@ -1,5 +1,6 @@
-import designTokenContract from '../../../../../config/DESIGN_TOKENS.json'
 import { Easing } from 'react-native-reanimated'
+
+import designTokenContract from '../../../../../config/DESIGN_TOKENS.json'
 
 const contract = designTokenContract.tokens
 

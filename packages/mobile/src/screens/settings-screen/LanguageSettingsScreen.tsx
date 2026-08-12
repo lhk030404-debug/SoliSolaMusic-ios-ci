@@ -48,7 +48,7 @@ export const LanguageSettingsScreen = () => {
           <Text variant='body' color='neutral' style={styles.description}>
             {t('settings.languageDescription')}
           </Text>
-          {LANGUAGE_OPTIONS.map((option) => {
+          {LANGUAGE_OPTIONS.map(option => {
             const label = t(optionKeys[option])
             const isSelected = preference === option
             const selected = t('languageSettings.selectedAnnouncement', {
@@ -57,9 +57,9 @@ export const LanguageSettingsScreen = () => {
             return (
               <SettingsRow
                 key={option}
-                onPress={() => {
-                  void selectSettingsLanguage(setLocalePreference, option)
-                }}
+                onPress={() =>
+                  selectSettingsLanguage(setLocalePreference, option)
+                }
                 accessibilityLabel={
                   isSelected ? `${label}. ${selected}` : label
                 }

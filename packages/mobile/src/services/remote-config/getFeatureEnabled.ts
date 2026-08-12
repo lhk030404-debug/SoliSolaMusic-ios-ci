@@ -1,6 +1,7 @@
 import { FEATURE_FLAG_OVERRIDE_KEY } from '@audius/common/hooks'
 import type { OverrideSetting } from '@audius/common/hooks'
-import { failClosedFlags, FeatureFlags } from '@audius/common/services'
+import { failClosedFlags } from '@audius/common/services'
+import type { FeatureFlags } from '@audius/common/services'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { remoteConfigInstance } from './remote-config-instance'
