@@ -1,0 +1,20 @@
+.purchaseButtonText {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--harmony-unit-2);
+}
+
+.spinner {
+  width: var(--harmony-unit-5);
+  height: var(--harmony-unit-5);
+}
+
+.spinner g path {
+  stroke: currentColor;
+}
+
+.errorContainer {
+  display: flex;
+  gap: var(--harmony-unit-2);
+  align-items: center;
+}

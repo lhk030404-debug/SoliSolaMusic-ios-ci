@@ -1,0 +1,166 @@
+import { useCallback, useContext } from 'react'
+
+import type { ParamListBase, RouteProp } from '@react-navigation/core'
+import type { Theme } from '@react-navigation/native'
+import type {
+  NativeStackNavigationOptions,
+  NativeStackNavigationProp
+} from '@react-navigation/native-stack'
+import { CardStyleInterpolators } from '@react-navigation/stack'
+import { Text, View } from 'react-native'
+
+import {
+  IconAudiusLogoHorizontal,
+  IconButton,
+  IconCaretLeft,
+  IconSearch
+} from '@audius/harmony-native'
+import { useDrawer } from 'app/hooks/useDrawer'
+import type { ContextualParams } from 'app/hooks/useNavigation'
+import { useNavigation } from 'app/hooks/useNavigation'
+import { makeStyles } from 'app/styles'
+
+import { AppDrawerContext } from '../app-drawer-screen'
+
+import { AccountPictureHeader } from './AccountPictureHeader'
+import type { AppScreenParamList } from './AppTabsScreen'
+
+const useStyles = makeStyles(({ palette, spacing, typography }) => ({
+  headerLeft: { marginLeft: spacing(-2) + 1, width: 40 },
+  headerRight: {
+    paddingVertical: spacing(2),
+    paddingLeft: spacing(2)
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: typography.fontByWeight.bold,
+    color: palette.neutralLight5,
+    textTransform: 'uppercase'
+  },
+  audiusLogo: {
+    height: 24,
+    width: 93,
+    marginRight: 10
+  }
+}))
+
+type Options<ParamList extends ParamListBase = AppScreenParamList> = {
+  navigation: NativeStackNavigationProp<ParamList, string, string | undefined>
+  route: RouteProp<ParamList, string>
+  theme: Theme
+}
+
+export const useAppScreenOptions = <
+  ParamList extends ParamListBase = AppScreenParamList
+>(
+  overrides?: Partial<NativeStackNavigationOptions>
+) => {
+  const styles = useStyles()
+  const navigation = useNavigation()
+  const { drawerHelpers } = useContext(AppDrawerContext)
+  const { isOpen: isNowPlayingDrawerOpen } = useDrawer('NowPlaying')
+
+  const handleOpenLeftNavDrawer = useCallback(() => {
+    // Prevent opening left nav drawer when now-playing drawer is open
+    if (isNowPlayingDrawerOpen) {
+      return
+    }
+    drawerHelpers?.openDrawer()
+  }, [drawerHelpers, isNowPlayingDrawerOpen])
+
+  const handlePressSearch = useCallback(() => {
+    navigation.navigate('explore', {
+      screen: 'SearchExplore',
+      params: { autoFocus: true }
+    })
+  }, [navigation])
+
+  const screenOptions: (
+    options: Options<ParamList>
+  ) => NativeStackNavigationOptions = useCallback(
+    (options) => {
+      const { navigation, route } = options
+      const { params } = route
+      const isFromAppLeftDrawer =
+        params && (params as ContextualParams).fromAppDrawer
+
+      return {
+        // On iOS 26, the default `animation` ('default') makes
+        // `@react-navigation/native-stack` use Apple's
+        // `interactiveContentPopGestureRecognizer`, which is edge-only in our
+        // setup. Picking a non-default animation ('simple_push') combined with
+        // `customAnimationOnGesture: true` flips RNScreens onto its own
+        // `RNSPanGestureRecognizer`, which is full-screen and gives us
+        // swipe-to-pop from anywhere on the screen on both iOS 26 and earlier.
+        animation: isFromAppLeftDrawer ? 'none' : 'simple_push',
+        customAnimationOnGesture: true,
+        fullScreenGestureEnabled: true,
+        freezeOnBlur: true,
+        cardOverlayEnabled: true,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        headerShadowVisible: false,
+        headerTitleAlign: 'center',
+        headerBackVisible: false,
+        headerLeft: (props) => {
+          const { canGoBack, ...other } = props
+          if (canGoBack) {
+            return (
+              <View style={styles.headerLeft}>
+                <IconButton
+                  icon={IconCaretLeft}
+                  color='subdued'
+                  size='l'
+                  {...other}
+                  onPress={() => navigation.pop()}
+                />
+              </View>
+            )
+          }
+          return (
+            <View style={[styles.headerLeft, { marginLeft: 0 }]}>
+              <AccountPictureHeader onPress={handleOpenLeftNavDrawer} />
+            </View>
+          )
+        },
+        title: '',
+        headerTitle: ({ children }) => {
+          if (children === 'none') return null
+          if (children) {
+            return (
+              <Text style={styles.title} accessibilityRole='header'>
+                {children}
+              </Text>
+            )
+          }
+          return (
+            <View>
+              <IconAudiusLogoHorizontal
+                height={24}
+                width={100}
+                color='subdued'
+              />
+            </View>
+          )
+        },
+        headerRightContainerStyle: styles.headerRight,
+        headerRight: () => {
+          return (
+            <View style={styles.headerRight}>
+              <IconButton
+                icon={IconSearch}
+                onPress={handlePressSearch}
+                hitSlop={20}
+                color='subdued'
+                size='m'
+              />
+            </View>
+          )
+        },
+        ...overrides
+      }
+    },
+    [handleOpenLeftNavDrawer, handlePressSearch, styles, overrides]
+  )
+
+  return screenOptions
+}

@@ -1,0 +1,15 @@
+.notificationDot {
+  display: block;
+  border-radius: 100%;
+  background: var(--harmony-secondary);
+}
+
+.large {
+  width: 14px;
+  height: 14px;
+}
+
+.small {
+  width: var(--harmony-unit-2);
+  height: var(--harmony-unit-2);
+}

@@ -1,0 +1,45 @@
+.more {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--harmony-font-xs);
+  font-weight: var(--harmony-font-medium);
+  text-decoration: underline;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.07s ease-in-out;
+}
+.more.light {
+  color: var(--harmony-n-400);
+}
+.more.dark {
+  color: var(--harmony-neutral);
+}
+.more:hover {
+  transform: scale(1.03);
+}
+.more.light:hover {
+  color: var(--harmony-n-600);
+}
+.more.dark:hover {
+  color: var(--harmony-n-700);
+}
+.more:active {
+  transform: scale(0.98);
+}
+.iconArrow {
+  margin-left: 6px;
+  width: 9px;
+}
+.more.light .iconArrow path {
+  fill: var(--harmony-n-400);
+}
+.more.dark .iconArrow path {
+  fill: var(--harmony-neutral);
+}
+.more.light:hover .iconArrow path {
+  fill: var(--harmony-n-600);
+}
+.more.dark:hover .iconArrow path {
+  fill: var(--harmony-n-700);
+}

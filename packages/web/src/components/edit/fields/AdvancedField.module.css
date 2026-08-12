@@ -1,0 +1,38 @@
+.attributionCommercialRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--harmony-unit-3);
+}
+
+.attributionRowItem {
+  flex-grow: 1;
+}
+
+.verticalDivider {
+  height: auto;
+}
+
+.disabled {
+  opacity: 0.5;
+}
+
+.license {
+  display: flex;
+  flex-direction: column;
+  gap: var(--harmony-unit-2);
+  padding: var(--harmony-unit-4);
+  border-radius: 8px;
+  border: 1px solid var(--harmony-border-strong);
+  background: var(--harmony-bg-surface-1);
+  text-transform: capitalize;
+}
+
+.licenseIcons {
+  gap: 6px;
+}
+
+.textFieldContainer {
+  flex: 1 1 0;
+  align-self: flex-start;
+}

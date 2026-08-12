@@ -1,0 +1,29 @@
+.headerSecondary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerSecondary .iconVerified {
+  margin-left: 4px;
+}
+
+.headerSecondary .link {
+  cursor: pointer;
+  transition: all 0.07s ease-in-out;
+}
+
+.headerSecondary .link:hover {
+  text-decoration: underline;
+}
+
+.userLink {
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+  cursor: pointer;
+  transition: all 0.07s ease-in-out;
+}
+
+.userLink:hover {
+  text-decoration: underline;
+}

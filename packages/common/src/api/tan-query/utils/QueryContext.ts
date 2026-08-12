@@ -1,0 +1,105 @@
+import { createContext, useContext } from 'react'
+
+import type { AudiusSdkWithServices } from '@audius/sdk'
+import type { Dispatch } from 'redux'
+import { getContext } from 'typed-redux-saga'
+
+import type { AuthService, IdentityService } from '~/services/auth'
+import {
+  AudiusBackend,
+  Env,
+  FeatureFlags,
+  LocalStorage,
+  RemoteConfigInstance,
+  SolanaWalletService
+} from '~/services/index'
+
+import {
+  AllTrackingEvents,
+  AnalyticsEvent,
+  IdentifyTraits
+} from '../../../models'
+
+export type QueryContextType = {
+  audiusSdk: () => Promise<AudiusSdkWithServices>
+  audiusBackend: AudiusBackend
+  authService: AuthService
+  solanaWalletService: SolanaWalletService
+  identityService: IdentityService
+  dispatch: Dispatch
+  env: Env
+  fetch: typeof fetch
+  localStorage: LocalStorage
+  remoteConfigInstance: RemoteConfigInstance
+  getFeatureEnabled: (
+    flag: FeatureFlags,
+    fallbackFlag?: FeatureFlags
+  ) => Promise<boolean> | boolean
+  analytics: {
+    init: (isMobile: boolean) => Promise<void>
+    track: (event: AnalyticsEvent, callback?: () => void) => Promise<void>
+    identify: (
+      traits: IdentifyTraits,
+      options?: Record<string, unknown>,
+      callback?: () => void
+    ) => Promise<void>
+    make: <T extends AllTrackingEvents>(
+      event: T
+    ) => {
+      eventName: string
+      properties: any
+    }
+  }
+  nftClient: null
+  imageUtils: {
+    generatePlaylistArtwork: (
+      urls: string[]
+    ) => Promise<{ url: string; file: File }>
+  }
+}
+
+export const QueryContext = createContext<QueryContextType>(null as any)
+
+export const useQueryContext = () => {
+  const queryContext = useContext(QueryContext)
+
+  if (!queryContext) {
+    throw new Error(
+      'useQueryContext has to be used within <QueryContext.Provider>'
+    )
+  }
+
+  return queryContext
+}
+
+export function* getQueryContext(): Generator<any, QueryContextType, any> {
+  // We can't use common typed `getContext` here because of circular dependency
+  return {
+    audiusBackend: yield* getContext<QueryContextType['audiusBackend']>(
+      'audiusBackendInstance'
+    ),
+    authService:
+      yield* getContext<QueryContextType['authService']>('authService'),
+    identityService:
+      yield* getContext<QueryContextType['identityService']>('identityService'),
+    audiusSdk: yield* getContext<QueryContextType['audiusSdk']>('audiusSdk'),
+    solanaWalletService: yield* getContext<
+      QueryContextType['solanaWalletService']
+    >('solanaWalletService'),
+    dispatch: yield* getContext<QueryContextType['dispatch']>('dispatch'),
+    env: yield* getContext<QueryContextType['env']>('env'),
+    fetch,
+    localStorage:
+      yield* getContext<QueryContextType['localStorage']>('localStorage'),
+    getFeatureEnabled:
+      yield* getContext<QueryContextType['getFeatureEnabled']>(
+        'getFeatureEnabled'
+      ),
+    remoteConfigInstance: yield* getContext<
+      QueryContextType['remoteConfigInstance']
+    >('remoteConfigInstance'),
+    analytics: yield* getContext<QueryContextType['analytics']>('analytics'),
+    nftClient: null,
+    imageUtils: yield* getContext<QueryContextType['imageUtils']>('imageUtils')
+  }
+}

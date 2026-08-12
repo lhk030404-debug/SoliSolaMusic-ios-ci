@@ -1,0 +1,48 @@
+.actionButton {
+  width: 40px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.animatedActionButton svg,
+.actionButton svg {
+  height: 40px !important;
+  width: 40px !important;
+}
+
+.animatedActionButton svg path {
+  fill: var(--harmony-n-400);
+}
+
+.favoriteButton svg,
+.shareButton svg {
+  height: 30px !important;
+  width: 30px !important;
+}
+
+.actionButton path {
+  fill: var(--harmony-n-400);
+}
+
+.activeButton svg path {
+  fill: var(--harmony-primary);
+}
+
+.disabledButton path {
+  fill: var(--harmony-n-100) !important;
+}
+
+.spinner svg path {
+  stroke: var(--harmony-n-400);
+}
+
+.animatedIconWrapper {
+  width: 40px;
+  height: 100%;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

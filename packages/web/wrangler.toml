@@ -1,0 +1,39 @@
+compatibility_date = "2025-12-10"
+compatibility_flags = ["nodejs_compat"]
+account_id = "3811365464a8e56b2b27a5590e328e49"
+main = "./scripts/workers-site/index.js"
+
+[site]
+bucket = "./build"
+
+[env.release]
+name = "audius-release-candidate"
+services = [
+  { binding = "SSR", service = "audius-web-ssr-release-candidate" }
+]
+vars = { ENVIRONMENT = "production", EMBED = "https://embed.audius.workers.dev", API_URL = "https://api.audius.co", DISCOVERY_NODES = "https://api.audius.co" }
+
+[env.production]
+name = "audius"
+services = [
+  { binding = "SSR", service = "audius-web-ssr" }
+]
+vars = { ENVIRONMENT = "production", EMBED = "https://embed.audius.workers.dev", API_URL = "https://api.audius.co", DISCOVERY_NODES = "https://api.audius.co" }
+
+# Preview environment for PR deployments (GitHub Actions)
+# Deployed on every PR; single preview URL overwritten per build
+[env.preview]
+name = "audius-web-preview"
+services = [
+  { binding = "SSR", service = "audius-web-ssr-preview" }
+]
+vars = { ENVIRONMENT = "production", EMBED = "https://embed.audius.workers.dev", API_URL = "https://api.audius.co", DISCOVERY_NODES = "https://api.audius.co" }
+
+# Test environment, replace `test` with subdomain
+# Invoke with npx wrangler dev --env test
+[env.test]
+name = "test"
+services = [
+  { binding = "SSR", service = "audius-web-ssr-test" }
+]
+vars = { ENVIRONMENT = "production", EMBED = "https://embed.audius.workers.dev", API_URL = "https://api.audius.co", DISCOVERY_NODES = "https://api.audius.co" }

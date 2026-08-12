@@ -1,0 +1,95 @@
+.searchBar {
+  height: 54px;
+  margin: 24px 48px 0px;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 2px;
+}
+
+.modalBody {
+  overflow: hidden;
+  height: 650px;
+  max-width: 500px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  margin: 0px 16px;
+}
+
+.listContent {
+  padding: 0px 32px 24px;
+}
+
+.list {
+  user-select: none;
+  font-size: var(--harmony-font-xs);
+  background-color: var(--harmony-white);
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: var(--harmony-font-l);
+  font-weight: var(--harmony-font-demi-bold);
+  color: var(--harmony-neutral);
+}
+
+.listItem.disabled .playlistName,
+.listItem.disabled .imageWrapper {
+  opacity: 0.5;
+}
+
+.listItem:not(.disabled):hover {
+  cursor: pointer;
+  color: var(--harmony-white);
+  background: var(--harmony-secondary);
+}
+
+.add {
+  margin-right: var(--harmony-spacing-m);
+}
+
+.add path:nth-child(1) {
+  fill: var(--harmony-secondary);
+}
+
+.add path:nth-child(2) {
+  fill: var(--harmony-white);
+}
+
+.listItem:hover .add path:nth-child(1) {
+  fill: var(--harmony-white);
+}
+
+.listItem:hover .add path:nth-child(2) {
+  fill: var(--harmony-secondary);
+}
+
+.listItem:hover .image {
+  border: 1px solid var(--harmony-white);
+}
+
+.imageWrapper {
+  height: 32px;
+  width: 32px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.image {
+  border-radius: 4px;
+}
+
+.playlistName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 32px;
+}

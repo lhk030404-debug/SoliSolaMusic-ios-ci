@@ -1,0 +1,7 @@
+.title {
+  align-self: center;
+}
+
+.button {
+  flex-grow: 1;
+}

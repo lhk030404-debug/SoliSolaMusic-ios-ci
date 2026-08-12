@@ -1,0 +1,7 @@
+.eslintrc.js
+build/**
+build_test/**
+coverage/**
+dist/**
+local-storage/**
+patches/**

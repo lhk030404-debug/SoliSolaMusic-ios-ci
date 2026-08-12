@@ -1,0 +1,289 @@
+import { HashId, Id, type UploadResponse } from '@audius/sdk'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { trackMetadataForUploadToSdk } from '~/adapters'
+import {
+  isContentUSDCPurchaseGated,
+  type USDCPurchaseConditions,
+  Name
+} from '~/models'
+import { createUserBankIfNeeded } from '~/services/audius-backend'
+import { ProgressStatus, uploadActions } from '~/store'
+import type { TrackMetadataForUpload } from '~/store'
+
+import { getTracksBatcher } from '../batchers/getTracksBatcher'
+import { QUERY_KEYS } from '../queryKeys'
+import { useCurrentAccountUser } from '../users/account/accountSelectors'
+import { useCurrentAccount } from '../users/account/useCurrentAccount'
+import { getUserQueryKey } from '../users/useUser'
+import { useQueryContext, type QueryContextType } from '../utils'
+
+import { mutationOptions } from './mutationOptions'
+import { publishStems } from './usePublishStems'
+
+const { updateProgress } = uploadActions
+
+type PublishTracksContext = Pick<
+  QueryContextType,
+  'audiusSdk' | 'analytics' | 'dispatch'
+> & {
+  userId: number
+  ethAddress?: string | null
+  kind?: 'tracks' | 'album' | 'playlist'
+}
+
+type PublishTracksParams = {
+  clientId: string
+  metadata: TrackMetadataForUpload
+  audioUploadResponse: UploadResponse
+  imageUploadResponse: UploadResponse
+  stemsUploadResponses?: UploadResponse[]
+}[]
+
+export const publishTracks = async (
+  context: PublishTracksContext,
+  params: PublishTracksParams
+) => {
+  const {
+    userId,
+    ethAddress,
+    kind,
+    audiusSdk,
+    dispatch,
+    analytics: { make, track }
+  } = context
+
+  if (!context.userId) {
+    throw new Error('User ID and wallet are required to publish tracks')
+  }
+
+  const sdk = await audiusSdk()
+
+  if (
+    ethAddress &&
+    params.some(
+      (p) =>
+        isContentUSDCPurchaseGated(p.metadata.stream_conditions) ||
+        isContentUSDCPurchaseGated(p.metadata.download_conditions)
+    )
+  ) {
+    createUserBankIfNeeded(sdk, {
+      mint: 'USDC',
+      ethAddress,
+      recordAnalytics: track
+    }).catch((error) => {
+      console.error(error)
+    })
+  }
+
+  return await Promise.all(
+    params.map(async (param) => {
+      const snakeMetadata = addPremiumMetadata(userId, param.metadata)
+
+      const trackId = await sdk.tracks.generateTrackId()
+      const camelMetadata = trackMetadataForUploadToSdk({
+        ...snakeMetadata,
+        track_id: trackId
+      })
+
+      const publishParentTrack = async () => {
+        try {
+          const res = await sdk.tracks.publishTrack({
+            userId: Id.parse(userId),
+            metadata: camelMetadata as Parameters<
+              typeof sdk.tracks.publishTrack
+            >[0]['metadata'],
+            audioUploadResponse: param.audioUploadResponse,
+            imageUploadResponse: param.imageUploadResponse
+          })
+          dispatch(
+            updateProgress({
+              clientId: param.clientId,
+              stemIndex: null,
+              key: 'audio',
+              progress: { status: ProgressStatus.COMPLETE }
+            })
+          )
+
+          dispatch(
+            updateProgress({
+              clientId: param.clientId,
+              stemIndex: null,
+              key: 'image',
+              progress: { status: ProgressStatus.COMPLETE }
+            })
+          )
+
+          // Track success analytics for this individual track
+          const analyticsKind =
+            (kind ?? 'tracks') === 'tracks'
+              ? params.length > 1
+                ? 'multi_track'
+                : 'single_track'
+              : kind === 'album'
+                ? 'album'
+                : 'playlist'
+          track(
+            make({
+              eventName: Name.TRACK_UPLOAD_SUCCESS,
+              endpoint: '',
+              kind: analyticsKind
+            })
+          )
+          return { result: res, error: null }
+        } catch (e) {
+          dispatch(
+            updateProgress({
+              clientId: param.clientId,
+              stemIndex: null,
+              key: 'audio',
+              progress: { status: ProgressStatus.ERROR }
+            })
+          )
+          console.error('Upload: Track Publish', e as Error)
+          console.error('Error publishing track:', e)
+          return { result: null, error: e as Error }
+        }
+      }
+
+      // Publish the parent track first, then publish stems sequentially.
+      // Previously both ran concurrently via Promise.all, which caused a race
+      // condition: publishStem calls referenced the parent trackId before it
+      // was confirmed on-chain, so every stem publish failed. The UI then
+      // showed red ⚠ error icons on all stem rows even though the upload
+      // succeeded (reproducible on contest uploads: Burko, Andrew Lux, etc.)
+      const trackResult = await publishParentTrack()
+      const stemsResults = await publishStems(context, {
+        clientId: param.clientId,
+        parentMetadata: param.metadata,
+        stems:
+          param.metadata.stems
+            ?.map((stem, index) => {
+              const audioUploadResponse = param.stemsUploadResponses?.[index]
+
+              // This should never be the case, but being defensive
+              if (!audioUploadResponse) return null
+              return {
+                metadata: stem,
+                audioUploadResponse
+              }
+            })
+            .filter(
+              (stem): stem is NonNullable<typeof stem> => stem !== null
+            ) ?? [],
+        parentTrackId: trackId
+      })
+
+      return {
+        clientId: param.clientId,
+        trackId: trackResult.result?.trackId ?? null,
+        stems: stemsResults,
+        error: trackResult.error
+      }
+    })
+  )
+}
+
+const getPublishTracksOptions = (context: PublishTracksContext) =>
+  mutationOptions({
+    mutationFn: async (params: PublishTracksParams) =>
+      publishTracks(context, params)
+  })
+
+export const usePublishTracks = (
+  options?: Partial<ReturnType<typeof getPublishTracksOptions>> & {
+    kind?: 'tracks' | 'album' | 'playlist'
+  }
+) => {
+  const queryContext = useQueryContext()
+  const queryClient = useQueryClient()
+  const { data: account } = useCurrentAccount()
+  const { data: accountUser } = useCurrentAccountUser()
+  const userId = account?.userId ?? undefined
+  const kind = options?.kind ?? 'tracks'
+
+  return useMutation({
+    ...options,
+    ...getPublishTracksOptions({
+      ...queryContext,
+      userId: userId!,
+      ethAddress: accountUser?.wallet,
+      kind
+    }),
+    onSuccess: async (data) => {
+      const sdk = await queryContext.audiusSdk()
+      const batchGetTracks = getTracksBatcher({
+        sdk,
+        currentUserId: userId,
+        queryClient,
+        dispatch: queryContext.dispatch
+      })
+      // Prefetch the published tracks into the cache
+      await Promise.all(
+        data
+          .filter((res) => !res.error && res.trackId)
+          .map((res) => batchGetTracks.fetch(HashId.parse(res.trackId!)))
+      )
+
+      // Invalidate the user's data to update track count
+      queryClient.invalidateQueries({
+        queryKey: getUserQueryKey(userId)
+      })
+
+      // Invalidate the uploader's profile tracks cache
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.profileTracks, accountUser?.handle]
+      })
+    }
+  })
+}
+
+/*
+ * Given a user's bank and USDC purchase conditions,
+ * returns updated conditions with price in WEI and splits in the new array format.
+ */
+export function getUSDCMetadata(
+  userId: number,
+  stream_conditions: USDCPurchaseConditions
+): USDCPurchaseConditions {
+  const priceCents = stream_conditions.usdc_purchase.price
+  return {
+    usdc_purchase: {
+      price: priceCents,
+      ...(stream_conditions.usdc_purchase.albumTrackPrice != null && {
+        albumTrackPrice: stream_conditions.usdc_purchase.albumTrackPrice
+      }),
+      splits: [
+        {
+          user_id: userId,
+          percentage: 100
+        }
+      ]
+    }
+  }
+}
+
+/**
+ * Adds relevant premium metadata
+ * Converts prices to WEI and adds splits for USDC purchasable content.
+ */
+export function addPremiumMetadata<T extends TrackMetadataForUpload>(
+  userId: number,
+  track: T
+) {
+  // download_conditions could be set separately from stream_conditions, so we check for them first
+  if (isContentUSDCPurchaseGated(track.download_conditions)) {
+    track.download_conditions = getUSDCMetadata(
+      userId,
+      track.download_conditions
+    )
+  }
+
+  if (isContentUSDCPurchaseGated(track.stream_conditions)) {
+    track.stream_conditions = getUSDCMetadata(userId, track.stream_conditions)
+    // If stream_conditions are set, download_conditions should always match
+    track.download_conditions = getUSDCMetadata(userId, track.stream_conditions)
+  }
+
+  return track
+}

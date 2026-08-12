@@ -1,0 +1,28 @@
+@import './colors.css';
+@import './sizing.css';
+@import './emoji.css';
+@import './ant-overrides.css';
+@import './shadows.css';
+
+/* Exclude landing page 2026 and download page so Dust Bucer / Urbanist can apply */
+#root *:not(#landing-page-2026 *):not(#download-page *),
+body *:not(#landing-page-2026 *):not(#download-page *) {
+  font-family: var(--harmony-font-family);
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--harmony-neutral);
+}
+
+body {
+  background: var(--harmony-background);
+  backface-visibility: hidden;
+  /** Turn off user select so the web app behaves more like "an app" */
+  user-select: none;
+}

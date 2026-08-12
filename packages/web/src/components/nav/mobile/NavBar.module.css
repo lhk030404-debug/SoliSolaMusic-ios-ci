@@ -1,0 +1,134 @@
+.container {
+  display: flex;
+  height: 40px;
+  height: calc(40px + env(safe-area-inset-top, 0px));
+  padding: 0px;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) 0px
+    env(safe-area-inset-left, 0px);
+  background-color: var(--harmony-white);
+  border-bottom: 1px solid var(--harmony-n-150);
+  width: 100%;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  min-width: var(--mobile-min-width);
+  user-select: none;
+  touch-action: none;
+}
+
+.leftElement {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-right: auto;
+  position: relative;
+  opacity: 1;
+  margin-left: var(--harmony-spacing-s);
+  transition: opacity 0.3s ease-in-out;
+}
+
+.leftElement.isLoading {
+  opacity: 0;
+}
+
+.logo {
+  cursor: pointer;
+  position: absolute;
+  padding: 0px 8px;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  transform: scale(1);
+  transition: all ease-in-out 0.07s;
+}
+
+.logo:active {
+  transform: scale(0.93);
+}
+
+.rightElement {
+  display: flex;
+  justify-content: flex-end;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  width: 100%;
+}
+
+.rightElement path {
+  fill: var(--harmony-n-400);
+}
+
+.rightElement.isLoading {
+  opacity: 0;
+}
+
+.searchIcon {
+  cursor: pointer;
+  position: absolute;
+  right: 4px;
+  top: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  padding: 0px;
+  margin: 0px;
+  transform: scale(1);
+  transition: all ease-in-out 0.07s;
+}
+
+.searchIcon:active {
+  transform: scale(0.9);
+}
+
+.searchIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.searchBar {
+  flex: 1;
+  margin-right: 0px;
+  margin-left: 24px;
+}
+
+.searchBar input {
+  position: static;
+  background-color: var(--notification-background-active);
+  margin-top: 4px;
+  margin-right: 8px;
+}
+
+.signUpButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 66px;
+  padding: 0;
+  border: none;
+  color: white;
+  background-color: var(--harmony-primary);
+  margin-right: auto;
+  height: 24px;
+  border-radius: 6px;
+  font-family: var(--harmony-font-family);
+  font-size: var(--harmony-font-s);
+  font-weight: var(--harmony-font-demi-bold);
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.centerText {
+  color: var(--harmony-n-300);
+  font-size: var(--harmony-font-l);
+  font-weight: var(--harmony-font-heavy);
+  text-align: center;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  height: calc(100% - env(safe-area-inset-top, 0px));
+  text-transform: uppercase;
+}

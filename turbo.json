@@ -1,0 +1,47 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["^build"],
+      "outputLogs": "new-only"
+    },
+    "rebuild": {
+      "cache": false,
+      "outputLogs": "new-only"
+    },
+    "start": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"],
+      "outputLogs": "new-only"
+    },
+    "start:vite": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"],
+      "outputLogs": "new-only"
+    },
+    "lint": {
+      "outputLogs": "new-only",
+      "dependsOn": ["^build", "^rebuild"]
+    },
+    "lint:fix": {
+      "outputLogs": "new-only",
+      "dependsOn": ["^build", "^rebuild"]
+    },
+    "verify": {
+      "outputLogs": "new-only",
+      "dependsOn": ["^build", "^rebuild"]
+    },
+    "test": {
+      "outputLogs": "new-only",
+      "outputs": ["coverage/**"],
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "outputLogs": "new-only",
+      "dependsOn": ["^build"]
+    }
+  }
+}

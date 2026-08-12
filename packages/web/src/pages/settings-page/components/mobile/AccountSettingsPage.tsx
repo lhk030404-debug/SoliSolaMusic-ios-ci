@@ -1,0 +1,319 @@
+import { useState, useContext, useCallback } from 'react'
+
+import {
+  useQueryContext,
+  useCurrentAccountUser,
+  useCurrentUserEmail
+} from '@audius/common/api'
+import { Name, SquareSizes } from '@audius/common/models'
+import { useTierAndVerifiedForUser } from '@audius/common/store'
+import { route } from '@audius/common/utils'
+import {
+  Button,
+  IconRecoveryEmail,
+  IconEmailAddress,
+  IconError,
+  IconKey,
+  IconSignOut,
+  IconValidationCheck,
+  IconVerified,
+  Flex,
+  Text,
+  IconComponent,
+  useTheme,
+  Image
+} from '@audius/harmony'
+import { debounce } from 'lodash'
+import { useDispatch } from 'react-redux'
+
+import { make, useRecord } from 'common/store/analytics/actions'
+import MobilePageContainer from 'components/mobile-page-container/MobilePageContainer'
+import { ToastContext } from 'components/toast/ToastContext'
+import { useProfilePicture } from 'hooks/useProfilePicture'
+import SignOutModal from 'pages/settings-page/components/mobile/SignOutModal'
+import { push } from 'utils/navigation'
+
+import styles from './AccountSettingsPage.module.css'
+import settingsPageStyles from './SettingsPage.module.css'
+
+const {
+  CHECK_PAGE,
+  CHANGE_EMAIL_SETTINGS_PAGE,
+  CHANGE_PASSWORD_SETTINGS_PAGE
+} = route
+
+const messages = {
+  title: 'Account',
+  description: 'Configure your Audius account',
+  recoveryTitle: 'Resend Recovery Email',
+  recoveryDescription:
+    'Store your recovery email safely. This email is the only way to recover your account if you forget your password.',
+  recoveryButtonTitle: 'Resend Recovery Email',
+  recoveryEmailSent: 'Recovery Email Sent!',
+  recoveryEmailNotSent: 'Unable to send recovery email. Please try again!',
+  emailVerificationTitle: 'Email Verification',
+  emailVerificationDescription:
+    'Verify that you can receive email at the address connected to your Audius account.',
+  emailVerificationButtonTitle: 'Resend Verification Email',
+  emailVerificationSent: 'Verification email sent!',
+  emailVerificationAlreadyVerified: 'Your email is already verified.',
+  emailVerificationNotSent:
+    'Unable to send verification email. Please try again!',
+  emailVerifiedStatus: 'Email verified',
+  emailNotVerifiedStatus: 'Email not verified',
+  verifyTitle: 'Verify Your Account',
+  verifyDescription:
+    'Verify your Audius profile by completing identity verification',
+  verifyButtonTitle: 'Get Verified',
+  emailTitle: 'Change Email',
+  emailDescription: 'Change the email you use to sign in and receive emails.',
+  emailButtonTitle: 'Change Email',
+  passwordTitle: 'Change Password',
+  passwordDescription: 'Change the password to your Audius account.',
+  passwordButtonTitle: 'Change Password',
+  signOutTitle: 'Sign Out',
+  signOutDescription: 'Sign out of your Audius Account.',
+  signOutButtonTitle: 'Sign Out',
+  deleteAccountTitle: 'Delete Account',
+  deleteAccountDescription: 'Delete your account. This cannot be undone',
+  deleteAccountButtonTitle: 'Delete Account',
+
+  signOut:
+    'Make sure you have your account recovery email stored somewhere safe before signing out!',
+  emailSent: 'Email Sent!',
+  emailNotSent: 'Something broke! Please try again!'
+}
+
+type AccountSettingsItemProps = {
+  title: string
+  description: string
+  icon: IconComponent
+  buttonTitle: string
+  disabled?: boolean
+  onClick: () => void
+  /** Optional verification status shown above the action button. */
+  isVerified?: boolean
+  verifiedText?: string
+  notVerifiedText?: string
+  /** Hide the action button (e.g. once the email is verified). */
+  hideButton?: boolean
+}
+
+const AccountSettingsItem = ({
+  title,
+  description,
+  icon: Icon,
+  buttonTitle,
+  disabled,
+  onClick,
+  isVerified,
+  verifiedText,
+  notVerifiedText,
+  hideButton
+}: AccountSettingsItemProps) => {
+  const { color } = useTheme()
+  return (
+    <Flex
+      direction='column'
+      ph='l'
+      pv='m'
+      gap='s'
+      backgroundColor='white'
+      w='100%'
+      css={{
+        borderTop: `1px solid ${color.border.default}`,
+        '&:last-child': {
+          borderBottom: `1px solid ${color.border.default}`
+        }
+      }}
+    >
+      <Flex alignItems='center' gap='s'>
+        <Icon color='default' width={16} height={16} />
+        <Text variant='title' strength='weak' size='s'>
+          {title}
+        </Text>
+      </Flex>
+      <Text
+        variant='body'
+        size='xs'
+        textAlign='start'
+        css={{ lineHeight: '166%' }}
+      >
+        {description}
+      </Text>
+      {verifiedText && notVerifiedText ? (
+        <Flex alignItems='center' gap='xs'>
+          {isVerified ? (
+            <IconValidationCheck size='s' />
+          ) : (
+            <IconError size='s' color='subdued' />
+          )}
+          <Text variant='body' size='xs' color='subdued'>
+            {isVerified ? verifiedText : notVerifiedText}
+          </Text>
+        </Flex>
+      ) : null}
+      {hideButton ? null : (
+        <Button
+          variant='secondary'
+          size='small'
+          fullWidth
+          onClick={onClick}
+          disabled={disabled}
+        >
+          {buttonTitle}
+        </Button>
+      )}
+    </Flex>
+  )
+}
+
+const AccountSettingsPage = () => {
+  const dispatch = useDispatch()
+  const { authService, identityService } = useQueryContext()
+  const { data: accountData } = useCurrentAccountUser({
+    select: (user) => ({
+      handle: user?.handle,
+      userId: user?.user_id,
+      name: user?.name
+    })
+  })
+  const { userId, handle, name } = accountData ?? {}
+  const { data: emailData } = useCurrentUserEmail()
+  const isEmailVerified = emailData?.isEmailVerified
+  const [showModalSignOut, setShowModalSignOut] = useState(false)
+  const [isSendingVerificationEmail, setIsSendingVerificationEmail] =
+    useState(false)
+  const { toast } = useContext(ToastContext)
+  const { isVerified } = useTierAndVerifiedForUser(userId)
+
+  const goToRoute = useCallback(
+    (route: string) => dispatch(push(route)),
+    [dispatch]
+  )
+
+  const profilePicture = useProfilePicture({
+    userId,
+    size: SquareSizes.SIZE_480_BY_480
+  })
+  const record = useRecord()
+  const onClickRecover = useCallback(
+    () =>
+      debounce(
+        async () => {
+          try {
+            await identityService.sendRecoveryInfo(
+              await authService.generateRecoveryInfo()
+            )
+            toast(messages.emailSent)
+            record(make(Name.SETTINGS_RESEND_ACCOUNT_RECOVERY, {}))
+          } catch (e) {
+            toast(messages.emailNotSent)
+          }
+        },
+        2000,
+        { leading: true, trailing: false }
+      )(),
+    [authService, identityService, toast, record]
+  )
+
+  const onClickResendVerificationEmail = useCallback(async () => {
+    setIsSendingVerificationEmail(true)
+    try {
+      const result = await identityService.resendEmailVerification()
+      toast(
+        result.alreadyVerified
+          ? messages.emailVerificationAlreadyVerified
+          : messages.emailVerificationSent
+      )
+    } catch (e) {
+      toast(messages.emailVerificationNotSent)
+    } finally {
+      setIsSendingVerificationEmail(false)
+    }
+  }, [identityService, toast])
+
+  const goToChangePasswordSettingsPage = useCallback(() => {
+    goToRoute(CHANGE_PASSWORD_SETTINGS_PAGE)
+  }, [goToRoute])
+
+  const goToVerification = useCallback(() => {
+    goToRoute(CHECK_PAGE)
+  }, [goToRoute])
+
+  const goToChangeEmailSettingsPage = useCallback(() => {
+    goToRoute(CHANGE_EMAIL_SETTINGS_PAGE)
+  }, [goToRoute])
+
+  return (
+    <MobilePageContainer
+      title={messages.title}
+      description={messages.description}
+      containerClassName={settingsPageStyles.pageBackground}
+    >
+      <div className={settingsPageStyles.bodyContainer}>
+        <div className={styles.account}>
+          <Image src={profilePicture} className={styles.profilePicture} />
+          <div className={styles.info}>
+            <div className={styles.name}>{name}</div>
+            <div className={styles.handle}>{`@${handle}`}</div>
+          </div>
+        </div>
+        <AccountSettingsItem
+          icon={IconRecoveryEmail}
+          title={messages.recoveryTitle}
+          description={messages.recoveryDescription}
+          buttonTitle={messages.recoveryButtonTitle}
+          onClick={onClickRecover}
+        />
+        <AccountSettingsItem
+          icon={IconEmailAddress}
+          title={messages.emailVerificationTitle}
+          description={messages.emailVerificationDescription}
+          buttonTitle={messages.emailVerificationButtonTitle}
+          onClick={onClickResendVerificationEmail}
+          disabled={isSendingVerificationEmail}
+          isVerified={isEmailVerified}
+          verifiedText={messages.emailVerifiedStatus}
+          notVerifiedText={messages.emailNotVerifiedStatus}
+          hideButton={isEmailVerified}
+        />
+        <AccountSettingsItem
+          icon={IconVerified}
+          title={messages.verifyTitle}
+          description={messages.verifyDescription}
+          buttonTitle={messages.verifyButtonTitle}
+          onClick={goToVerification}
+          disabled={isVerified}
+        />
+        <AccountSettingsItem
+          icon={IconEmailAddress}
+          title={messages.emailTitle}
+          description={messages.emailDescription}
+          buttonTitle={messages.emailButtonTitle}
+          onClick={goToChangeEmailSettingsPage}
+        />
+        <AccountSettingsItem
+          icon={IconKey}
+          title={messages.passwordTitle}
+          description={messages.passwordDescription}
+          buttonTitle={messages.passwordButtonTitle}
+          onClick={goToChangePasswordSettingsPage}
+        />
+        <AccountSettingsItem
+          icon={IconSignOut}
+          title={messages.signOutTitle}
+          description={messages.signOutDescription}
+          buttonTitle={messages.signOutButtonTitle}
+          onClick={() => setShowModalSignOut(true)}
+        />
+        <SignOutModal
+          isOpen={showModalSignOut}
+          onClose={() => setShowModalSignOut(false)}
+        />
+      </div>
+    </MobilePageContainer>
+  )
+}
+
+export default AccountSettingsPage

@@ -1,0 +1,18 @@
+.container {
+  flex: 0 0 74px;
+  height: 74px;
+}
+
+.imageWrapper {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Empty artwork: image icon always visible on gray (no skeleton) */
+.artworkIconVisible {
+  opacity: 1 !important;
+  background-color: transparent !important;
+}
+.artworkIconVisible path {
+  fill: var(--harmony-static-white);
+}

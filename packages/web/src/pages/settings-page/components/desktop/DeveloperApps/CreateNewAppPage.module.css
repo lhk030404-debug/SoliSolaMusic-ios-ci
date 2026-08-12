@@ -1,0 +1,22 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--harmony-unit-6);
+}
+
+.actionsContainer {
+  display: flex;
+  gap: var(--harmony-unit-2);
+}
+
+.errorContainer {
+  text-align: center;
+}
+
+.errorText {
+  text-align: center;
+  font-weight: var(--harmony-font-bold);
+  color: var(--harmony-red);
+  font-size: var(--harmony-font-m);
+  line-height: 120%;
+}

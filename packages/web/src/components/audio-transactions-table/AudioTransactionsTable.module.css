@@ -1,0 +1,26 @@
+.textContainer {
+  position: relative;
+  display: inline-flex;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.textCell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.typeText {
+  line-height: 150%;
+}
+
+.tableWrapper {
+  padding-bottom: 0;
+  margin-bottom: 96px;
+}
+
+.tableWrapper :global([class*='showMoreContainer']) {
+  background-color: transparent;
+}

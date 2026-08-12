@@ -1,0 +1,71 @@
+/**
+ * Track genre accepts any string up to 100 characters. This enum lists the
+ * canonical/known values used for autocomplete suggestions; arbitrary strings
+ * are also valid at the API and SDK layers.
+ *
+ * Key naming matches the previous generated-enum style (PascalCase) for
+ * backwards compatibility with downstream consumers (e.g. @audius/common,
+ * web, mobile).
+ */
+export enum Genre {
+  All = 'All Genres',
+  Electronic = 'Electronic',
+  Rock = 'Rock',
+  Metal = 'Metal',
+  Alternative = 'Alternative',
+  HipHopRap = 'Hip-Hop/Rap',
+  Experimental = 'Experimental',
+  Punk = 'Punk',
+  Folk = 'Folk',
+  Pop = 'Pop',
+  Ambient = 'Ambient',
+  Soundtrack = 'Soundtrack',
+  World = 'World',
+  Jazz = 'Jazz',
+  Acoustic = 'Acoustic',
+  Funk = 'Funk',
+  RbSoul = 'R&B/Soul',
+  Devotional = 'Devotional',
+  Classical = 'Classical',
+  Reggae = 'Reggae',
+  Podcasts = 'Podcasts',
+  Country = 'Country',
+  SpokenWord = 'Spoken Word',
+  Comedy = 'Comedy',
+  Blues = 'Blues',
+  Kids = 'Kids',
+  Audiobooks = 'Audiobooks',
+  Latin = 'Latin',
+  LoFi = 'Lo-Fi',
+  Hyperpop = 'Hyperpop',
+  Dancehall = 'Dancehall',
+
+  // Electronic Subgenres
+  Techno = 'Techno',
+  Trap = 'Trap',
+  House = 'House',
+  TechHouse = 'Tech House',
+  DeepHouse = 'Deep House',
+  Disco = 'Disco',
+  Electro = 'Electro',
+  Jungle = 'Jungle',
+  ProgressiveHouse = 'Progressive House',
+  Hardstyle = 'Hardstyle',
+  GlitchHop = 'Glitch Hop',
+  Trance = 'Trance',
+  FutureBass = 'Future Bass',
+  FutureHouse = 'Future House',
+  TropicalHouse = 'Tropical House',
+  Downtempo = 'Downtempo',
+  DrumBass = 'Drum & Bass',
+  Dubstep = 'Dubstep',
+  JerseyClub = 'Jersey Club',
+  Vaporwave = 'Vaporwave',
+  Moombahton = 'Moombahton'
+}
+
+/**
+ * Track genre value type. Any string up to 100 characters is accepted at the
+ * API layer. The {@link Genre} enum provides canonical autocomplete values.
+ */
+export type GenreString = Genre | string

@@ -1,0 +1,19 @@
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.readMore {
+  all: unset;
+  color: var(--harmony-secondary);
+}
+
+.readMore:hover {
+  text-decoration: underline !important;
+}
+
+.title {
+  font-size: var(--harmony-font-l);
+  font-weight: var(--harmony-font-bold);
+  color: var(--harmony-secondary);
+}

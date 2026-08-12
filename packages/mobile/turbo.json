@@ -1,0 +1,34 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "@audius/common#build",
+        "@audius/fixed-decimal#build",
+        "@audius/eth#build",
+        "@audius/spl#build"
+      ],
+      "outputs": ["dist/**", "build/**"],
+      "outputLogs": "new-only"
+    },
+    "android": {
+      "env": ["ENVFILE"],
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "new-only"
+    },
+    "ios": {
+      "env": ["ENVFILE"],
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "new-only"
+    },
+    "bundle:ios": {
+      "outputs": ["./ios/main.jsbundle"],
+      "dependsOn": ["build"],
+      "outputLogs": "new-only"
+    }
+  }
+}

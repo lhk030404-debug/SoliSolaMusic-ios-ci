@@ -1,0 +1,102 @@
+.wrapper {
+  width: 100%;
+  display: flex;
+  position: relative;
+}
+
+.wrapper.horizontal {
+  flex-direction: row;
+}
+.wrapper.horizontal .label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 8px;
+}
+
+.wrapper.vertical {
+  flex-direction: column;
+}
+.wrapper.vertical .label {
+  margin-bottom: 4px;
+}
+
+.label {
+  margin-bottom: 4px;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+.tagInput {
+  width: 100%;
+  border: 1px solid var(--harmony-n-100);
+  border-radius: 6px;
+  padding: 4px 16px;
+  background-color: var(--harmony-n-25);
+  color: var(--harmony-neutral);
+  font-weight: 500;
+  gap: 8px;
+
+  cursor: text;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  user-select: none;
+  transition: border ease-in-out 0.1s;
+}
+.wrapper.normal > .tagInput {
+  min-height: 50px;
+}
+.wrapper.small > .tagInput {
+  min-height: 34px;
+}
+.wrapper.normal.horizontal .label {
+  max-height: 50px;
+}
+.wrapper.small.horizontal .label {
+  max-height: 34px;
+}
+.tagInput:hover {
+  border-color: var(--harmony-n-200);
+}
+.wrapper.focused .tagInput {
+  border-color: var(--harmony-secondary);
+}
+
+.flash {
+  background-color: var(--harmony-white);
+  color: var(--harmony-neutral);
+}
+
+.flash g path {
+  fill: var(--harmony-neutral);
+}
+
+.newTagInput {
+  height: 20px;
+  margin: 4px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  width: 0;
+  color: var(--harmony-neutral);
+}
+
+.activeInput {
+  width: 100px;
+}
+
+.tagCount {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  color: var(--harmony-n-400);
+  font-size: 12px;
+  font-weight: 500;
+}
+.tagCount.nearLimit {
+  color: var(--harmony-orange);
+  font-weight: var(--harmony-font-bold);
+}

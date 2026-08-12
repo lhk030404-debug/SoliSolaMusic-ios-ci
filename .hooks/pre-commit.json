@@ -1,0 +1,9 @@
+{
+  "steps": [
+    {
+      "name": "check secrets",
+      "command": "[[ -n $CI ]] || npm run check-secrets"
+    }
+  ]
+}
+

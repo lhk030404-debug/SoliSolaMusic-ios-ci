@@ -1,0 +1,143 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+require 'json'
+require 'net/http'
+require 'securerandom'
+
+default_platform(:ios)
+
+AUDIUSMUSIC_ID = "co.audius.audiusmusic"
+AUDIUSMUSIC_RELEASECANDIDATE_ID = "co.audius.audiusmusic.releasecandidate"
+AUDIUSMUSIC_PROFILE = "match AppStore co.audius.audiusmusic"
+AUDIUSMUSIC_RELEASECANDIDATE_PROFILE = "match AppStore co.audius.audiusmusic.releasecandidate"
+TEAM = "LRFCG93S85"
+
+platform :ios do
+  before_all do
+    setup_circle_ci
+  end
+
+  desc "Build the app"
+  lane :build do |options|
+
+    if options[:bundle_id] === AUDIUSMUSIC_ID
+      appId = AUDIUSMUSIC_ID
+      provisioningProfile = AUDIUSMUSIC_PROFILE
+      environment = 'prod'
+      scheme = 'AudiusReactNative'
+      configuration = 'Release'
+    elsif options[:bundle_id] === AUDIUSMUSIC_RELEASECANDIDATE_ID
+      appId = AUDIUSMUSIC_RELEASECANDIDATE_ID
+      provisioningProfile = AUDIUSMUSIC_RELEASECANDIDATE_PROFILE
+      environment = 'prod'
+      scheme = 'AudiusReactNative'
+      configuration = 'ReleaseCandidate'
+    end
+
+    match(
+      type: "appstore",
+      readonly: is_ci,
+      app_identifier: [options[:bundle_id], "#{options[:bundle_id]}.RichPushExtension"]
+    )
+
+    settings_to_override = {
+      :BUNDLE_IDENTIFIER => appId,
+      :DEVELOPMENT_TEAM => TEAM
+    }
+
+    ENV["ENVFILE"]=".env.#{environment}"
+    puts "ENVFILE: #{ENV['ENVFILE']}"
+
+    plistVersionNumber = options[:plist_version] ? (options[:plist_version]) : (Gem::Version.new get_version_number_from_plist(
+      scheme: scheme
+    ))
+
+    # Increment build
+
+    # Build number (e.g. 12) needs to be unique for the given version number
+    # Increment using the updated version number so that for each version number
+    # build numbers start at 1
+
+    app_store_connect_api_key
+    increment_build_number(
+      build_number: app_store_build_number(
+        app_identifier: options[:bundle_id],
+        initial_build_number: 0,
+        version: plistVersionNumber.to_s,
+        live: false
+      ) + 1,
+    )
+
+    # Build ios
+    gym(
+      workspace: "AudiusReactNative.xcworkspace",
+      codesigning_identity: "iPhone Distribution",
+      scheme: scheme,
+      configuration: configuration,
+      output_directory: "./output/gym",
+      xcargs: settings_to_override,
+      export_method: "app-store",
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: {
+          appId => provisioningProfile,
+          "#{appId}.RichPushExtension" => "#{provisioningProfile}.RichPushExtension"
+        }
+      }
+    )
+  end
+
+  desc "Push a build to TestFlight"
+  lane :upload do |options|
+
+    if (options[:bundle_id] === 'co.audius.audiusmusic') 
+      appleId = "1491270519"
+      ipa = './output/gym/Audius Music.ipa'
+    elsif (options[:bundle_id] === 'co.audius.audiusmusic.releasecandidate')
+      appleId = "6444068448"
+      ipa = './output/gym/Audius Music Release Candidate.ipa'
+    end
+   
+    # Upload to test flight
+    pilot(
+      skip_waiting_for_build_processing: true,
+      apple_id: appleId,
+      app_identifier: options[:bundle_id],
+      ipa: ipa,
+      # Don't actually distribute, just upload
+      skip_submission: true
+    )
+  end
+
+  desc "Build + upload via TestFlight"
+  lane:build_and_upload do |options|
+    if options[:bundle_id] === AUDIUSMUSIC_ID
+      scheme = 'AudiusReactNative'
+    elsif options[:bundle_id] === AUDIUSMUSIC_RELEASECANDIDATE_ID
+      scheme = 'AudiusReactNative'
+    end
+    
+    plistVersionNumber = Gem::Version.new get_version_number_from_plist(
+      scheme: scheme
+    )
+    
+    # Build and upload to TestFlight
+    UI.message "Doing a full build and release"
+    build(bundle_id: options[:bundle_id], plist_version: plistVersionNumber)
+    upload(bundle_id: options[:bundle_id])
+  end
+
+end

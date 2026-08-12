@@ -1,0 +1,45 @@
+/* End of the lineup message */
+
+.endOfLineup {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 40px;
+  user-select: none;
+}
+
+.endTitle {
+  color: var(--harmony-n-300);
+  font-family: var(--harmony-font-family);
+  font-size: var(--harmony-font-xs);
+  font-weight: var(--harmony-font-heavy);
+  letter-spacing: 2px;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+  margin-top: 16px;
+}
+
+.endDescriptionContainer {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+}
+
+.endDescription {
+  color: var(--harmony-n-400);
+  font-family: var(--harmony-font-family);
+  font-size: var(--harmony-font-s);
+  font-weight: var(--harmony-font-medium);
+  letter-spacing: 0.09px;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0px 20px;
+}
+
+.divider {
+  background-color: #e7e6eb;
+  border-top: 1px solid var(--harmony-n-150);
+  width: 100%;
+}

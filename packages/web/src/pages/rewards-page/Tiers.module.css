@@ -1,0 +1,95 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--harmony-white);
+  flex: 1;
+  justify-content: flex-start;
+  border: 1px solid var(--harmony-border-default);
+  border-radius: 12px;
+  box-shadow: 0px 16px 20px var(--table-shadow);
+  min-height: 210px;
+  margin-bottom: 32px;
+}
+
+.title {
+  background: var(--harmony-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-top: 48px;
+  margin-bottom: 0;
+  text-align: center;
+  /* Fluid type vs this header column, not the viewport (titleContainer is the query container) */
+  font-size: clamp(2.25rem, 9cqi, 2.625rem);
+  line-height: 1.24;
+}
+
+.subtitle {
+  display: block;
+  text-wrap: pretty;
+  font-size: clamp(1rem, 4.5cqi, 1.25rem);
+  line-height: 1.65;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+}
+
+.titleContainer {
+  container-type: inline-size;
+  container-name: perks-header;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Tight title → subtitle, then more air before the next section */
+  row-gap: var(--harmony-unit-2);
+  margin-bottom: 88px;
+  max-width: 840px;
+  padding: 0 28px;
+  text-align: center;
+}
+
+.tierNumberText {
+  color: var(--harmony-n-200);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 17.6px;
+  letter-spacing: 0.15em;
+}
+
+.buttonContainer {
+  display: flex;
+  margin: 48px 0px;
+}
+
+.buttonContainer > *:first-child {
+  margin-right: 16px;
+}
+
+.tierLevel {
+  color: var(--harmony-secondary);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+@media (max-width: 980px) {
+  .subtitle {
+    padding: 0px 10px;
+  }
+
+  .titleContainer {
+    margin-bottom: 64px;
+  }
+
+  .buttonContainer {
+    flex-direction: column;
+    margin-top: 24px;
+  }
+
+  .buttonContainer > *:first-child {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+}

@@ -1,0 +1,23 @@
+.nameWrapper > .badge {
+  fill: var(--harmony-static-white);
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.3));
+  margin-bottom: 8px;
+}
+.nameWrapper > .badge.hide {
+  visibility: hidden;
+}
+
+.nameWrapper .editableName {
+  max-width: 440px;
+}
+.nameWrapper .name,
+.nameWrapper .editableName {
+  margin-top: -8px;
+}
+
+.cardLineup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--harmony-unit-3);
+}

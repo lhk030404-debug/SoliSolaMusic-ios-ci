@@ -1,0 +1,93 @@
+#import "AppDelegate.h"
+#import "RNBootSplash.h"
+#import <CodePush/CodePush.h>
+
+#import <GoogleCast/GoogleCast.h>
+#import <React/RCTBridge.h>
+#import <React/RCTBundleURLProvider.h>
+#import <React/RCTRootView.h>
+#import <ReactAppDependencyProvider/RCTAppDependencyProvider.h>
+#import <React/RCTLinkingManager.h>
+#import "RNNotifications.h"
+#import <TiktokOpensdkReactNative-Bridging-Header.h>
+
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application
+   openURL:(NSURL *)url
+   options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+{
+  BOOL handledByTikTokOpenSDK = [TiktokOpensdkReactNative handleOpenURL:url];
+  BOOL handledByRNLinkingManager = [RCTLinkingManager application:application openURL:url options:options];
+  return handledByTikTokOpenSDK || handledByRNLinkingManager;
+}
+
+// Only if your app is using [Universal Links](https://developer.apple.com/library/prerelease/ios/documentation/General/Conceptual/AppSearch/UniversalLinks.html).
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler
+{
+  BOOL handledByTikTokOpenSDK = [TiktokOpensdkReactNative handleUserActivity:userActivity];
+  BOOL handledByRNLinkingManager = [RCTLinkingManager application:application
+                  continueUserActivity:userActivity
+                    restorationHandler:restorationHandler];
+  return handledByTikTokOpenSDK || handledByRNLinkingManager;
+}
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+  [RNNotifications startMonitorNotifications];
+  NSString *receiverAppID = @"222B31C8";
+  GCKDiscoveryCriteria *criteria = [[GCKDiscoveryCriteria alloc] initWithApplicationID:receiverAppID];
+  GCKCastOptions* options = [[GCKCastOptions alloc] initWithDiscoveryCriteria:criteria];
+  // Allow our app to control chromecast volume
+  options.physicalVolumeButtonsWillControlDeviceVolume = YES;
+  // Prevent backgrounding from suspending sessions
+  options.suspendSessionsWhenBackgrounded = NO;
+  [GCKCastContext setSharedInstanceWithOptions:options];
+
+  self.moduleName = @"AudiusReactNative";
+  self.dependencyProvider = [RCTAppDependencyProvider new];
+  // You can add your custom initial props in the dictionary below.
+  // They will be passed down to the ViewController used by React Native.
+  self.initialProps = @{};
+  BOOL result = [super application:application didFinishLaunchingWithOptions:launchOptions];
+  
+  // For react-native-bootsplash v6 with new architecture, we need to initialize after root view is created
+  // The storyboard shows initially, but we need to connect it to React Native for useHideAnimation to work
+
+  return result;
+}
+
+// Override customizeRootView for React Native 0.74+ with new architecture
+- (void)customizeRootView:(RCTRootView *)rootView {
+  [super customizeRootView:rootView];
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+}
+
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+  return [self bundleURL];
+}
+
+- (NSURL *)bundleURL
+{
+#if DEBUG
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
+#else
+  return [CodePush bundleURL];
+#endif
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+  [RNNotifications didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+  [RNNotifications didFailToRegisterForRemoteNotificationsWithError:error];
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
+  [RNNotifications didReceiveBackgroundNotification:userInfo withCompletionHandler:completionHandler];
+}
+
+@end

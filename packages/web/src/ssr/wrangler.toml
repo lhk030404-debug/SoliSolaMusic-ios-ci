@@ -1,0 +1,34 @@
+compatibility_date = "2025-12-10"
+compatibility_flags = ["nodejs_compat"]
+account_id = "3811365464a8e56b2b27a5590e328e49"
+main = "./worker.js"
+
+[site]
+bucket = "../../build-ssr/client"
+
+[env.release]
+name = "audius-web-ssr-release-candidate"
+vars = { VITE_ENVIRONMENT = "production", DISCOVERY_NODE_ALLOWLIST = [
+    "https://api.audius.co"
+] }
+
+[env.production]
+name = "audius-web-ssr"
+vars = { SENTRY_DSN = "https://4db9c77b0bd7ae6a935f8bd58c06dad3@o260428.ingest.sentry.io/4506623015124992", DISCOVERY_NODE_ALLOWLIST = [
+    "https://api.audius.co"
+] }
+
+# Preview environment for PR deployments (GitHub Actions)
+[env.preview]
+name = "audius-web-ssr-preview"
+vars = { DISCOVERY_NODE_ALLOWLIST = [
+    "https://api.audius.co"
+] }
+
+# Test environment, replace `test` with subdomain
+# Invoke with npx wrangler dev --env test
+[env.test]
+name = "test-audius-web-ssr"
+vars = { DISCOVERY_NODE_ALLOWLIST = [
+    "https://api.audius.co"
+] }

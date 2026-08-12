@@ -1,0 +1,41 @@
+.content {
+  position: relative;
+}
+
+.flair {
+  position: absolute;
+  background-color: var(--harmony-white);
+  border-radius: 4px;
+  /* Harmony Image uses positive z-index layers for artwork and overlays. */
+  z-index: 5;
+}
+
+.flair.tiny {
+  bottom: 2px;
+  right: -2px;
+}
+
+.flair.small {
+  bottom: -4px;
+  right: -5px;
+}
+
+.flair.medium {
+  bottom: -3px;
+  right: -3px;
+}
+
+.flair.large {
+  bottom: -8px;
+  right: -8px;
+}
+
+.flair.xlarge {
+  bottom: -7px;
+  right: -8px;
+}
+
+.children {
+  width: 100%;
+  height: 100%;
+}

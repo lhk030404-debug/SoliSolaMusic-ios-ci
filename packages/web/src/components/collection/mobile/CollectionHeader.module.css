@@ -1,0 +1,48 @@
+.coverArt {
+  box-sizing: border-box;
+  height: 224px;
+  width: 224px;
+  border: 1px solid var(--harmony-n-100);
+  border-radius: var(--harmony-border-radius-m);
+  overflow: hidden;
+  margin-bottom: 23px;
+  background-size: cover;
+  background-position: 50%;
+  background-repeat: no-repeat;
+}
+
+/* Loading */
+
+.loadingSkeleton {
+  padding: 0 !important;
+  border-radius: 4px;
+}
+
+.loadingSkeleton.loadingTitle {
+  height: 24px;
+  width: 160px !important;
+}
+.loadingSkeleton.loadingName {
+  height: 24px;
+  width: 120px !important;
+}
+
+.loadingInfoSection {
+  width: 100%;
+}
+
+.loadingDescription {
+  margin-top: 8px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.loadingSkeleton.loadingInfoSection {
+  height: 24px;
+  width: 100% !important;
+}
+
+.loadingSkeleton.loadingDescription {
+  height: 24px;
+  width: 100% !important;
+}

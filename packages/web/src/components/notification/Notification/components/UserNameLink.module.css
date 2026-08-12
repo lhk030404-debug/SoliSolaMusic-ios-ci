@@ -1,0 +1,26 @@
+.root {
+  font-size: var(--harmony-font-medium);
+  font-weight: var(--harmony-font-medium);
+  line-height: 21px;
+}
+
+.deactivated {
+  color: var(--harmony-n-700);
+  font-size: var(--harmony-font-s);
+}
+
+.link {
+  font-size: inherit;
+  font-weight: inherit;
+  color: var(--harmony-secondary);
+  overflow-wrap: break-word;
+}
+
+.badges {
+  margin-left: var(--harmony-unit-1);
+}
+
+.link:hover {
+  color: var(--harmony-secondary);
+  text-decoration: underline !important;
+}

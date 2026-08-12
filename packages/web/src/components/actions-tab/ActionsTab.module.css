@@ -1,0 +1,181 @@
+.actionsSection {
+  display: flex;
+}
+
+.vertical {
+  width: 64px;
+  flex-direction: column;
+  border-radius: 0px 8px 0px 0px;
+}
+
+.actionsSection.small {
+  position: absolute;
+  right: 16px;
+  top: 8px;
+  width: 4px;
+  background: var(--harmony-white);
+}
+.actionButton {
+  position: relative;
+  flex: 1 auto;
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  margin-top: -1px;
+  background-color: var(--harmony-white);
+  border: 1px solid var(--harmony-n-100);
+  cursor: pointer;
+}
+
+.iconKebabHorizontal,
+.actionButton > svg {
+  margin: 0 auto;
+}
+.actionsSection.standalone .actionButton:first-child {
+  border-radius: 0px 0px 0px 8px;
+}
+.actionsSection.standalone .actionButton:last-child {
+  border-radius: 0px 0px 8px 0px;
+}
+
+.actionsSection.vertical .actionButton:first-child {
+  margin-top: 0px;
+  border-radius: 0px 8px 0px 0px;
+}
+.actionsSection.standalone.vertical .actionButton:last-child {
+  border-radius: 0px 0px 8px 0px;
+}
+
+.actionsSection .actionButton:hover {
+  z-index: 1;
+}
+
+.actionsSection.horizontal .actionButton {
+  border-bottom: none;
+}
+
+.actionsSection.horizontal .actionButton:first-child {
+  border-left: none;
+}
+.actionsSection.horizontal .actionButton:last-child {
+  border-right: none;
+}
+
+.show.actionsSection .actionButton:hover {
+  background: var(--harmony-n-50);
+  border-color: var(--harmony-n-150);
+}
+.show.actionsSection .actionButton:active {
+  box-shadow: inset 1px 1px 0 0 var(--harmony-n-150);
+  border-color: var(--harmony-n-150);
+  background: var(--harmony-n-100);
+}
+.show.actionsSection .actionButton:active path {
+  fill: var(--harmony-neutral);
+}
+
+.iconContainer {
+  width: 24px;
+  height: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuKebabContainer > div {
+  width: 100%;
+}
+
+.iconKebabHorizontalWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.iconKebabHorizontalWrapper:focus {
+  outline: none;
+}
+
+.iconKebabHorizontalWrapper:focus-visible {
+  border-radius: 999px;
+  outline: 2px solid var(--harmony-focus, var(--harmony-secondary));
+  outline-offset: 3px;
+}
+
+.iconKebabHorizontalRef {
+  display: flex;
+}
+
+.actionButton svg,
+.iconContainer svg,
+.iconKebabHorizontalWrapper svg {
+  transition: all 0.07s ease-in-out !important;
+}
+
+.show .actionButton:hover svg,
+.show .iconContainer:hover svg,
+.show .iconKebabHorizontalWrapper:hover svg {
+  transform: scale3d(1.1, 1.1, 1.1);
+}
+
+.show .actionButton:active svg,
+.show .iconContainer:active svg,
+.show .iconKebabHorizontalWrapper:active svg {
+  transform: scale(0.95);
+}
+
+.iconRepost path,
+.iconShare path,
+.iconKebabHorizontal path,
+.iconListens path {
+  fill: var(--harmony-n-400);
+}
+.iconRepost.reposted path {
+  fill: var(--harmony-primary);
+}
+
+.disabled {
+  cursor: default !important;
+}
+.disabled .actionButton:hover,
+.disabled:hover {
+  background-color: var(--harmony-white) !important;
+  border-color: var(--harmony-n-100) !important;
+  box-shadow: none !important;
+}
+.show .disabled .actionButton:active,
+.disabled:active {
+  background-color: var(--harmony-white);
+  border-color: var(--harmony-n-100);
+  box-shadow: none;
+}
+
+.disabled .iconRepost path,
+.disabled .iconKebabHorizontal path,
+.disabled .iconShare path {
+  fill: var(--harmony-n-100) !important;
+}
+
+.disabled .actionButton:hover svg,
+.disabled .iconContainer:hover svg,
+.disabled .iconKebabHorizontalWrapper:hover svg,
+.disabled svg {
+  transform: scale3d(1, 1, 1) !important;
+}
+
+.actionIconContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disabled .actionIconContainer,
+.disabled .iconKebabHorizontalWrapper {
+  cursor: default;
+}

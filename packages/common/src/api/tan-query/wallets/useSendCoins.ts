@@ -1,0 +1,211 @@
+import { PublicKey } from '@solana/web3.js'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { useQueryContext } from '~/api/tan-query/utils'
+import { Name, SolanaWalletAddress } from '~/models'
+import { getErrorMessage } from '~/utils'
+
+import { getUserCoinQueryKey } from '../coins/useUserCoin'
+import { useCurrentAccountUser } from '../users/account/accountSelectors'
+import { useWalletAddresses } from '../users/account/useWalletAddresses'
+
+import {
+  invalidateAudioBalance,
+  updateAudioBalanceOptimistically
+} from './useAudioBalance'
+import { useCoinBalance } from './useCoinBalance'
+
+export type SendCoinsParams = {
+  recipientWallet: SolanaWalletAddress
+  amount: bigint
+  recipientEthAddress?: string // Optional: when sending to a user, provide their ETH address to derive user-bank ATA
+  /** Where the send was initiated (for analytics parity with legacy Tip Audio) */
+  source?: string
+  /** Recipient handle when sending to a known user (for analytics) */
+  recipientHandle?: string
+}
+
+export type SendCoinsResult = {
+  signature: string
+  success: boolean
+}
+
+/**
+ * Hook for sending coins on Solana blockchain.
+ * This hook handles only Solana transfers, not ETH transfers.
+ *
+ * @returns Mutation object with sendCoins function and status
+ */
+export const useSendCoins = ({ mint }: { mint: string }) => {
+  const queryClient = useQueryClient()
+  const { audiusBackend, audiusSdk, analytics, env } = useQueryContext()
+  const { data: walletAddresses } = useWalletAddresses()
+  const { data: currentUser } = useCurrentAccountUser()
+
+  const { data: coinBalance } = useCoinBalance({
+    mint,
+    includeExternalWallets: true,
+    includeStaked: false
+  })
+
+  const isAudioMint = mint === env.WAUDIO_MINT_ADDRESS
+
+  return useMutation({
+    mutationFn: async ({
+      recipientWallet,
+      amount,
+      recipientEthAddress
+    }: SendCoinsParams): Promise<SendCoinsResult> => {
+      try {
+        const currentUser = walletAddresses?.currentUser
+        if (!currentUser) {
+          throw new Error('Failed to retrieve current user wallet address')
+        }
+
+        const sdk = await audiusSdk()
+
+        if (!coinBalance?.balance || coinBalance.balance.value < amount) {
+          throw new Error('Insufficient balance to send tokens')
+        }
+
+        const { res: signature } = await audiusBackend.sendTokens({
+          address: recipientWallet,
+          amount: amount as any, // TODO: Fix type mismatch between bigint and AudioWei
+          ethAddress: currentUser,
+          sdk,
+          mint: new PublicKey(mint) as any, // TODO: Fix type mismatch between string and MintName | PublicKey
+          recipientEthAddress // Optional: when provided, derives user-bank ATA instead of regular ATA
+        })
+
+        return {
+          signature,
+          success: true
+        }
+      } catch (error) {
+        console.error('Error sending coins:', error)
+
+        const errorMessage = getErrorMessage(error)
+
+        if (errorMessage === 'Missing social proof') {
+          throw new Error('Missing social proof')
+        }
+        if (
+          errorMessage ===
+          'Recipient has no $AUDIO token account. Please install Phantom-Wallet to create one.'
+        ) {
+          throw new Error(errorMessage)
+        }
+        // Preserve network-related error messages
+        if (
+          errorMessage.includes('Failed to connect to Solana network') ||
+          errorMessage.includes('Failed to get recent blockhash') ||
+          errorMessage.includes('fetch failed') ||
+          errorMessage.includes('network')
+        ) {
+          throw new Error(errorMessage)
+        }
+
+        throw new Error('Something has gone wrong, please try again.')
+      }
+    },
+    onMutate: async ({ amount }) => {
+      const userId = currentUser?.user_id ?? null
+      const queryKey = getUserCoinQueryKey(mint, userId)
+      await queryClient.cancelQueries({ queryKey })
+
+      const previousBalance = queryClient.getQueryData(queryKey)
+
+      if (previousBalance) {
+        queryClient.setQueryData(queryKey, (old) => {
+          if (!old) return old
+
+          const amountNumber = Number(amount)
+          return {
+            ...old,
+            balance: old.balance - amountNumber,
+            accounts: old.accounts?.map((account: any) =>
+              account.isInAppWallet
+                ? { ...account, balance: account.balance - amountNumber }
+                : account
+            )
+          }
+        })
+      }
+
+      // For AUDIO, also optimistically update the audio balance queries
+      if (isAudioMint && currentUser?.spl_wallet) {
+        updateAudioBalanceOptimistically({
+          queryClient,
+          splWallet: currentUser.spl_wallet,
+          changeLamports: -amount // Negative because we're sending coins
+        })
+      }
+
+      return { previousBalance }
+    },
+    onSuccess: (_, { recipientWallet, amount, source, recipientHandle }) => {
+      if (isAudioMint && analytics) {
+        const senderWallet = walletAddresses?.currentUser
+        if (senderWallet) {
+          analytics.track(
+            analytics.make({
+              eventName: Name.SEND_AUDIO_SUCCESS,
+              from: senderWallet,
+              recipient: recipientWallet,
+              amount: amount.toString(),
+              source,
+              senderHandle: currentUser?.handle ?? undefined,
+              senderWallet,
+              recipientHandle: recipientHandle ?? undefined,
+              recipientWallet
+            })
+          )
+        }
+      }
+    },
+    onError: (
+      error,
+      { amount, recipientWallet, source, recipientHandle },
+      context
+    ) => {
+      if (context?.previousBalance) {
+        const userId = currentUser?.user_id ?? null
+        const queryKey = getUserCoinQueryKey(mint, userId)
+        queryClient.setQueryData(queryKey, context.previousBalance)
+      }
+
+      // For AUDIO, invalidate the audio balance queries to refetch the correct balance
+      if (isAudioMint && currentUser?.spl_wallet) {
+        invalidateAudioBalance({
+          queryClient,
+          splWallet: currentUser.spl_wallet
+        })
+      }
+
+      if (isAudioMint && analytics) {
+        const senderWallet = walletAddresses?.currentUser
+        if (senderWallet) {
+          analytics.track(
+            analytics.make({
+              eventName: Name.SEND_AUDIO_FAILURE,
+              from: senderWallet,
+              recipient: recipientWallet,
+              error: error instanceof Error ? error.message : 'Unknown error',
+              amount: amount.toString(),
+              source,
+              senderHandle: currentUser?.handle ?? undefined,
+              senderWallet,
+              recipientHandle: recipientHandle ?? undefined,
+              recipientWallet
+            })
+          )
+        }
+      }
+
+      console.error(
+        'Send Coins',
+        error instanceof Error ? error : new Error(error as string)
+      )
+    }
+  })
+}

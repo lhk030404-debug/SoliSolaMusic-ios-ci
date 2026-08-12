@@ -1,0 +1,16 @@
+.content > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--harmony-unit-6);
+}
+
+.footer {
+  display: flex;
+  gap: var(--harmony-unit-2);
+  padding: 0 var(--harmony-unit-6) var(--harmony-unit-6);
+}
+
+.button {
+  flex: 1;
+}

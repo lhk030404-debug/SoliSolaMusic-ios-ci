@@ -1,0 +1,16 @@
+.root {
+  font-size: var(--harmony-font-medium);
+  font-weight: var(--harmony-font-medium);
+  line-height: 21px;
+}
+
+.link {
+  font-size: inherit;
+  font-weight: inherit;
+  color: var(--harmony-secondary);
+}
+
+.link:hover {
+  color: var(--harmony-secondary);
+  text-decoration: underline !important;
+}

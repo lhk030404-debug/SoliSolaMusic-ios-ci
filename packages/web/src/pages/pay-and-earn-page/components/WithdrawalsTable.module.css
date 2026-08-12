@@ -1,0 +1,9 @@
+.text {
+  line-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.methodHeader {
+  padding-left: 0;
+}

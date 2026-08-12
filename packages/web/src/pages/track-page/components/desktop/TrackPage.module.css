@@ -1,0 +1,16 @@
+.commentsAndLineupContainer {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  container-type: inline-size;
+}
+
+.commentsAndLineupSection {
+  flex-direction: row;
+}
+
+@container (max-width: 740px) {
+  .commentsAndLineupSection {
+    flex-direction: column;
+  }
+}

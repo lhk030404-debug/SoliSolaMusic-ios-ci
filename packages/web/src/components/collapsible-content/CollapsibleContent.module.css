@@ -1,0 +1,8 @@
+.collapsibleContainer {
+  /** Unfortunately, this calcluates to overflow: auto hidden; */
+  overflow: visible hidden;
+  /** Hack to hide horizontal scrollbars **/
+  padding: 0 150px;
+  margin: 0 -150px;
+  transition: height var(--harmony-quick);
+}

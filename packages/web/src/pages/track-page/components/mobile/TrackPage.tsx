@@ -1,0 +1,347 @@
+import { useEffect, useContext, useCallback } from 'react'
+
+import {
+  useCurrentUserId,
+  useTrackByParams,
+  useToggleFavoriteTrack,
+  useUser
+} from '@audius/common/api'
+import { useCurrentTrack, useGatedContentAccess } from '@audius/common/hooks'
+import {
+  FavoriteSource,
+  ID,
+  Track,
+  PlayableType,
+  Name,
+  ShareSource,
+  RepostSource,
+  PlaybackSource,
+  FavoriteType
+} from '@audius/common/models'
+import {
+  OverflowAction,
+  tracksSocialActions as socialTracksActions,
+  shareModalUIActions,
+  favoritesUserListActions,
+  repostsUserListActions,
+  mobileOverflowMenuUIActions,
+  playbackSelectors,
+  playbackActions,
+  RepostType
+} from '@audius/common/store'
+import type { PlaybackTrack } from '@audius/common/store'
+import { formatDate, route } from '@audius/common/utils'
+import { Flex } from '@audius/harmony'
+import { Id } from '@audius/sdk'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router'
+
+import { make } from 'common/store/analytics/actions'
+import { CommentPreview } from 'components/comments/CommentPreview'
+import { HeaderContext } from 'components/header/mobile/HeaderContextProvider'
+import MobilePageContainer from 'components/mobile-page-container/MobilePageContainer'
+import NavContext, {
+  LeftPreset,
+  CenterPreset,
+  RightPreset
+} from 'components/nav/mobile/NavContext'
+import DeletedPage from 'pages/deleted-page/DeletedPage'
+import { getTrackDefaults } from 'pages/track-page/utils'
+import { getTrackPageContext } from 'ssr/metaTags'
+import { parseTrackRoute } from 'utils/route/trackRouteParser'
+
+import { TrackPageLineup } from '../TrackPageLineup'
+import { TrackContestsSection } from '../shared/TrackContestsSection'
+
+import TrackPageHeader from './TrackHeader'
+
+const { NOT_FOUND_PAGE, FAVORITING_USERS_ROUTE, REPOSTING_USERS_ROUTE } = route
+const { getPlaying, getPreviewing } = playbackSelectors
+const { requestOpen: requestOpenShareModal } = shareModalUIActions
+const { open } = mobileOverflowMenuUIActions
+const { setFavorite } = favoritesUserListActions
+const { setRepost } = repostsUserListActions
+
+const TrackPage = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const params = parseTrackRoute(location.pathname)
+  const { data: track, status } = useTrackByParams(params)
+  const { data: user } = useUser(track?.owner_id)
+  const { data: accountUserId } = useCurrentUserId()
+  const currentTrack = useCurrentTrack()
+  const playing = useSelector(getPlaying)
+  const previewing = useSelector(getPreviewing)
+  const currentPlaybackTrackId = useSelector(
+    playbackSelectors.getCurrentTrackId
+  )
+
+  const heroPlaying =
+    playing &&
+    !!track &&
+    !!currentTrack &&
+    currentTrack.track_id === track.track_id
+
+  // Simple error handling
+  useEffect(() => {
+    if (status === 'error') {
+      navigate(NOT_FOUND_PAGE)
+    }
+  }, [status, navigate])
+  const { setLeft, setCenter, setRight } = useContext(NavContext)!
+  useEffect(() => {
+    setLeft(LeftPreset.BACK)
+    setCenter(CenterPreset.LOGO)
+    setRight(RightPreset.KEBAB)
+  }, [setLeft, setCenter, setRight])
+
+  const { setHeader } = useContext(HeaderContext)
+  useEffect(() => {
+    setHeader(null)
+  }, [setHeader])
+
+  const isOwner = track ? track.owner_id === accountUserId : false
+  const isSaved = track ? track.has_current_user_saved : false
+  const isReposted = track ? track.has_current_user_reposted : false
+  const isFollowing = user ? user.does_current_user_follow : false
+
+  const { isFetchingNFTAccess, hasStreamAccess, hasDownloadAccess } =
+    useGatedContentAccess(track)
+
+  const isCommentingEnabled = !track?.comments_disabled
+
+  const loading = !track || isFetchingNFTAccess
+
+  const toggleSaveTrack = useToggleFavoriteTrack({
+    trackId: track?.track_id,
+    source: FavoriteSource.TRACK_PAGE
+  })
+
+  // Handlers
+  const onHeroPlay = useCallback(
+    ({
+      isPlaying: isPlayingParam,
+      isPreview = false
+    }: {
+      isPlaying: boolean
+      isPreview?: boolean
+    }) => {
+      if (!track) return
+
+      const isOwner = track.owner_id === accountUserId
+      const shouldPreview = isPreview && isOwner
+      const isSameTrack = currentPlaybackTrackId === track.track_id
+      const playbackSource = 'TRACK_TRACKS'
+
+      if (previewing !== isPreview || !isSameTrack) {
+        dispatch(playbackActions.stop({}))
+        const tracks: PlaybackTrack[] = [
+          {
+            trackId: track.track_id,
+            source: playbackSource
+          }
+        ]
+        dispatch(
+          playbackActions.playFrom({
+            tracks,
+            startIndex: 0,
+            querySource: null
+          })
+        )
+        dispatch(
+          make(Name.PLAYBACK_PLAY, {
+            id: `${track.track_id}`,
+            isPreview: shouldPreview,
+            source: PlaybackSource.TRACK_PAGE
+          })
+        )
+      } else if (isPlayingParam) {
+        dispatch(playbackActions.togglePlay())
+        dispatch(
+          make(Name.PLAYBACK_PAUSE, {
+            id: `${track.track_id}`,
+            source: PlaybackSource.TRACK_PAGE
+          })
+        )
+      } else {
+        dispatch(playbackActions.play())
+        dispatch(
+          make(Name.PLAYBACK_PLAY, {
+            id: `${track.track_id}`,
+            isPreview: shouldPreview,
+            source: PlaybackSource.TRACK_PAGE
+          })
+        )
+      }
+    },
+    [track, accountUserId, currentPlaybackTrackId, previewing, dispatch]
+  )
+
+  const onHeroRepost = useCallback(
+    (isReposted: boolean, trackId: ID) => {
+      if (!isReposted) {
+        dispatch(
+          socialTracksActions.repostTrack(trackId, RepostSource.TRACK_PAGE)
+        )
+      } else {
+        dispatch(
+          socialTracksActions.undoRepostTrack(trackId, RepostSource.TRACK_PAGE)
+        )
+      }
+    },
+    [dispatch]
+  )
+
+  const onHeroShare = useCallback(
+    (trackId: ID) => {
+      dispatch(
+        requestOpenShareModal({
+          type: 'track',
+          trackId,
+          source: ShareSource.PAGE
+        })
+      )
+    },
+    [dispatch]
+  )
+
+  const onClickMobileOverflow = useCallback(
+    (trackId: ID, overflowActions: OverflowAction[]) => {
+      dispatch(
+        open({
+          source: 'TRACKS' as any,
+          id: trackId,
+          overflowActions
+        })
+      )
+    },
+    [dispatch]
+  )
+
+  const goToFavoritesPage = useCallback(
+    (trackId: ID) => {
+      dispatch(setFavorite(trackId, FavoriteType.TRACK))
+      navigate(FAVORITING_USERS_ROUTE)
+    },
+    [dispatch, navigate]
+  )
+
+  const goToRepostsPage = useCallback(
+    (trackId: ID) => {
+      dispatch(setRepost(trackId, RepostType.TRACK))
+      navigate(REPOSTING_USERS_ROUTE)
+    },
+    [dispatch, navigate]
+  )
+
+  const onPlay = () => onHeroPlay({ isPlaying: heroPlaying })
+  const onPreview = () =>
+    onHeroPlay({ isPlaying: heroPlaying, isPreview: true })
+  const onRepost = isOwner
+    ? () => {}
+    : () => track && onHeroRepost(isReposted, track.track_id)
+  const onShare = () => {
+    track && onHeroShare(track.track_id)
+  }
+
+  const defaults = getTrackDefaults(track as Track | null)
+
+  // SEO fields (isRemix so original vs remix snippet/structured data is correct)
+  const releaseDate = track ? track.release_date || track.created_at : ''
+  const seoFields = getTrackPageContext({
+    title: track?.title,
+    permalink: track?.permalink,
+    userName: user?.name,
+    releaseDate: releaseDate ? formatDate(releaseDate) : '',
+    isRemix: !!track?.remix_of
+  })
+
+  // Handle deleted track
+  if ((track?.is_delete || track?._marked_deleted) && user) {
+    return (
+      <DeletedPage
+        title={seoFields.title ?? ''}
+        description={seoFields.description ?? ''}
+        canonicalUrl={seoFields.canonicalUrl ?? ''}
+        structuredData={seoFields.structuredData}
+        playable={{
+          metadata: (track as Track | null) ?? null,
+          type: PlayableType.TRACK
+        }}
+        user={user ?? null}
+        deletedByArtist={!track._blocked && track.is_available}
+      />
+    )
+  }
+
+  return (
+    <MobilePageContainer
+      title={seoFields.title ?? ''}
+      description={seoFields.description ?? ''}
+      ogDescription={defaults.description}
+      canonicalUrl={seoFields.canonicalUrl ?? ''}
+      structuredData={seoFields.structuredData}
+      entityType='track'
+      hashId={track?.track_id ? Id.parse(track.track_id) : undefined}
+      noIndex={defaults.isUnlisted}
+    >
+      <Flex column p='l' gap='2xl' w='100%'>
+        <Flex column gap='l'>
+          <TrackPageHeader
+            isLoading={loading}
+            isPlaying={heroPlaying}
+            isPreviewing={previewing}
+            isReposted={isReposted}
+            isFollowing={isFollowing}
+            title={defaults.title}
+            trackId={defaults.trackId}
+            userId={track?.owner_id ?? 0}
+            tags={defaults.tags}
+            description={defaults.description}
+            listenCount={defaults.playCount}
+            repostCount={defaults.repostCount}
+            commentCount={defaults.commentCount}
+            commentsDisabled={defaults.commentsDisabled}
+            duration={defaults.duration}
+            releaseDate={defaults.releaseDate}
+            credits={defaults.credits}
+            genre={defaults.genre}
+            mood={defaults.mood}
+            saveCount={defaults.saveCount}
+            isOwner={isOwner}
+            isSaved={isSaved}
+            coSign={defaults.coSign}
+            onClickMobileOverflow={onClickMobileOverflow}
+            onPlay={onPlay}
+            onPreview={onPreview}
+            onSave={toggleSaveTrack}
+            onShare={onShare}
+            onRepost={onRepost}
+            isUnlisted={defaults.isUnlisted}
+            isStreamGated={defaults.isStreamGated}
+            streamConditions={defaults.streamConditions}
+            hasStreamAccess={hasStreamAccess}
+            hasDownloadAccess={hasDownloadAccess}
+            isRemix={!!defaults.remixParentTrackId}
+            fieldVisibility={defaults.fieldVisibility}
+            goToFavoritesPage={goToFavoritesPage}
+            goToRepostsPage={goToRepostsPage}
+          />
+        </Flex>
+        <TrackContestsSection trackId={defaults.trackId} />
+        {isCommentingEnabled ? (
+          <CommentPreview entityId={defaults.trackId} />
+        ) : null}
+        <TrackPageLineup
+          user={user ?? null}
+          trackId={defaults.trackId}
+          commentsDisabled={track?.comments_disabled}
+        />
+      </Flex>
+    </MobilePageContainer>
+  )
+}
+
+export default TrackPage

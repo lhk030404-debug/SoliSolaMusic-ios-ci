@@ -1,0 +1,54 @@
+.modal {
+  max-width: 720px;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container div {
+  font-size: var(--harmony-font-m);
+  font-weight: var(--harmony-font-medium);
+  line-height: 20px;
+}
+
+.subtitle {
+  margin: 24px 0px 16px;
+  max-width: 308px;
+  text-align: center;
+}
+
+.desktop {
+  margin: 16px 0px;
+}
+
+.qr {
+  margin-top: 22px;
+  height: 272px;
+  width: 272px;
+}
+
+.dividerContainer {
+  display: flex;
+  align-items: center;
+  max-width: 422px;
+  width: 100%;
+}
+
+.dividerWord {
+  margin: 0px 16px;
+  color: var(--harmony-n-400);
+}
+
+.divider {
+  height: 1px;
+  flex: 1;
+  background-color: var(--harmony-n-150);
+}
+
+.buttonContainer {
+  margin-bottom: 30px;
+}

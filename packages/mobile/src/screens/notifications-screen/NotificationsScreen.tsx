@@ -1,0 +1,36 @@
+import { useCallback } from 'react'
+
+import { useMarkNotificationsAsViewed } from '@audius/common/api'
+import { useFocusEffect } from '@react-navigation/native'
+
+import { Screen, ScreenContent } from 'app/components/core'
+import { ScreenPrimaryContent } from 'app/components/core/Screen/ScreenPrimaryContent'
+import { ScreenSecondaryContent } from 'app/components/core/Screen/ScreenSecondaryContent'
+import { MobileRootHeader } from 'app/screens/app-screen/MobileRootHeader'
+
+import { NotificationList } from './NotificationList'
+
+const messages = {
+  header: 'Notifications'
+}
+
+export const NotificationsScreen = () => {
+  const { mutate: markAsViewed } = useMarkNotificationsAsViewed()
+
+  const handleMarkAsViewed = useCallback(() => {
+    markAsViewed()
+  }, [markAsViewed])
+
+  useFocusEffect(handleMarkAsViewed)
+
+  return (
+    <Screen header={() => <MobileRootHeader title={messages.header} />}>
+      <ScreenPrimaryContent>{null}</ScreenPrimaryContent>
+      <ScreenContent>
+        <ScreenSecondaryContent>
+          <NotificationList />
+        </ScreenSecondaryContent>
+      </ScreenContent>
+    </Screen>
+  )
+}

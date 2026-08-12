@@ -1,0 +1,230 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  min-width: 100%;
+  background: #111;
+  color: #fff;
+  font-family: 'Urbanist', sans-serif;
+  font-feature-settings:
+    'liga' 0,
+    'clig' 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: #111;
+  z-index: -1;
+}
+
+.page .main,
+.page > nav,
+.page > footer {
+  transition: opacity 0.35s ease-out;
+}
+
+.page:not([data-fonts-ready]) .main,
+.page:not([data-fonts-ready]) .page > nav,
+.page:not([data-fonts-ready]) .page > footer {
+  opacity: 0;
+}
+
+.page[data-fonts-ready] .main,
+.page[data-fonts-ready] .page > nav,
+.page[data-fonts-ready] .page > footer {
+  opacity: 1;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.spacer {
+  width: 100%;
+  height: 160px;
+}
+
+.spacerSmall {
+  width: 100%;
+  height: 160px;
+}
+
+/* ── Hero / Title ── */
+.titleSection {
+  width: 100%;
+  max-width: 1440px;
+  padding: 0 96px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Dust Bucer', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 146px;
+  line-height: 0.72;
+  color: #fff;
+  margin: 0;
+  font-feature-settings: 'salt' 1;
+  text-transform: uppercase;
+}
+
+.titleLine2 {
+  display: inline;
+}
+
+.subtitle {
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 40px 0 0;
+}
+
+/* ── Download Grid ── */
+.downloadGrid {
+  display: flex;
+  width: 100%;
+  max-width: 1240px;
+  padding: 0 100px;
+  box-sizing: border-box;
+}
+
+.desktopColumn,
+.mobileColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.desktopColumn {
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sectionHeading {
+  font-family: 'Dust Bucer', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 112px;
+  line-height: 1;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+  font-feature-settings: 'salt' 1;
+  text-transform: uppercase;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 21.5px;
+  margin-top: 24px;
+}
+
+.downloadLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Urbanist', sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  padding: 0;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.downloadLink:hover {
+  color: #fff;
+  transform: scale(1.03);
+}
+
+.downloadLink:active {
+  color: rgba(255, 255, 255, 0.5);
+  transform: scale(0.99);
+}
+
+.linkIcon {
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+}
+
+.linkIcon path {
+  fill: currentColor;
+}
+
+/* ── Responsive / Mobile ── */
+@media (max-width: 800px) {
+  .spacer {
+    height: 160px;
+  }
+
+  .spacerSmall {
+    height: 120px;
+  }
+
+  .titleSection {
+    padding: 0 56px;
+  }
+
+  .title {
+    font-size: 104px;
+    line-height: 0.72;
+  }
+
+  /* Break title into two lines: "Download" then "the App" */
+  .titleLine2 {
+    display: block;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    margin-top: 40px;
+  }
+
+  .downloadGrid {
+    flex-direction: column;
+    gap: 40px;
+    padding: 0 8px;
+  }
+
+  .desktopColumn {
+    border-right: none;
+    padding-bottom: 0;
+  }
+
+  .sectionHeading {
+    font-size: 74px;
+  }
+
+  .links {
+    gap: 18px;
+  }
+
+  .downloadLink {
+    font-size: 22px;
+  }
+
+  .linkIcon {
+    width: 22px;
+    height: 22px;
+  }
+}

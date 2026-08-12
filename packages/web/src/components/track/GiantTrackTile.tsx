@@ -1,0 +1,720 @@
+import { useCallback, useState, useEffect, useRef } from 'react'
+
+import {
+  useTrackRank,
+  useToggleFavoriteTrack,
+  useTrack,
+  useStems
+} from '@audius/common/api'
+import {
+  isContentUSDCPurchaseGated,
+  ID,
+  FieldVisibility,
+  Remix,
+  AccessConditions,
+  FavoriteSource
+} from '@audius/common/models'
+import {
+  PurchaseableContentType,
+  useEarlyReleaseConfirmationModal,
+  usePublishConfirmationModal
+} from '@audius/common/store'
+import { Genre, Nullable, dayjs, formatReleaseDate } from '@audius/common/utils'
+import {
+  Text,
+  Box,
+  Flex,
+  IconRepost,
+  IconHeart,
+  IconKebabHorizontal,
+  IconShare,
+  IconRocket,
+  IconButton,
+  MusicBadge,
+  Paper,
+  PlainButton,
+  IconCaretDown,
+  IconCaretUp,
+  spacing,
+  Tooltip
+} from '@audius/harmony'
+import IconCalendarMonth from '@audius/harmony/src/assets/icons/CalendarMonth.svg'
+import IconTrending from '@audius/harmony/src/assets/icons/Trending.svg'
+import IconVisibilityHidden from '@audius/harmony/src/assets/icons/VisibilityHidden.svg'
+import { useTheme } from '@emotion/react'
+import { ResizeObserver } from '@juggle/resize-observer'
+import cn from 'classnames'
+import { pick } from 'lodash'
+import { useToggle } from 'react-use'
+import useMeasure from 'react-use-measure'
+
+import { TrackArtists } from 'components/link'
+import Menu from 'components/menu/Menu'
+import { SearchTag } from 'components/search-bar/SearchTag'
+import Skeleton from 'components/skeleton/Skeleton'
+import Toast from 'components/toast/Toast'
+import { UserGeneratedText } from 'components/user-generated-text'
+
+import { CardTitle } from './CardTitle'
+import { DownloadSection } from './DownloadSection'
+import { GatedContentSection } from './GatedContentSection'
+import GiantArtwork from './GiantArtwork'
+import styles from './GiantTrackTile.module.css'
+import { GiantTrackTileProgressInfo } from './GiantTrackTileProgressInfo'
+import { PlayPauseButton } from './PlayPauseButton'
+import { TrackDogEar } from './TrackDogEar'
+import { TrackMetadataList } from './TrackMetadataList'
+import { TrackStats } from './TrackStats'
+
+// Toast timeouts in ms
+const REPOST_TIMEOUT = 1000
+const SAVED_TIMEOUT = 1000
+const MAX_DESCRIPTION_LINES = 8
+const DEFAULT_LINE_HEIGHT = spacing.xl
+
+const messages = {
+  makePublic: 'MAKE PUBLIC',
+  releaseNow: 'RELEASE NOW',
+  isPublishing: 'PUBLISHING',
+  unplayed: 'Unplayed',
+  timeLeft: 'left',
+  played: 'Played',
+  generatedWithAi: 'Generated With AI',
+  actionGroupLabel: 'track actions',
+  hidden: 'hidden',
+  releases: (releaseDate: string) =>
+    `Releases ${formatReleaseDate({ date: releaseDate, withHour: true })}`,
+  seeMore: 'See More',
+  seeLess: 'See Less'
+}
+
+type GiantTrackTileProps = {
+  artistHandle: string
+  coSign: Nullable<Remix>
+  credits: string
+  currentUserId: Nullable<ID>
+  description: string
+  hasStreamAccess: boolean
+  duration: number
+  fieldVisibility: FieldVisibility
+  following: boolean
+  genre: string
+  isArtistPick: boolean
+  isOwner: boolean
+  isStreamGated: boolean
+  isDownloadGated: boolean
+  isPublishing: boolean
+  isRemix: boolean
+  isReposted: boolean
+  isSaved: boolean
+  isUnlisted: boolean
+  isScheduledRelease: boolean
+  listenCount: number
+  loading: boolean
+  mood: string
+  onMakePublic: (trackId: ID) => void
+  onFollow: () => void
+  onPlay: () => void
+  onPreview: () => void
+  onRepost: () => void
+  onSave: () => void
+  onShare: () => void
+  onUnfollow: () => void
+  playing: boolean
+  previewing: boolean
+  streamConditions: Nullable<AccessConditions>
+  downloadConditions: Nullable<AccessConditions>
+  releaseDate: string
+  repostCount: number
+  saveCount: number
+  tags: string
+  trackId: number
+  trackTitle: string
+  userId: number
+  ddexApp?: string | null
+  scrollToCommentSection: () => void
+}
+
+export const GiantTrackTile = ({
+  artistHandle,
+  coSign,
+  description,
+  hasStreamAccess,
+  duration,
+  fieldVisibility,
+  following,
+  genre,
+  isArtistPick,
+  isOwner,
+  isStreamGated,
+  isRemix,
+  isReposted,
+  isPublishing,
+  isSaved,
+  isScheduledRelease,
+  isUnlisted,
+  listenCount,
+  loading,
+  onFollow,
+  onMakePublic,
+  onPlay,
+  onPreview,
+  onSave,
+  onShare,
+  onRepost,
+  onUnfollow,
+  releaseDate,
+  repostCount,
+  saveCount,
+  playing,
+  previewing,
+  streamConditions,
+  tags,
+  trackId,
+  trackTitle,
+  userId,
+  ddexApp,
+  scrollToCommentSection
+}: GiantTrackTileProps) => {
+  const [artworkLoading, setArtworkLoading] = useState(false)
+  const onArtworkLoad = useCallback(
+    () => setArtworkLoading(false),
+    [setArtworkLoading]
+  )
+  const toggleSaveTrack = useToggleFavoriteTrack({
+    trackId,
+    source: FavoriteSource.TRACK_PAGE
+  })
+
+  const isLongFormContent =
+    genre === Genre.Podcasts || genre === Genre.Audiobooks
+  const isUSDCPurchaseGated = isContentUSDCPurchaseGated(streamConditions)
+  const { data: track } = useTrack(trackId, {
+    select: (track) => pick(track, ['is_downloadable', 'preview_cid'])
+  })
+  const { data: collaborators } = useTrack(trackId, {
+    select: (track) => track.collaborators
+  })
+  const { data: stems = [] } = useStems(trackId)
+  const shouldShowDownloadSection = !!track?.is_downloadable || stems.length > 0
+  // Preview button is shown for USDC-gated tracks if user does not have access
+  // or is the owner
+  const showPreview =
+    isUSDCPurchaseGated && (isOwner || !hasStreamAccess) && track?.preview_cid
+  // Play button is conditionally hidden for USDC-gated tracks when the user does not have access
+  const showPlay = isUSDCPurchaseGated ? hasStreamAccess : true
+  const shouldShowScheduledRelease =
+    isScheduledRelease && dayjs(releaseDate).isAfter(dayjs())
+  const [isDescriptionExpanded, toggleDescriptionExpanded] = useToggle(false)
+  const [showToggle, setShowToggle] = useState(false)
+  const theme = useTheme()
+  const toggleButtonRef = useRef<HTMLButtonElement>(null)
+
+  const handleToggleDescription = useCallback(() => {
+    toggleDescriptionExpanded()
+    // If we're collapsing, scroll the button into view
+    if (isDescriptionExpanded && toggleButtonRef.current) {
+      toggleButtonRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end'
+      })
+    }
+  }, [isDescriptionExpanded, toggleDescriptionExpanded])
+
+  // This ref holds the description height for expansion
+  const [descriptionRef, descriptionBounds] = useMeasure({
+    polyfill: ResizeObserver
+  })
+
+  // This ref holds the full content height for expansion
+  const [fullContentRef, fullContentBounds] = useMeasure({
+    polyfill: ResizeObserver
+  })
+
+  // Calculate if toggle should be shown based on content height
+  useEffect(() => {
+    if (description && descriptionBounds.height && fullContentBounds.height) {
+      const lineHeight = DEFAULT_LINE_HEIGHT
+      const maxHeight = lineHeight * MAX_DESCRIPTION_LINES
+      setShowToggle(fullContentBounds.height > maxHeight)
+    }
+  }, [description, descriptionBounds.height, fullContentBounds.height])
+
+  const renderCardTitle = (className: string) => {
+    return (
+      <CardTitle
+        className={className}
+        isUnlisted={isUnlisted}
+        isScheduledRelease={isScheduledRelease}
+        isRemix={isRemix}
+        isStreamGated={isStreamGated}
+        isPodcast={genre === Genre.Podcasts}
+        streamConditions={streamConditions}
+        isRemixContest={false}
+      />
+    )
+  }
+
+  const renderShareButton = () => {
+    const shouldShow =
+      (!isUnlisted && !isPublishing) || fieldVisibility.share || isOwner
+    return shouldShow ? (
+      <Tooltip text='Share'>
+        <IconButton
+          aria-label='Share'
+          icon={IconShare}
+          color='subdued'
+          size='2xl'
+          onClick={onShare}
+        />
+      </Tooltip>
+    ) : null
+  }
+
+  const { onOpen: openPublishConfirmation } = usePublishConfirmationModal()
+  const { onOpen: openEarlyReleaseConfirmation } =
+    useEarlyReleaseConfirmationModal()
+
+  const renderMakePublicButton = () => {
+    if (!(isUnlisted || isPublishing) || !isOwner) {
+      return null
+    }
+
+    let text = messages.isPublishing
+    if (isUnlisted && !isPublishing) {
+      text = isScheduledRelease ? messages.releaseNow : messages.makePublic
+    }
+
+    return (
+      <Tooltip text={text}>
+        <span>
+          <IconButton
+            aria-label={text}
+            icon={IconRocket}
+            color='subdued'
+            size='2xl'
+            isLoading={isPublishing}
+            disabled={isPublishing}
+            onClick={() => {
+              if (isScheduledRelease) {
+                openEarlyReleaseConfirmation({
+                  contentType: 'track',
+                  confirmCallback: () => {
+                    onMakePublic(trackId)
+                  }
+                })
+              } else {
+                openPublishConfirmation({
+                  contentType: 'track',
+                  confirmCallback: () => {
+                    onMakePublic(trackId)
+                  }
+                })
+              }
+            }}
+          />
+        </span>
+      </Tooltip>
+    )
+  }
+
+  const renderRepostButton = () => {
+    return (
+      !isUnlisted &&
+      !isPublishing &&
+      !isOwner && (
+        <Toast
+          text={'Reposted!'}
+          disabled={isReposted}
+          delay={REPOST_TIMEOUT}
+          anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+          transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+        >
+          <Tooltip
+            disabled={isOwner || repostCount === 0}
+            text={isReposted ? 'Unrepost' : 'Repost'}
+          >
+            <div>
+              <IconButton
+                aria-label={isReposted ? 'Unrepost' : 'Repost'}
+                name='repost'
+                disabled={isOwner}
+                icon={IconRepost}
+                color={isReposted ? 'active' : 'subdued'}
+                size='2xl'
+                onClick={onRepost}
+              />
+            </div>
+          </Tooltip>
+        </Toast>
+      )
+    )
+  }
+
+  const renderFavoriteButton = () => {
+    return (
+      !isUnlisted &&
+      !isOwner && (
+        <Toast
+          text={'Favorited!'}
+          disabled={isSaved}
+          delay={SAVED_TIMEOUT}
+          anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+          transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+        >
+          <Tooltip
+            disabled={isOwner || saveCount === 0}
+            text={isSaved ? 'Unfavorite' : 'Favorite'}
+          >
+            <div>
+              <IconButton
+                aria-label={isSaved ? 'Unfavorite' : 'Favorite'}
+                name='favorite'
+                disabled={isOwner}
+                icon={IconHeart}
+                color={isSaved ? 'active' : 'subdued'}
+                size='2xl'
+                onClick={toggleSaveTrack}
+              />
+            </div>
+          </Tooltip>
+        </Toast>
+      )
+    )
+  }
+
+  const renderListenCount = () => {
+    const shouldShow = isOwner || (!isStreamGated && !isUnlisted)
+
+    if (!shouldShow) {
+      return null
+    }
+    return (
+      <Text variant='title' color='subdued' size='l'>
+        {!isOwner && listenCount === 0 ? (
+          <span className={styles.firstListen}>
+            Be the first to listen to this track!
+          </span>
+        ) : (
+          <>
+            <span className={styles.numberOfListens}>
+              {listenCount.toLocaleString()}
+            </span>{' '}
+            <span className={styles.listenText}>
+              {listenCount === 1 ? 'Play' : 'Plays'}
+            </span>
+          </>
+        )}
+      </Text>
+    )
+  }
+
+  const renderTags = () => {
+    const shouldShow = !isUnlisted || fieldVisibility.tags
+    if (!shouldShow || !tags) return null
+    return (
+      <Flex wrap='wrap' gap='s'>
+        {tags
+          .split(',')
+          .filter((t) => t)
+          .map((tag) => (
+            <SearchTag key={tag} source='track page'>
+              {tag}
+            </SearchTag>
+          ))}
+      </Flex>
+    )
+  }
+
+  const isLoading = loading || artworkLoading
+
+  const overflowMenuExtraItems = []
+  if (!isOwner) {
+    overflowMenuExtraItems.push({
+      text: following ? 'Unfollow Artist' : 'Follow Artist',
+      onClick: () =>
+        setTimeout(() => (following ? onUnfollow() : onFollow()), 0)
+    })
+  }
+
+  const overflowMenu = {
+    menu: {
+      type: 'track',
+      trackId,
+      trackTitle,
+      ddexApp,
+      genre,
+      handle: artistHandle,
+      isFavorited: isSaved,
+      isReposted,
+      mount: 'page',
+      isOwner,
+      includeFavorite: hasStreamAccess,
+      includeRepost: hasStreamAccess,
+      includeShare: true,
+      includeTrackPage: false,
+      isArtistPick,
+      isUnlisted,
+      includeEmbed: !(isUnlisted || isStreamGated),
+      includeArtistPick: true,
+      includeAddToAlbum: isOwner && !ddexApp,
+      includeRemixContest: true,
+      extraMenuItems: overflowMenuExtraItems
+    }
+  }
+
+  const fadeIn = {
+    [styles.show]: !isLoading,
+    [styles.hide]: isLoading
+  }
+
+  const trendingRank = useTrackRank(trackId)
+  const renderBadges = () => (
+    <>
+      {trendingRank ? (
+        <MusicBadge color='blue' icon={IconTrending}>
+          {trendingRank}
+        </MusicBadge>
+      ) : null}
+      {shouldShowScheduledRelease ? (
+        <MusicBadge variant='accent' icon={IconCalendarMonth}>
+          {messages.releases(releaseDate)}
+        </MusicBadge>
+      ) : isUnlisted ? (
+        <MusicBadge icon={IconVisibilityHidden}>{messages.hidden}</MusicBadge>
+      ) : null}
+    </>
+  )
+
+  return (
+    <Paper
+      column
+      w='100%'
+      justifyContent='center'
+      mh='auto'
+      border='default'
+      css={{ maxWidth: 1080, textAlign: 'left', containerType: 'inline-size' }}
+    >
+      <TrackDogEar trackId={trackId} borderOffset={0} />
+      <div className={styles.topSectionWrapper}>
+        <div className={styles.topSection}>
+          <div className={styles.typeLabelCompact}>
+            {renderCardTitle(cn(fadeIn))}
+          </div>
+          <div className={cn(fadeIn, styles.badgesSectionCompact)}>
+            {renderBadges()}
+          </div>
+          <div className={styles.artworkSection}>
+            <GiantArtwork
+              trackId={trackId}
+              coSign={coSign}
+              callback={onArtworkLoad}
+            />
+          </div>
+          <Flex column gap='xl' className={styles.infoSection}>
+            <Flex column gap='l' className={styles.titleArtistSection}>
+              <div className={styles.typeLabelRow}>
+                {renderCardTitle(cn(fadeIn))}
+              </div>
+              <Box>
+                <Text
+                  variant='heading'
+                  size='xl'
+                  className={cn(fadeIn, styles.titleHeader)}
+                  css={{
+                    fontSize: 'clamp(24px, calc(1.6cqi + 18.75px), 36px)',
+                    lineHeight: 1.33
+                  }}
+                >
+                  {trackTitle}
+                </Text>
+                {isLoading && <Skeleton width='686px' height='96px' />}
+              </Box>
+              <Flex className={styles.artistRow}>
+                {isLoading && <Skeleton width='200px' height='24px' />}
+                <Text
+                  variant='title'
+                  strength='weak'
+                  tag='h2'
+                  className={cn(fadeIn)}
+                  css={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <Text color='subdued'>By </Text>
+                  <TrackArtists
+                    userId={userId}
+                    collaborators={collaborators}
+                    popover
+                  />
+                </Text>
+              </Flex>
+              <div
+                className={cn(
+                  fadeIn,
+                  styles.trackStatsRow,
+                  styles.statsDesktop
+                )}
+              >
+                <TrackStats
+                  trackId={trackId}
+                  scrollToCommentSection={scrollToCommentSection}
+                  className={styles.headerTrackStats}
+                />
+              </div>
+            </Flex>
+
+            <Flex
+              gap='xl'
+              alignItems='center'
+              className={cn(fadeIn, styles.playSection)}
+            >
+              {showPlay ? (
+                <PlayPauseButton
+                  className={styles.playbackButton}
+                  disabled={!hasStreamAccess}
+                  playing={playing && !previewing}
+                  onPlay={onPlay}
+                  trackId={trackId}
+                />
+              ) : null}
+              {showPreview ? (
+                <PlayPauseButton
+                  className={styles.playbackButton}
+                  playing={playing && previewing}
+                  onPlay={onPreview}
+                  trackId={trackId}
+                  isPreview
+                />
+              ) : null}
+              {isLongFormContent ? (
+                <GiantTrackTileProgressInfo
+                  duration={duration}
+                  trackId={trackId}
+                />
+              ) : (
+                <div className={styles.listenCountDesktop}>
+                  {renderListenCount()}
+                </div>
+              )}
+            </Flex>
+          </Flex>
+          {isUnlisted && !isOwner ? null : (
+            <Flex
+              gap='2xl'
+              alignItems='center'
+              className={cn(fadeIn, styles.actionsSection)}
+              role='group'
+              aria-label={messages.actionGroupLabel}
+            >
+              {hasStreamAccess && renderRepostButton()}
+              {hasStreamAccess && renderFavoriteButton()}
+              {renderShareButton()}
+              {renderMakePublicButton()}
+              <span>
+                {/* prop types for overflow menu don't work correctly
+              so we need to cast here */}
+                <Menu {...(overflowMenu as any)}>
+                  {(ref, triggerPopup) => (
+                    <div className={cn(styles.menuKebabContainer)} ref={ref}>
+                      <IconButton
+                        aria-label='More options'
+                        icon={IconKebabHorizontal}
+                        color='subdued'
+                        size='2xl'
+                        onClick={() => triggerPopup()}
+                      />
+                    </div>
+                  )}
+                </Menu>
+              </span>
+            </Flex>
+          )}
+          <div className={styles.badgesSection}>{renderBadges()}</div>
+        </div>
+      </div>
+
+      {isStreamGated && streamConditions ? (
+        <Box p='l' pb='xl' w='100%' backgroundColor='surface1'>
+          <GatedContentSection
+            isLoading={isLoading}
+            contentId={trackId}
+            contentType={PurchaseableContentType.TRACK}
+            streamConditions={streamConditions}
+            hasStreamAccess={hasStreamAccess}
+            isOwner={isOwner}
+            ownerId={userId}
+          />
+        </Box>
+      ) : null}
+
+      <Flex
+        column
+        p='l'
+        backgroundColor='surface1'
+        borderTop='default'
+        className={cn(fadeIn)}
+        gap='l'
+      >
+        <div className={styles.statsInDescription}>
+          <TrackStats
+            trackId={trackId}
+            scrollToCommentSection={scrollToCommentSection}
+            showPlayCount
+            forceMobileStyle
+          />
+        </div>
+        {description ? (
+          <Flex column gap='m'>
+            {/* Container with height transition */}
+            <Flex
+              direction='column'
+              css={{
+                transition: `height ${theme.motion.expressive}, opacity ${theme.motion.quick}`,
+                overflow: 'hidden',
+                height: isDescriptionExpanded
+                  ? fullContentBounds.height
+                  : Math.min(
+                      fullContentBounds.height,
+                      DEFAULT_LINE_HEIGHT * MAX_DESCRIPTION_LINES
+                    )
+              }}
+            >
+              {/* Inner content that we measure */}
+              <Flex ref={fullContentRef} direction='column'>
+                <UserGeneratedText
+                  ref={descriptionRef}
+                  tag='h3'
+                  size='s'
+                  lineHeight='multi'
+                >
+                  {description}
+                </UserGeneratedText>
+              </Flex>
+            </Flex>
+            {showToggle && (
+              <PlainButton
+                ref={toggleButtonRef}
+                iconRight={isDescriptionExpanded ? IconCaretUp : IconCaretDown}
+                onClick={handleToggleDescription}
+                css={{ alignSelf: 'flex-start' }}
+              >
+                {isDescriptionExpanded ? messages.seeLess : messages.seeMore}
+              </PlainButton>
+            )}
+          </Flex>
+        ) : null}
+
+        <TrackMetadataList trackId={trackId} />
+
+        {renderTags()}
+
+        {shouldShowDownloadSection ? (
+          <DownloadSection trackId={trackId} />
+        ) : null}
+      </Flex>
+    </Paper>
+  )
+}

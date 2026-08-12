@@ -1,0 +1,92 @@
+name: Public iOS Baseline
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-ios-baseline-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '24.10.0'
+  NPM_VERSION: '11.10.0'
+  RUBY_VERSION: '3.1.6'
+
+jobs:
+  ios:
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm install --global npm@${{ env.NPM_VERSION }}
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Record macOS and Xcode baseline
+        run: |
+          sw_vers
+          xcodebuild -version
+          ruby --version
+          node --version
+          npm --version
+      - name: Install Python compatibility shim for node-gyp
+        run: |
+          # Python on the rolling macOS image no longer bundles distutils.
+          python3 -m pip install --break-system-packages --upgrade setuptools
+      - name: Install JavaScript dependencies from lockfile
+        env:
+          CI: 'true'
+          SKIP_POD_INSTALL: 'true'
+          SKIP_ANDROID_INSTALL: 'true'
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: |
+          soft_limit="$(ulimit -Sn)"
+          hard_limit="$(ulimit -Hn)"
+          echo "open-files soft=${soft_limit} hard=${hard_limit}"
+          if [ "${hard_limit}" = "unlimited" ]; then
+            target_limit=65536
+          else
+            target_limit="${hard_limit}"
+          fi
+          ulimit -Sn "${target_limit}"
+          echo "open-files raised-soft=$(ulimit -Sn)"
+          npm ci --prefer-offline --no-audit --no-fund
+      - name: Install locked Ruby and CocoaPods dependencies
+        working-directory: packages/mobile/ios
+        run: |
+          gem install bundler --version 2.5.16 --no-document
+          bundle _2.5.16_ config set path vendor/bundle
+          bundle _2.5.16_ install
+          RCT_NEW_ARCH_ENABLED=0 bundle _2.5.16_ exec pod install --deployment
+      - name: Build shared mobile dependencies
+        run: npx turbo run build --filter=@audius/mobile
+      - name: Create release JavaScript bundle
+        run: npm run bundle:ios -w @audius/mobile
+      - name: Build unsigned iOS simulator baseline
+        working-directory: packages/mobile
+        run: |
+          set -o pipefail
+          ENVFILE=.env.dev xcodebuild \
+            -workspace ios/AudiusReactNative.xcworkspace \
+            -scheme Dev \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            build | tee ../../g00-ios-build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g00-ios-build-log
+          path: g00-ios-build.log
+          if-no-files-found: warn

@@ -1,0 +1,72 @@
+.colorTile {
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 16px;
+  transition: transform 0.18s ease-in-out;
+  position: relative;
+}
+
+.colorTile:active {
+  transform: scale(0.98);
+}
+
+.hasEmoji.colorTile {
+  height: 128px;
+}
+
+.title {
+  color: var(--harmony-static-white);
+  font-size: var(--harmony-font-xl);
+  font-weight: var(--harmony-font-heavy);
+  letter-spacing: 0.25px;
+  line-height: 26px;
+  text-align: left;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.25);
+  text-transform: uppercase;
+}
+
+.hasEmoji .title {
+  font-weight: var(--harmony-font-bold);
+  margin-top: 8px;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  text-transform: none;
+}
+
+.description {
+  color: var(--harmony-static-white);
+  font-size: var(--harmony-font-m);
+  font-weight: var(--harmony-font-medium);
+  letter-spacing: 0.2px;
+  line-height: 23px;
+  text-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.25);
+  text-align: left;
+}
+
+.icon {
+  position: absolute;
+  top: 0px;
+  right: -6px;
+}
+
+.icon svg {
+  opacity: 0.3;
+  mix-blend-mode: overlay;
+}
+
+.colorTile :global(i.emoji) {
+  height: 40px;
+  width: 40px;
+  margin-top: 8px;
+}
+
+.rewardsPill {
+  position: absolute;
+  left: 16px;
+  bottom: 13px;
+}
+
+.rewardsPill svg {
+  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+}

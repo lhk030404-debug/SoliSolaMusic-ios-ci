@@ -1,0 +1,84 @@
+.root {
+  flex: 0 0 auto;
+  height: calc(100% + var(--chat-header-height, 112px));
+  min-width: 0;
+  overflow-y: scroll;
+  box-sizing: border-box;
+
+  /* Extend the scroll container behind the frosted header and composer so
+   * there is real content behind them for backdrop-filter to blur. The
+   * scroll-padding properties keep the inner content 32px clear of the
+   * chrome once scrolled to either edge, while letting the backdrop-filter
+   * still pick up messages flowing behind them mid-scroll. */
+  margin-top: calc(-1 * var(--chat-message-overlap-top, 112px));
+  margin-bottom: calc(-1 * var(--chat-composer-height, 88px));
+  padding-top: calc(var(--chat-message-overlap-top, 112px) + 32px);
+  padding-bottom: calc(var(--chat-composer-height, 88px) + 32px);
+}
+
+.emptyStateRoot {
+  flex: 1;
+  height: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.listRoot {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-left: 32px;
+  padding-right: 32px;
+  min-width: 0;
+}
+
+.emptyListRoot {
+  flex-direction: column;
+  min-height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.emptyListRoot > * {
+  margin: 0;
+  width: 100%;
+}
+
+.separator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 0;
+  margin: var(--harmony-unit-8) 0;
+  scroll-margin: var(--harmony-unit-8) 0;
+  border-bottom: 1px solid var(--harmony-n-300);
+}
+
+.separator .tag {
+  padding: 3.5px 8px;
+  background: var(--harmony-n-300);
+  border-radius: 2px;
+
+  font-size: var(--harmony-font-xs);
+  font-weight: var(--harmony-font-bold);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--harmony-white);
+}
+
+.spinner {
+  margin: var(--harmony-unit-6) auto 0;
+  width: var(--harmony-unit-8);
+}
+
+/* Recolor the Lottie spinner's stroke. The component renders an inline
+ * `<g><path>` whose default stroke is `--harmony-n-500`; in the chat
+ * message-list context we want the subdued text token so it visually
+ * matches the "Beginning of Conversation" affordance below. */
+.spinner :global(g) path {
+  stroke: var(--harmony-text-subdued);
+}

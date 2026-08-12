@@ -1,0 +1,53 @@
+.root:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.root {
+  padding: var(--harmony-unit-6) 0;
+  border-top: 1px solid var(--harmony-n-150);
+  cursor: pointer;
+}
+
+.optionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--harmony-unit-2);
+}
+
+.tag {
+  margin-left: auto;
+}
+
+.input {
+  /* this dummy class needs to exist for .input:checked to work. This will be removed when radio has label and icons */
+}
+
+.root.disabled {
+  cursor: default;
+}
+
+.root.disabled .optionTitle {
+  opacity: 0.5;
+}
+
+.root:has(.input:checked) .optionTitle {
+  color: var(--harmony-secondary);
+}
+
+.optionTitle path {
+  fill: var(--harmony-neutral);
+}
+
+.root:has(.input:checked) .optionTitle path {
+  fill: var(--harmony-secondary);
+}
+
+.collapsibleContainer {
+  overflow: hidden;
+  transition: height var(--harmony-quick);
+}
+
+.collapsibleContainer.collapsed {
+  display: none;
+}

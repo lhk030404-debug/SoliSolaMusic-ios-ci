@@ -1,0 +1,7 @@
+require('./expressAppTest')
+require('./apiHelpersTest')
+require('./authenticationTest')
+require('./relayTest')
+require('./configTest')
+require('./txRelay.js')
+require('../src/utils/contentNodeIPCheckTest.js')

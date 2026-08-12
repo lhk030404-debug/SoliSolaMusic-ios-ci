@@ -1,0 +1,21 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["^build"],
+      "outputLogs": "new-only"
+    },
+    "test": {
+      "cache": false,
+      "outputLogs": "new-only",
+      "dependsOn": ["build"]
+    },
+    "watch": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "outputLogs": "new-only"
+    }
+  }
+}

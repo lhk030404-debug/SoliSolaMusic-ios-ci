@@ -1,0 +1,14 @@
+Dockerfile*
+*.yml
+
+**/node_modules
+**/dist
+npm-debug.log
+.git
+
+packages/mobile/ios/Pods
+packages/mobile/android/.gradle
+packages/mobile/android/.cxx
+packages/mobile/android/app/.cxx
+packages/mobile/android/app/build
+packages/mobile/android/build

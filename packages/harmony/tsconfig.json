@@ -1,0 +1,33 @@
+{
+  "extends": "@tsconfig/strictest/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "dom"],
+    "module": "esnext",
+    "sourceMap": true,
+    "checkJs": false,
+    "allowJs": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "exactOptionalPropertyTypes": false,
+    "declaration": true,
+    "declarationMap": true,
+    "baseUrl": "./",
+    // TODO: enable after react-native migration [C-3548]
+    "isolatedModules": false,
+    "paths": {
+      "~harmony/*": ["src/*"]
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ],
+    "outDir": "build",
+    "declarationDir": "./",
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "build", "dist", "rollup.config.mjs"],
+}

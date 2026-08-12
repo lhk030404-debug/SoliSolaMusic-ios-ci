@@ -1,0 +1,48 @@
+.container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.contentGlow {
+  filter: drop-shadow(
+      0 0 8px
+        color-mix(
+          in srgb,
+          var(--frosted-surface-background-color, var(--harmony-n-25)) 50%,
+          transparent
+        )
+    )
+    drop-shadow(
+      0 0 16px
+        color-mix(
+          in srgb,
+          var(--frosted-surface-background-color, var(--harmony-n-25)) 50%,
+          transparent
+        )
+    );
+}
+
+.bottomBarContainer {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.bottomBar {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.rightDecorator {
+  display: flex;
+  align-items: center;
+  margin: 0px 0px 0px auto;
+}
+
+/* Single line, full title visible — no wrap, no ellipsis */
+.pageTitle {
+  white-space: nowrap;
+}

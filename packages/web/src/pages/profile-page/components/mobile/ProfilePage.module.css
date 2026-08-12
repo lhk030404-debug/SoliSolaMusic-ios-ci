@@ -1,0 +1,64 @@
+.container {
+  flex-direction: column;
+}
+
+/**
+ * Deactivated profiles have no tabs or lineups, so the page would otherwise
+ * end just below the header and leave the rest of the viewport blank. Stretch
+ * the container to the full viewport so the tombstone (flex: 1) can fill it.
+ */
+.deactivatedContainer {
+  /**
+   * 100% (not 100dvh) so the page stops at the bottom of the scroll area
+   * rather than overflowing by the height of anything stacked above it,
+   * e.g. the announcement banner.
+   */
+  min-height: 100%;
+}
+
+/* Bottom Section */
+
+.tracksLineupContainer {
+  padding: 16px 12px 0px;
+  width: 100%;
+}
+
+.cardLineupContainer {
+  padding: 16px 11px 0px;
+  width: 100%;
+}
+
+/* Empty Section */
+.emptyTab {
+  margin: 8px 12px;
+  padding: 30px 24px;
+  border: 1px solid var(--harmony-n-100);
+  border-radius: 6px;
+  background-color: var(--harmony-white);
+  box-shadow:
+    0 0 1px 0 var(--tile-shadow-1),
+    0 1px 0 0 var(--tile-shadow-2),
+    0 2px 5px -2px var(--tile-shadow-3);
+
+  color: var(--harmony-neutral);
+  font-size: var(--harmony-font-m);
+  font-weight: var(--harmony-font-medium);
+  line-height: 26px;
+  text-align: center;
+}
+
+.emoji {
+  margin-left: 3px;
+}
+
+.iconReposts {
+  height: 24px !important;
+}
+
+.overflowNav {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

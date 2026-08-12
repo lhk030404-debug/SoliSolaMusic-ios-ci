@@ -1,0 +1,26 @@
+.root {
+  display: flex;
+}
+
+.profilePictureBase {
+  transition: all 0.07s ease-in-out;
+  transform: scale3d(1, 1, 1);
+}
+
+.profilePictureBase:not(.disabled):hover {
+  transform: scale3d(1.05, 1.05, 1.05);
+}
+
+.userHeader {
+  display: inline-flex;
+  align-items: center;
+}
+
+.profilePicture {
+  composes: profilePictureBase;
+  margin-right: calc(var(--harmony-unit-2) * -1);
+}
+
+.profilePicture > div {
+  border-color: var(--harmony-n-25);
+}

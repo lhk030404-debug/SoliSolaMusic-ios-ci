@@ -1,0 +1,384 @@
+.tableWrapper {
+  position: relative;
+  width: 100%;
+  min-width: 288px;
+  border-radius: 8px;
+  box-shadow: var(--harmony-shadow-mid);
+  background-color: var(--harmony-white);
+  overflow: hidden;
+  padding-bottom: 5px;
+}
+
+.table {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 288px !important;
+  background-color: var(--harmony-white);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.tableHead {
+  position: relative;
+  display: block;
+  padding-top: 24px;
+  background-color: var(--harmony-white);
+  color: var(--harmony-neutral);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--harmony-n-100);
+}
+
+.tableHeadRow {
+  display: flex;
+  flex: 1 1 0;
+  position: relative;
+  overflow: hidden;
+  min-width: 0px !important;
+  background-color: var(--harmony-white);
+}
+
+.cellSection {
+  flex: 1 1 0;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+.tableHeader {
+  position: relative;
+  background-color: var(--harmony-white);
+  padding-left: 0px;
+  padding-right: 12px;
+  line-height: normal;
+  user-select: none;
+}
+
+.textCell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  min-height: 41px;
+}
+
+.headerContent[role='button'] {
+  cursor: pointer;
+}
+
+.headerContent:focus {
+  outline: none;
+}
+
+.headerContent:focus-visible {
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 2px var(--harmony-focus, var(--harmony-secondary));
+  outline: none;
+}
+
+.tableHeader.leftAlign .headerContent {
+  justify-content: flex-start;
+  padding-left: 12px;
+}
+
+.tableHeader.rightAlign .headerContent {
+  justify-content: flex-end;
+}
+
+.tableHeader:not(.leftAlign):not(.rightAlign) .headerContent {
+  justify-content: center;
+}
+
+.sortCaretContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.sortCaret {
+  height: 8px;
+  width: 8px;
+}
+
+.sortCaret path {
+  fill: var(--harmony-n-400);
+}
+
+.pageButtonContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+}
+
+.pageButton {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  height: 24px;
+  width: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--harmony-n-600);
+  cursor: pointer;
+}
+
+.pageButton:focus {
+  outline: none;
+}
+
+.pageButton:focus-visible {
+  outline: 2px solid var(--harmony-focus, var(--harmony-secondary));
+  outline-offset: 3px;
+}
+
+.pageButton:not(.active):hover {
+  color: var(--harmony-neutral);
+}
+
+.pageButton.active {
+  background-color: var(--harmony-secondary);
+  color: var(--harmony-white);
+  cursor: default;
+}
+
+.pageCaret {
+  height: 16px;
+  width: 16px;
+}
+
+.pageCaretButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pageCaret path {
+  fill: var(--harmony-n-400);
+}
+
+.pageCaretButton:not(:disabled):hover .pageCaret path {
+  fill: var(--harmony-neutral);
+}
+
+.pageCaretButton:disabled {
+  cursor: default;
+}
+
+.pageCaretButton:disabled .pageCaret path {
+  fill: var(--harmony-n-150);
+}
+
+.pageCaretButton:focus {
+  outline: none;
+}
+
+.pageCaretButton:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--harmony-focus, var(--harmony-secondary));
+  outline-offset: 3px;
+}
+
+.showMoreContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 15px 0;
+  border: 0;
+  background-color: var(--harmony-n-25);
+  border-top: 1px solid var(--harmony-n-100);
+  cursor: pointer;
+}
+
+.showMoreContainer:focus {
+  outline: none;
+}
+
+.showMoreContainer:focus-visible {
+  outline: 2px solid var(--harmony-focus, var(--harmony-secondary));
+  outline-offset: -2px;
+}
+
+.showMoreContainer:hover .showMoreText {
+  color: var(--harmony-neutral);
+}
+
+.showMoreContainer:hover .showMoreCaret path {
+  fill: var(--harmony-neutral);
+}
+
+.showMoreText {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--harmony-n-400);
+  transition: all 0.07s ease-in-out;
+}
+
+.showMoreCaret {
+  height: 16px;
+  width: 16px;
+}
+
+.showMoreCaret path {
+  transition: all 0.07s ease-in-out;
+  fill: var(--harmony-n-400);
+}
+
+.tableBody {
+  display: block;
+  overflow: hidden;
+  background-color: var(--harmony-n-50);
+}
+
+.tableRow {
+  display: flex;
+  position: relative;
+  flex: 1 1 0;
+  overflow: hidden;
+  background-color: var(--harmony-white);
+  min-width: 0px !important;
+  color: var(--harmony-neutral);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tableRow:focus {
+  outline: none;
+}
+
+.tableRow:focus-visible {
+  z-index: 4;
+  outline: 2px solid var(--harmony-focus, var(--harmony-secondary));
+  outline-offset: -2px;
+}
+.tableRow > .tableCell {
+  background-color: var(--harmony-white);
+}
+
+.tableRow.active {
+  color: var(--harmony-primary);
+}
+
+.tableRow:hover:not(.skeletonRow),
+.tableRow:focus-within:not(.skeletonRow),
+.tableRow:hover:not(.skeletonRow) > .tableCell,
+.tableRow:focus-within:not(.skeletonRow) > .tableCell {
+  z-index: 3;
+  box-shadow:
+    0 1px 0 0 var(--harmony-n-100),
+    0 -1px 0 0 var(--harmony-n-100);
+  transition: all 0.07s ease-in-out;
+  background-color: var(--harmony-n-50);
+}
+
+.tableRow.skeletonRow {
+  cursor: default;
+}
+
+.tableRow.disabled {
+  cursor: default;
+  color: var(--harmony-n-400);
+  background-color: var(--harmony-n-50);
+}
+
+.tableRow.disabled:hover {
+  box-shadow: none;
+  background-color: var(--harmony-n-50);
+}
+
+.tableCell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+  justify-content: center;
+  height: 64px;
+  padding: 20px 12px;
+  background-color: transparent;
+  user-select: none;
+  transition: all 0.05s ease-in-out;
+}
+
+.textContainer {
+  position: relative;
+  max-width: 100%;
+  height: 18px;
+  display: inline-flex;
+}
+
+.textCell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leftAlign {
+  text-align: left;
+  justify-content: left;
+}
+
+.rightAlign {
+  text-align: right;
+  justify-content: right;
+}
+
+.reorderableRow {
+  cursor: grab;
+}
+
+.droppable {
+  position: relative;
+}
+
+.droppable::after {
+  content: '';
+  position: absolute;
+  height: 3px;
+  left: 0;
+  right: 0;
+  top: 0;
+  background-color: var(--harmony-secondary);
+  opacity: 0;
+  z-index: 2;
+}
+
+.droppableHover::after {
+  opacity: 1;
+}
+
+.cellSectionEnd {
+  position: sticky !important;
+  right: 0;
+  /* z-index: 3; */
+  /* background-color: inherit; */
+}
+
+.cellSectionEnd.menu {
+  flex: 0 0 64px;
+}

@@ -1,0 +1,120 @@
+/* Inner Lottie wrapper – sized so the SVG renders at the 24px icon footprint */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--harmony-unit-6);
+  height: var(--harmony-unit-6);
+}
+
+/* Outer <button> element – matches desktop iconButton behavior */
+.buttonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--harmony-unit-6);
+  height: var(--harmony-unit-6);
+  transform: scale3d(1, 1, 1);
+  transition: all 0.12s ease-in-out !important;
+}
+
+.buttonContent:hover {
+  transform: scale3d(1.18, 1.18, 1.18);
+}
+
+.buttonContent:active {
+  transform: scale3d(0.95, 0.95, 0.95);
+}
+
+.disabledButton,
+.disabledButton:hover,
+.disabledButton:active {
+  transform: scale3d(1, 1, 1);
+}
+
+/* Repost Lottie has heavy internal whitespace – scale up to match the 24px icons */
+.repostButton {
+  transform: scale(1.25);
+  transform-origin: center;
+}
+
+/* Favorite Lottie sits slightly high in its viewBox – nudge down and scale to match */
+.favoriteButton {
+  transform: translateY(1px) scale(0.95);
+  transform-origin: center;
+}
+
+/* Subdued inactive state - matches share icon */
+.buttonContent path {
+  fill: var(--harmony-n-400) !important;
+}
+
+.activeButton path {
+  fill: var(--harmony-primary) !important;
+}
+
+.disabledButton path {
+  fill: var(--harmony-n-100) !important;
+}
+
+.tinted path {
+  fill: var(--harmony-n-400);
+}
+
+.share {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--harmony-unit-6);
+  width: var(--harmony-unit-6);
+  transform: scale3d(1, 1, 1);
+  transition: all 0.12s ease-in-out !important;
+}
+
+/* Match repost/favorite 1.18 hover total – Harmony IconButton already scales svg on hover */
+.share:hover {
+  transform: scale3d(1.07, 1.07, 1.07);
+}
+
+.share:active {
+  transform: scale3d(0.95, 0.95, 0.95);
+}
+
+.shareHidden {
+  visibility: hidden;
+}
+
+.overflow {
+  height: var(--harmony-unit-6);
+  width: var(--harmony-unit-6);
+}
+
+.gatedContent {
+  align-items: center;
+  background-color: var(--harmony-blue);
+  border-radius: var(--harmony-unit-1);
+  color: var(--harmony-white);
+  display: flex;
+  gap: var(--harmony-unit-1);
+  height: var(--harmony-unit-6);
+  padding: var(--harmony-unit-2) var(--harmony-unit-3);
+}
+
+.gatedContent svg {
+  width: var(--harmony-unit-4);
+  height: var(--harmony-unit-4);
+}
+
+.gatedContent path {
+  fill: var(--harmony-white);
+}
+
+.spinner {
+  height: var(--harmony-unit-4);
+  width: var(--harmony-unit-4);
+}
+
+.spinner g path {
+  stroke: var(--harmony-white);
+}

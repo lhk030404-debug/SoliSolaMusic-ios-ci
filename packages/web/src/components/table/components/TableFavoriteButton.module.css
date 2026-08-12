@@ -1,0 +1,24 @@
+.tableFavoriteButton {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.tableFavoriteButton.favorited {
+  opacity: 1;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  position: relative;
+}
+
+/* Subdued inactive – matches other action icons */
+.icon path {
+  fill: var(--harmony-n-400) !important;
+}
+
+.tableFavoriteButton.favorited .icon path {
+  fill: var(--harmony-primary) !important;
+}

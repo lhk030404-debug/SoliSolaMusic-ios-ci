@@ -1,0 +1,32 @@
+.icon {
+  height: 30px;
+  aspect-ratio: 1;
+  margin-right: var(--harmony-unit-2);
+}
+
+/* .iconFollow, */
+/* .iconRepost, */
+/* .iconFavorite, */
+/* .iconMilestone, */
+/* .iconRelease, */
+/* .iconTrending, */
+/* .iconRemix, */
+/* .iconTip, */
+/* .iconAddTrackToPlaylist {} */
+
+.iconRewards {
+  margin-right: var(--harmony-unit-2);
+}
+
+.iconRewards i {
+  margin-bottom: 0 !important;
+}
+
+.iconTier {
+  margin-right: var(--harmony-unit-2);
+}
+
+.iconTier img {
+  height: 32px;
+  width: 32px;
+}

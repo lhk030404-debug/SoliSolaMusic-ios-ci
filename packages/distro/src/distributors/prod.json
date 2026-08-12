@@ -1,0 +1,54 @@
+{
+  "distributors": [
+    {
+      "name": "audiosalad",
+      "appKey": "6fd67276ac60a405284c2b553a9d1d27a9760b10",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "fuga",
+      "appKey": "1ba4906aea0d0f5571bdd6e4985c59ad97ab51b2",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "dashgo",
+      "appKey": "a5cce5f3ea25b7dfb2c1a84ed1f58d1ecbc9be5c",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "revelator",
+      "appKey": "2ee33a0d99972fbe344c694cbd89e9f2553f7ac4",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "toolroom",
+      "appKey": "0971d74d0ea82387d6fc8d780eeb3f122ece8792",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "higheq",
+      "appKey": "f327a13ad819f02abcc7fcee5db0bd0b828e710c",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "sme",
+      "appKey": "52511242f575dab814c06d1f80ca1cbad9cc58ea",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "orchard",
+      "appKey": "d3a331d096ed4377654fe25fb33613f746667db8",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "onchainmusic",
+      "appKey": "6c1ef2e9c33e2ba1c0d352e41e06e8a3c7721c6f",
+      "url": "http://ddex.audius.co"
+    },
+    {
+      "name": "volume",
+      "appKey": "ebad928af3e5609578707b3f60c3b0d98e6ef8e1",
+      "url": "http://ddex.audius.co"
+    }
+  ]
+}

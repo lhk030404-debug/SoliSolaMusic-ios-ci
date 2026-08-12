@@ -1,0 +1,298 @@
+/**
+ * Audius Color Palette
+ *
+ * Each defined color has variants defined by the 'dark' or 'light'
+ * keyword. The number signifies an increasing value for the property, e.g.
+ * -dark-2 is darker than -dark-1.
+ */
+:root {
+  --secondary-transparent: rgba(126, 27, 204, 0.85);
+
+  /* --white everywhere except darkmode, which is static*/
+  --darkmode-static-white: var(--harmony-white);
+
+  --ai-primary: #1fd187;
+  --ai-secondary: #0fc578;
+
+  --page-header-gradient-color-1: #5b23e1;
+  --page-header-gradient-color-2: #a22feb;
+  --page-header-gradient: linear-gradient(
+    -22deg,
+    var(--page-header-gradient-color-1) 0%,
+    var(--page-header-gradient-color-2) 100%
+  );
+  --page-header-text-shadow-color: rgba(162, 47, 235, 0.2);
+  --page-header-text-shadow: 0px 2px 4px var(--page-header-text-shadow-color);
+  --accent-red-gradient: linear-gradient(
+    315deg,
+    var(--harmony-dark-red) 0%,
+    var(--harmony-red) 100%
+  );
+  --play-button-triangle: var(--harmony-white);
+  --track-slider-rail: var(--harmony-neutral);
+  --track-slider-handle: var(--harmony-n-600);
+  --track-slider-handle-border: var(--harmony-border-negative);
+}
+
+:root,
+html[data-theme='day'],
+html[data-theme='classic-light'],
+html[data-theme='default-light'] {
+  --image-shadow: rgba(10, 10, 10, 0.35);
+  --tile-shadow-1: rgba(133, 129, 153, 0.1);
+  --tile-shadow-2: #e3e3e3;
+  --tile-shadow-3: rgba(133, 129, 153, 0.25);
+  --tile-shadow-1-alt: rgba(133, 129, 153, 0.2);
+
+  --currently-playing-border: #ffffff;
+  --currently-playing-default-shadow: rgba(242, 242, 242, 0.5);
+
+  --card-image-shadow: rgba(133, 129, 153, 0.75);
+
+  --input-background: rgba(255, 255, 255, 0.8);
+
+  --search-bar-background: rgba(255, 255, 255, 0.8);
+  --search-bar-expanded: var(--harmony-white);
+  --search-bar-border: rgba(143, 149, 152, 0.1);
+  --search-bar-shadow: rgba(133, 129, 153, 0.15);
+
+  --scrubber-hover: var(--harmony-gradient);
+  --stems-token-value-slider-background: var(--harmony-gradient);
+  --stems-token-value-slider-background-error: var(--accent-red-gradient);
+
+  --table-shadow: rgba(133, 129, 153, 0.15);
+
+  --mask: rgba(243, 240, 247, 0.5);
+  --skeleton-gradient: linear-gradient(
+    90deg,
+    #f7f7f9 25%,
+    #f2f2f4 37%,
+    #f7f7f9 63%
+  );
+  --skeleton: var(--harmony-n-50);
+  --skeleton-highlight: var(--harmony-n-100);
+  --profile-completion-shadow-1: rgba(126, 27, 204, 0.05);
+  --profile-completion-shadow-2: rgba(133, 129, 153, 0.2);
+
+  --default-profile-picture-background: var(--harmony-n-400);
+
+  --notification-panel-box-shadow: rgba(0, 0, 0, 0.25);
+  --notification-border: rgba(133, 129, 153, 0.2);
+  --notification-background: #ffffff;
+  --notification-border-hover: rgba(133, 129, 153, 0.2);
+  --notification-background-hover: #ffffff;
+  --notification-background-box-shadow: 0 2px 15px -4px rgba(133, 129, 153, 0.2);
+  --notification-border-active: rgba(133, 129, 153, 0.2);
+  --notification-background-active: #fafafa;
+
+  --notification-unread-border: rgba(126, 27, 204, 0.3);
+  --notification-unread-background: rgba(152, 73, 214, 0.02);
+  --notification-unread-border-hover: rgba(126, 27, 204, 0.3);
+  --notification-unread-background-hover: rgba(152, 73, 214, 0.02);
+  --notification-unread-background-box-shadow: 0 2px 15px -4px
+    rgba(126, 27, 204, 0.15);
+  --notification-unread-border-active: rgba(126, 27, 204, 0.3);
+  --notification-unread-background-active: rgba(152, 73, 214, 0.06);
+
+  --page-header-gradient-1: rgb(252, 252, 252);
+  --page-header-gradient-2: rgba(252, 252, 252, 0.85);
+  --page-header-gradient-2-alt: rgba(252, 252, 252, 0.95);
+  --next-and-previous-buttons: var(--harmony-neutral);
+}
+
+html[data-theme='dark'],
+html[data-theme='classic-dark'] {
+  --darkmode-static-white: var(--harmony-white);
+  --page-header-gradient-color-1: #7652cc;
+  --page-header-gradient-color-2: #b05ce6;
+  --tile-shadow-1: rgba(17, 17, 34, 0.1);
+  --tile-shadow-2: #35364f;
+  --tile-shadow-3: rgba(17, 17, 34, 0.25);
+  --tile-shadow-1-alt: rgba(17, 17, 34, 0.2);
+  --currently-playing-border: none;
+  --currently-playing-default-shadow: rgba(17, 17, 17, 0.1);
+  --card-image-shadow: rgba(17, 17, 17, 0.25);
+  --input-background: rgba(76, 80, 107, 0.8);
+  --search-bar-background: rgba(76, 80, 107, 0.8);
+  --search-bar-expanded: rgba(76, 80, 107, 1);
+  --search-bar-border: rgba(143, 149, 152, 0.1);
+  --search-bar-shadow: rgba(36, 36, 56, 0.2);
+  --slider-handle: var(--harmony-n-950);
+  --table-shadow: rgba(17, 17, 34, 0.15);
+  --mask: rgba(36, 36, 52, 0.7);
+  --skeleton-gradient: linear-gradient(
+    90deg,
+    #393a54 25%,
+    #35364f 37%,
+    #393a54 63%
+  );
+  --skeleton: var(--harmony-n-50);
+  --skeleton-highlight: var(--harmony-n-100);
+  --profile-completion-shadow-1: rgba(0, 0, 0, 0);
+  --profile-completion-shadow-2: rgba(17, 17, 34, 0.15);
+  --default-profile-picture-background: var(--harmony-n-200);
+  --notification-panel-box-shadow: rgba(0, 0, 0, 0.25);
+  --notification-border: rgba(133, 129, 153, 0.2);
+  --notification-background: #32334d;
+  --notification-border-hover: rgba(133, 129, 153, 0.2);
+  --notification-background-hover: #32334d;
+  --notification-background-box-shadow: 0 2px 15px -4px rgba(17, 17, 34, 0.2);
+  --notification-border-active: #4e4f6a;
+  --notification-background-active: #2f3048;
+  --notification-unread-border: #4e4f6a;
+  --notification-unread-background: #3f415b;
+  --notification-unread-border-hover: #4e4f6a;
+  --notification-unread-background-hover: #3f415b;
+  --notification-unread-background-box-shadow: none;
+  --notification-unread-border-active: #4e4f6a;
+  --notification-unread-background-active: #363751;
+  --page-header-gradient: linear-gradient(
+    -22deg,
+    var(--page-header-gradient-color-1) 0%,
+    var(--page-header-gradient-color-2) 100%
+  );
+  --secondary-gradient: linear-gradient(315deg, #6b0fb3 0%, #7e1bcc 100%);
+  --page-header-gradient-1: rgb(53, 54, 79);
+  --page-header-gradient-2: rgba(53, 54, 79, 0.85);
+  --page-header-gradient-2-alt: rgba(53, 54, 79, 0.95);
+  --page-header-text-shadow-color: rgba(162, 47, 235, 0.2);
+  --page-header-text-shadow: 0px 2px 4px var(--page-header-text-shadow-color);
+  --next-and-previous-buttons: var(--harmony-neutral);
+  --play-button-triangle: var(--harmony-white);
+  --track-slider-rail: var(--harmony-neutral);
+  --track-slider-handle: var(--harmony-n-600);
+}
+
+/* Default theme (Neue) - neutral grays, uses harmony tokens for header gradient */
+html[data-theme='default-dark'] {
+  --darkmode-static-white: var(--harmony-white);
+  --page-header-gradient-color-1: #6f55d8;
+  --page-header-gradient-color-2: #d767e1;
+  --page-header-gradient: linear-gradient(
+    -22deg,
+    var(--page-header-gradient-color-1) 0%,
+    var(--page-header-gradient-color-2) 100%
+  );
+  --page-header-gradient-1: var(--harmony-n-25);
+  --page-header-gradient-2: rgba(15, 15, 15, 0.85);
+  --page-header-gradient-2-alt: rgba(15, 15, 15, 0.95);
+  --page-header-text-shadow-color: rgba(111, 85, 216, 0.3);
+  --page-header-text-shadow: 0px 2px 4px var(--page-header-text-shadow-color);
+  /* Inherit other dark theme vars from a base - we need the full set */
+  --tile-shadow-1: rgba(17, 17, 34, 0.1);
+  --tile-shadow-2: #1a1a1a;
+  --tile-shadow-3: rgba(17, 17, 34, 0.25);
+  --tile-shadow-1-alt: rgba(17, 17, 34, 0.2);
+  --currently-playing-border: none;
+  --currently-playing-default-shadow: rgba(17, 17, 17, 0.1);
+  --card-image-shadow: rgba(17, 17, 17, 0.25);
+  --input-background: rgba(31, 31, 31, 0.8);
+  --search-bar-background: rgba(31, 31, 31, 0.8);
+  --search-bar-expanded: rgba(31, 31, 31, 1);
+  --search-bar-border: rgba(143, 149, 152, 0.1);
+  --search-bar-shadow: rgba(0, 0, 0, 0.3);
+  --slider-handle: var(--harmony-n-950);
+  --table-shadow: rgba(17, 17, 34, 0.15);
+  --mask: rgba(0, 0, 0, 0.7);
+  --skeleton-gradient: linear-gradient(
+    90deg,
+    #1a1a1a 25%,
+    #141414 37%,
+    #1a1a1a 63%
+  );
+  --skeleton: var(--harmony-n-50);
+  --skeleton-highlight: var(--harmony-n-100);
+  --profile-completion-shadow-1: rgba(0, 0, 0, 0);
+  --profile-completion-shadow-2: rgba(17, 17, 34, 0.15);
+  --default-profile-picture-background: var(--harmony-n-200);
+  --notification-panel-box-shadow: rgba(0, 0, 0, 0.25);
+  --notification-border: rgba(51, 51, 51, 0.5);
+  --notification-background: #1f1f1f;
+  --notification-border-hover: rgba(51, 51, 51, 0.5);
+  --notification-background-hover: #1f1f1f;
+  --notification-background-box-shadow: 0 2px 15px -4px rgba(0, 0, 0, 0.3);
+  --notification-border-active: #333333;
+  --notification-background-active: #141414;
+  --notification-unread-border: #474747;
+  --notification-unread-background: #292929;
+  --notification-unread-border-hover: #474747;
+  --notification-unread-background-hover: #292929;
+  --notification-unread-background-box-shadow: none;
+  --notification-unread-border-active: #474747;
+  --notification-unread-background-active: #1a1a1a;
+  --secondary-gradient: linear-gradient(315deg, #6f55d8 0%, #d767e1 100%);
+  --next-and-previous-buttons: var(--harmony-neutral);
+  --play-button-triangle: var(--harmony-white);
+  --track-slider-rail: var(--harmony-neutral);
+  --track-slider-handle: var(--harmony-n-600);
+}
+
+html[data-theme='default-light'] {
+  /* Override header gradient to use default theme's surface color */
+  --page-header-gradient-1: var(--harmony-n-25);
+  --page-header-gradient-2: rgba(247, 247, 248, 0.85);
+  --page-header-gradient-2-alt: rgba(247, 247, 248, 0.95);
+}
+
+html[data-theme='matrix'] {
+  --darkmode-static-white: var(--harmony-white);
+  --page-header-gradient-color-1: #4ff069;
+  --page-header-gradient-color-2: #09bd51;
+  --page-header-gradient: linear-gradient(-22deg, #4ff069 0%, #09bd51 100%);
+  --tile-shadow-1: rgba(0, 0, 0, 0.1);
+  --tile-shadow-2: #000000;
+  --tile-shadow-3: rgba(0, 0, 0, 0.25);
+  --tile-shadow-1-alt: rgba(17, 17, 34, 0.2);
+  --currently-playing-border: none;
+  --currently-playing-default-shadow: rgba(17, 17, 17, 0.1);
+  --card-image-shadow: rgba(17, 17, 17, 0.25);
+  --input-background: var(--harmony-n-50);
+  --search-bar-background: var(--harmony-n-50);
+  --search-bar-expanded: var(--harmony-n-50);
+  --search-bar-border: rgba(143, 149, 152, 0.1);
+  --search-bar-shadow: rgba(36, 36, 56, 0.2);
+  --slider-handle: var(--harmony-n-950);
+  --table-shadow: rgba(17, 17, 34, 0.15);
+  --mask: rgba(36, 36, 52, 0.7);
+  --skeleton-gradient: linear-gradient(
+    90deg,
+    #393a54 25%,
+    #35364f 37%,
+    #393a54 63%
+  );
+  --skeleton: var(--harmony-n-150);
+  --skeleton-highlight: var(--harmony-n-200);
+  --profile-completion-shadow-1: rgba(0, 0, 0, 0);
+  --profile-completion-shadow-2: rgba(17, 17, 34, 0.15);
+  --default-profile-picture-background: var(--harmony-n-200);
+  --notification-panel-box-shadow: rgba(0, 0, 0, 0.25);
+  --notification-border: var(--harmony-n-150);
+  --notification-background: var(--harmony-white);
+  --notification-border-hover: var(--harmony-n-100);
+  --notification-background-hover: var(--harmony-n-50);
+  --notification-background-box-shadow: 0 2px 15px -4px rgba(17, 17, 34, 0.2);
+  --notification-border-active: var(--harmony-n-100);
+  --notification-background-active: var(--harmony-white);
+  --notification-unread-border: var(--harmony-n-100);
+  --notification-unread-background: --var(--harmony-n-100);
+  --notification-unread-border-hover: var(--harmony-n-200);
+  --notification-unread-background-hover: var(--harmony-n-150);
+  --notification-unread-background-box-shadow: none;
+  --notification-unread-border-active: var(--harmony-n-100);
+  --notification-unread-background-active: --var(--harmony-white);
+  --page-header-gradient-1: var(--harmony-n-25);
+  --page-header-gradient-2: var(--harmony-n-25);
+  --page-header-gradient-2-alt: var(--harmony-n-25);
+  --page-header-text-shadow-color: rgba(20, 255, 0, 0.25);
+  --page-header-text-shadow: 0px 0px 5px rgba(225, 255, 234, 0.25),
+    0px 0px 15px var(--page-header-text-shadow-color);
+  --next-and-previous-buttons: var(--harmony-n-400);
+  --secondary-gradient: linear-gradient(0deg, #2f8b27 0%, #00ff29 95.45%);
+  --play-button-triangle: var(--harmony-white);
+  --track-slider-rail: linear-gradient(
+    294.99deg,
+    #4ff069 -8.52%,
+    #09bd51 118.66%
+  );
+  --track-slider-handle: var(--harmony-n-600);
+}

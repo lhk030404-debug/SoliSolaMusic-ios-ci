@@ -1,0 +1,144 @@
+.playBar {
+  height: 48px;
+  max-height: 48px;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  background: var(--harmony-white);
+}
+
+.controls {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0 4px;
+}
+
+.favorite {
+  position: relative;
+  cursor: pointer;
+  height: 28px !important;
+  width: 28px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.artwork {
+  flex: 0 0 26px;
+  margin-left: 12px;
+  box-sizing: border-box;
+  height: 26px;
+  width: 26px;
+  border: 1px solid var(--harmony-n-100);
+}
+
+.image {
+  position: relative;
+  height: 26px;
+  width: 26px;
+  border-radius: 2px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.imageEmpty {
+  background-color: var(--harmony-n-100);
+}
+
+.emptyArtworkIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.emptyArtworkIcon path {
+  fill: var(--harmony-static-white);
+}
+
+.info {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 100%;
+  min-width: 0;
+  margin-right: var(--harmony-unit-2);
+  user-select: none;
+  padding-top: 20px;
+  margin-top: -20px;
+}
+
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: 8px;
+}
+
+.titleLine {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: normal;
+}
+
+.separator {
+  margin: 0px 4px;
+}
+
+.title {
+  color: var(--harmony-neutral);
+  font-size: var(--harmony-font-xs);
+  font-weight: var(--harmony-font-bold);
+}
+
+.artist {
+  color: var(--harmony-neutral);
+  font-size: var(--harmony-font-xs);
+  font-weight: var(--harmony-font-medium);
+}
+
+.play {
+  margin-left: auto;
+  margin-right: 8px;
+  justify-self: flex-end;
+  flex: 0 0 auto;
+  width: 32px;
+}
+
+.lockPreview {
+  flex: 0 0 auto;
+  margin-left: var(--harmony-unit-2);
+}
+
+.lockOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+  opacity: 0.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconLock {
+  width: 10px;
+  height: 10px;
+}
+
+.iconLock path {
+  fill: var(--harmony-white);
+}

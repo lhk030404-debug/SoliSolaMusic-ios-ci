@@ -1,0 +1,244 @@
+import { useCallback, useState } from 'react'
+
+import {
+  useCurrentAccountUser,
+  useCurrentUserEmail,
+  useQueryContext,
+  useResendRecoveryEmail
+} from '@audius/common/api'
+import { modalsActions, useTierAndVerifiedForUser } from '@audius/common/store'
+import { css } from '@emotion/native'
+import { pick } from 'lodash'
+import { Text, View } from 'react-native'
+import { useDispatch } from 'react-redux'
+
+import {
+  Flex,
+  IconEmailAddress,
+  IconKey,
+  IconRecoveryEmail,
+  IconSignOut,
+  IconSkull,
+  IconUser,
+  IconVerified
+} from '@audius/harmony-native'
+import {
+  ScrollView,
+  Screen,
+  ScreenContent,
+  ProfilePicture
+} from 'app/components/core'
+import { useNavigation } from 'app/hooks/useNavigation'
+import { useToast } from 'app/hooks/useToast'
+import { makeStyles } from 'app/styles'
+
+import type { ProfileTabScreenParamList } from '../app-screen/ProfileTabScreen'
+
+import { AccountSettingsItem } from './AccountSettingsItem'
+const { setVisibility } = modalsActions
+
+const messages = {
+  title: 'Account',
+  recoveryTitle: 'Recovery Email',
+  recoveryDescription:
+    'Store your recovery email safely. This email is the only way to recover your account if you forget your password.',
+  recoveryButtonTitle: 'Resend Recovery Email',
+  recoveryEmailSent: 'Recovery Email Sent!',
+  recoveryEmailNotSent: 'Unable to send recovery email. Please try again!',
+  emailVerificationTitle: 'Email Verification',
+  emailVerificationDescription:
+    'Verify that you can receive email at the address connected to your Audius account.',
+  emailVerificationButtonTitle: 'Resend Verification Email',
+  emailVerificationSent: 'Verification email sent!',
+  emailVerificationAlreadyVerified: 'Your email is already verified.',
+  emailVerificationNotSent:
+    'Unable to send verification email. Please try again!',
+  emailVerifiedStatus: 'Email verified',
+  emailNotVerifiedStatus: 'Email not verified',
+  verifyTitle: 'Verification',
+  verifyDescription:
+    'Verify your Audius profile by completing identity verification.',
+  verifyButtonTitle: 'Get Verified',
+  emailTitle: 'Change Email',
+  emailDescription: 'Change the email you use to sign in and receive emails.',
+  emailButtonTitle: 'Change Email',
+  passwordTitle: 'Change Password',
+  passwordDescription: 'Change the password to your Audius account.',
+  passwordButtonTitle: 'Change Password',
+  signOutTitle: 'Sign Out',
+  signOutDescription: 'Sign out of your Audius Account.',
+  signOutButtonTitle: 'Sign Out',
+  deleteAccountTitle: 'Delete Account',
+  deleteAccountDescription: 'Delete your account. This cannot be undone',
+  deleteAccountButtonTitle: 'Delete Account'
+}
+
+const useStyles = makeStyles(({ typography, palette, spacing }) => ({
+  header: {
+    alignItems: 'center',
+    paddingVertical: spacing(8)
+  },
+  name: { ...typography.h2, color: palette.neutral, marginTop: spacing(1) },
+  handle: {
+    ...typography.h2,
+    color: palette.neutral,
+    fontFamily: typography.fontByWeight.medium
+  }
+}))
+
+export const AccountSettingsScreen = () => {
+  const styles = useStyles()
+  const { toast } = useToast()
+  const dispatch = useDispatch()
+  const { identityService } = useQueryContext()
+  const [isSendingVerificationEmail, setIsSendingVerificationEmail] =
+    useState(false)
+  const { data: emailData } = useCurrentUserEmail()
+  const isEmailVerified = emailData?.isEmailVerified
+  const { data: accountData } = useCurrentAccountUser({
+    select: (user) => pick(user, ['user_id', 'handle', 'name'])
+  })
+  const {
+    user_id: accountUserId,
+    handle: accountHandle,
+    name: accountName
+  } = accountData ?? {}
+
+  const navigation = useNavigation<ProfileTabScreenParamList>()
+  const { isVerified } = useTierAndVerifiedForUser(accountUserId)
+
+  // Calculate badge size based on h2 font size (h2 is fontSize.medium = 16, so badge is 14)
+  const badgeSize = 14
+
+  const { mutate: resendRecoveryEmail } = useResendRecoveryEmail()
+
+  const handlePressRecoveryEmail = useCallback(() => {
+    resendRecoveryEmail(undefined, {
+      onSuccess: () => toast({ content: messages.recoveryEmailSent }),
+      onError: () => toast({ content: messages.recoveryEmailNotSent })
+    })
+  }, [resendRecoveryEmail, toast])
+
+  const handlePressEmailVerification = useCallback(async () => {
+    setIsSendingVerificationEmail(true)
+    try {
+      const result = await identityService.resendEmailVerification()
+      toast({
+        content: result.alreadyVerified
+          ? messages.emailVerificationAlreadyVerified
+          : messages.emailVerificationSent,
+        type: 'info'
+      })
+    } catch (e) {
+      toast({ content: messages.emailVerificationNotSent, type: 'error' })
+    } finally {
+      setIsSendingVerificationEmail(false)
+    }
+  }, [identityService, toast])
+
+  const handlePressChangeEmail = useCallback(() => {
+    navigation.push('ChangeEmail')
+  }, [navigation])
+
+  const handlePressChangePassword = useCallback(() => {
+    navigation.push('ChangePassword')
+  }, [navigation])
+
+  const handlePressVerification = useCallback(() => {
+    navigation.push('VerificationWebView')
+  }, [navigation])
+
+  const openSignOutDrawer = useCallback(() => {
+    dispatch(setVisibility({ modal: 'SignOutConfirmation', visible: true }))
+  }, [dispatch])
+
+  const openDeactivateAccountDrawer = useCallback(() => {
+    dispatch(
+      setVisibility({ modal: 'DeactivateAccountConfirmation', visible: true })
+    )
+  }, [dispatch])
+
+  if (!accountUserId) return null
+
+  return (
+    <Screen
+      title={messages.title}
+      icon={IconUser}
+      topbarRight={null}
+      variant='secondary'
+    >
+      <ScreenContent>
+        <ScrollView>
+          <View style={styles.header}>
+            <ProfilePicture
+              userId={accountUserId}
+              style={css({ width: 128, height: 128 })}
+            />
+            <Flex row gap='xs' alignItems='center' justifyContent='center'>
+              <Text style={styles.name}>{accountName}</Text>
+              {isVerified ? (
+                <IconVerified height={badgeSize} width={badgeSize} />
+              ) : null}
+            </Flex>
+            <Text style={styles.handle}>@{accountHandle}</Text>
+          </View>
+          <AccountSettingsItem
+            title={messages.recoveryTitle}
+            titleIcon={IconRecoveryEmail}
+            description={messages.recoveryDescription}
+            buttonTitle={messages.recoveryButtonTitle}
+            onPress={handlePressRecoveryEmail}
+          />
+          <AccountSettingsItem
+            title={messages.emailVerificationTitle}
+            titleIcon={IconEmailAddress}
+            description={messages.emailVerificationDescription}
+            buttonTitle={messages.emailVerificationButtonTitle}
+            onPress={handlePressEmailVerification}
+            disabled={isSendingVerificationEmail}
+            isVerified={isEmailVerified}
+            verifiedText={messages.emailVerifiedStatus}
+            notVerifiedText={messages.emailNotVerifiedStatus}
+            hideButton={isEmailVerified}
+          />
+          <AccountSettingsItem
+            title={messages.verifyTitle}
+            titleIcon={IconVerified}
+            description={messages.verifyDescription}
+            buttonTitle={messages.verifyButtonTitle}
+            onPress={handlePressVerification}
+            disabled={isVerified}
+          />
+          <AccountSettingsItem
+            title={messages.emailTitle}
+            titleIcon={IconEmailAddress}
+            description={messages.emailDescription}
+            buttonTitle={messages.emailButtonTitle}
+            onPress={handlePressChangeEmail}
+          />
+          <AccountSettingsItem
+            title={messages.passwordTitle}
+            titleIcon={IconKey}
+            description={messages.passwordDescription}
+            buttonTitle={messages.passwordButtonTitle}
+            onPress={handlePressChangePassword}
+          />
+          <AccountSettingsItem
+            title={messages.signOutTitle}
+            titleIcon={IconSignOut}
+            description={messages.signOutDescription}
+            buttonTitle={messages.signOutButtonTitle}
+            onPress={openSignOutDrawer}
+          />
+          <AccountSettingsItem
+            title={messages.deleteAccountTitle}
+            titleIcon={IconSkull}
+            description={messages.deleteAccountDescription}
+            buttonTitle={messages.deleteAccountButtonTitle}
+            onPress={openDeactivateAccountDrawer}
+          />
+        </ScrollView>
+      </ScreenContent>
+    </Screen>
+  )
+}

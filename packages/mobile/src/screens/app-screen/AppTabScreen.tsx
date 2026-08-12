@@ -1,0 +1,358 @@
+import { useCallback, useContext, useEffect, useRef } from 'react'
+
+import type {
+  FavoriteType,
+  ID,
+  SearchTrack,
+  SearchPlaylist
+} from '@audius/common/models'
+import type {
+  NotificationType,
+  RepostType,
+  CreateChatModalState,
+  TrackMetadataForUpload
+} from '@audius/common/store'
+import type {
+  GetCoinsSortMethodEnum,
+  GetCoinsSortDirectionEnum
+} from '@audius/sdk'
+import type { EventArg, NavigationState } from '@react-navigation/native'
+import { useIsFocused } from '@react-navigation/native'
+import type { createNativeStackNavigator } from '@react-navigation/native-stack'
+
+import { FilterButtonScreen } from '@audius/harmony-native'
+import type { FilterButtonScreenParams } from '@audius/harmony-native'
+import { useDrawer } from 'app/hooks/useDrawer'
+import { setLastNavAction } from 'app/hooks/useNavigation'
+import { AppDrawerContext } from 'app/screens/app-drawer-screen'
+import { SetAppTabNavigationContext } from 'app/screens/app-screen/AppTabNavigationProvider'
+import type { AppTabNavigation } from 'app/screens/app-screen/AppTabNavigationProvider'
+import { AudioScreen } from 'app/screens/audio-screen'
+import { CashScreen } from 'app/screens/cash-screen'
+import { ChangeEmailModalScreen } from 'app/screens/change-email-screen/ChangeEmailScreen'
+import { ChatListScreen } from 'app/screens/chat-screen/ChatListScreen'
+import { ChatScreen } from 'app/screens/chat-screen/ChatScreen'
+import { ChatUserListScreen } from 'app/screens/chat-screen/ChatUserListScreen'
+import {
+  CoinDetailsScreen,
+  EditCoinDetailsScreen
+} from 'app/screens/coin-details-screen'
+import { CoinRedeemScreen } from 'app/screens/coin-redeem-screen'
+import { CollectionScreen } from 'app/screens/collection-screen/CollectionScreen'
+import { EditProfileScreen } from 'app/screens/edit-profile-screen'
+import { ProfileScreen } from 'app/screens/profile-screen'
+import { RewardsScreen } from 'app/screens/rewards-screen'
+import { SendTokensUserSelectionScreen } from 'app/screens/send-tokens-user-selection-screen/SendTokensUserSelectionScreen'
+import {
+  AboutScreen,
+  AccountSettingsScreen,
+  ListeningHistoryScreen,
+  DownloadSettingsScreen,
+  InboxSettingsScreen,
+  CommentSettingsScreen,
+  NotificationSettingsScreen,
+  SettingsScreen
+} from 'app/screens/settings-screen'
+import { TrackScreen } from 'app/screens/track-screen'
+import { TrackRemixesScreen } from 'app/screens/track-screen/TrackRemixesScreen'
+import {
+  FavoritedScreen,
+  FollowersScreen,
+  FollowingScreen,
+  RepostsScreen,
+  NotificationUsersScreen,
+  MutualsScreen,
+  RelatedArtistsScreen,
+  CoinLeaderboardScreen
+} from 'app/screens/user-list-screen'
+import { WalletScreen } from 'app/screens/wallet-screen'
+
+import { ContestFollowersScreen, ContestScreen } from '../contest-screen'
+import { ContestsScreen } from '../contests-screen'
+import { FanClubSortScreen } from '../fan-club-sort-screen/FanClubSortScreen'
+import { FanClubsExploreScreen } from '../fan-clubs-explore-screen/FanClubsExploreScreen'
+
+import { useAppScreenOptions } from './useAppScreenOptions'
+
+export type AppTabScreenParamList = {
+  Track: {
+    searchTrack?: SearchTrack
+    canBeUnlisted?: boolean
+    showComments?: boolean
+    commentId?: string
+  } & ({ handle: string; slug: string } | { trackId: ID })
+  TrackRemixes: { trackId: ID } | { handle: string; slug: string }
+  Contest: { trackId: ID } | { handle: string; slug: string }
+  ContestFollowers: { eventId: ID }
+  Profile: { handle: string; id?: ID } | { handle?: string; id: ID }
+  Collection: {
+    id?: ID
+    slug?: string
+    searchCollection?: SearchPlaylist
+    collectionType?: 'playlist' | 'album'
+    handle?: string
+  }
+  EditCollection: { id: ID }
+  Favorited: { id: ID; favoriteType: FavoriteType }
+  Reposts: { id: ID; repostType: RepostType }
+  Followers: { userId: ID }
+  Following: { userId: ID }
+  Mutuals: { userId: ID }
+  RelatedArtists: { userId: ID }
+  CoinLeaderboard: { mint: string }
+  NotificationUsers: {
+    notification: any
+    notificationType: NotificationType
+    count: number
+  }
+  SettingsScreen: undefined
+  AboutScreen: undefined
+  ListeningHistoryScreen: undefined
+  AccountSettingsScreen: undefined
+  ChangeEmail: undefined
+  ChangePassword: undefined
+  VerificationWebView: undefined
+  InboxSettingsScreen: undefined
+  CommentSettingsScreen: undefined
+  DownloadSettingsScreen: undefined
+  NotificationSettingsScreen: undefined
+
+  AudioScreen: undefined
+  RewardsScreen: undefined
+  Contests: undefined
+  FanClubsExplore: undefined
+  FanClubSort: {
+    initialSortMethod?: GetCoinsSortMethodEnum
+    initialSortDirection?: GetCoinsSortDirectionEnum
+  }
+  wallet: undefined
+  CashScreen: undefined
+  CoinDetailsScreen: { ticker: string }
+  CoinRedeemScreen: { ticker: string; code?: string }
+  EditCoinDetailsScreen: { ticker: string }
+  Upload: {
+    initialMetadata?: Partial<TrackMetadataForUpload>
+  }
+  FeatureFlagOverride: undefined
+  CreateChatBlast: undefined
+  EditTrack: { id: ID }
+  ExternalWallets: undefined
+  ChatList: undefined
+  ChatUserList:
+    | {
+        presetMessage?: string
+        defaultUserList?: CreateChatModalState['defaultUserList']
+      }
+    | undefined
+  SendTokensUserSelection:
+    | {
+        excludedUserIds?: number[]
+        callbackId?: string
+      }
+    | undefined
+  Chat: {
+    chatId: string
+    presetMessage?: string
+  }
+  ChatBlastSelectContent: {
+    valueName: string
+    title: string
+    searchLabel: string
+    content: { label: string; value: string }[]
+  }
+  FilterButton: FilterButtonScreenParams
+}
+
+type NavigationStateEvent = EventArg<
+  'state',
+  false,
+  { state: NavigationState<AppTabScreenParamList> }
+>
+
+type AppTabScreenProps = {
+  baseScreen: (
+    Stack: ReturnType<typeof createNativeStackNavigator>
+  ) => React.ReactNode
+  Stack: ReturnType<typeof createNativeStackNavigator>
+}
+
+/**
+ * This is the base tab screen that includes common screens
+ * like track and profile
+ */
+export const AppTabScreen = ({ baseScreen, Stack }: AppTabScreenProps) => {
+  const screenOptions = useAppScreenOptions()
+  const { drawerNavigation, setIsAtStackRoot } = useContext(AppDrawerContext)
+  const { isOpen: isNowPlayingDrawerOpen } = useDrawer('NowPlaying')
+  const { setNavigation } = useContext(SetAppTabNavigationContext)
+  const isFocused = useIsFocused()
+  const isAtStackRootRef = useRef(true)
+
+  const applyDrawerSwipe = useCallback(
+    (isAtRoot: boolean) => {
+      setIsAtStackRoot?.(isAtRoot)
+      // NowPlayingDrawer calls setOptions({ swipeEnabled: false }) imperatively
+      // on pan release, and that override outlives a re-render of
+      // screenOptions, so we re-assert it imperatively here too.
+      drawerNavigation?.setOptions({
+        swipeEnabled: isAtRoot && !isNowPlayingDrawerOpen
+      })
+    },
+    [drawerNavigation, isNowPlayingDrawerOpen, setIsAtStackRoot]
+  )
+
+  const handleChangeState = useCallback(
+    (event: NavigationStateEvent) => {
+      // Nested navigator state changes bubble up; only act on the outer stack.
+      if (event?.data?.state?.type !== 'stack') return
+      const isAtRoot = event.data.state.routes.length === 1
+      isAtStackRootRef.current = isAtRoot
+      if (isFocused) applyDrawerSwipe(isAtRoot)
+    },
+    [isFocused, applyDrawerSwipe]
+  )
+
+  /**
+   * Reset lastNavAction on transitionEnd
+   * Need to do this via screenListeners on the Navigator because listening
+   * via navigation.addListener inside a screen does not always
+   * catch events from other screens
+   */
+  const handleTransitionEnd = useCallback(() => {
+    setLastNavAction(undefined)
+  }, [])
+
+  // Re-apply on tab focus so the drawer reflects the active tab's stack depth.
+  useEffect(() => {
+    if (isFocused) applyDrawerSwipe(isAtStackRootRef.current)
+  }, [isFocused, applyDrawerSwipe])
+
+  // Keep AppTabNavigationContext pointed at the active tab's stack so external
+  // surfaces like NowPlayingDrawer push onto whichever tab is currently in
+  // focus, regardless of stack depth.
+  const screenListeners = useCallback(
+    ({ navigation }: { navigation: any }) => ({
+      state: handleChangeState,
+      transitionEnd: handleTransitionEnd,
+      focus: () => setNavigation(navigation as AppTabNavigation)
+    }),
+    [handleChangeState, handleTransitionEnd, setNavigation]
+  )
+
+  return (
+    <Stack.Navigator
+      screenOptions={screenOptions}
+      screenListeners={screenListeners}
+    >
+      {baseScreen(Stack)}
+      <Stack.Screen name='Track' component={TrackScreen} />
+      <Stack.Screen name='TrackRemixes' component={TrackRemixesScreen} />
+      <Stack.Screen name='Collection' component={CollectionScreen} />
+      <Stack.Screen
+        name='Profile'
+        component={ProfileScreen}
+        // Profile uses a collapsible tab view (horizontal pager + vertical
+        // scroll). The global `fullScreenGestureEnabled: true` makes the
+        // swipe-to-pop recognizer span the whole screen, so a slightly diagonal
+        // vertical scroll gets hijacked as a back gesture. Restrict swipe-back
+        // to the left edge here (same treatment as the Chat screen) so
+        // mid-screen scrolling reaches the list untouched.
+        options={{ headerShown: false, fullScreenGestureEnabled: false }}
+      />
+      <Stack.Group>
+        <Stack.Screen name='Followers' component={FollowersScreen} />
+        <Stack.Screen name='Following' component={FollowingScreen} />
+        <Stack.Screen name='Favorited' component={FavoritedScreen} />
+        <Stack.Screen name='Mutuals' component={MutualsScreen} />
+        <Stack.Screen name='RelatedArtists' component={RelatedArtistsScreen} />
+        <Stack.Screen
+          name='NotificationUsers'
+          component={NotificationUsersScreen}
+        />
+      </Stack.Group>
+      <Stack.Screen name='Reposts' component={RepostsScreen} />
+      <Stack.Screen name='CoinLeaderboard' component={CoinLeaderboardScreen} />
+
+      <Stack.Screen name='AudioScreen' component={AudioScreen} />
+      <Stack.Screen name='RewardsScreen' component={RewardsScreen} />
+      <Stack.Screen
+        name='Contests'
+        component={ContestsScreen}
+        // Contests is reached from the left nav drawer, which passes
+        // `fromAppDrawer: true` and drops the screen animation to 'none'.
+        // That leaves a jarring instant pop when navigating away. Force the
+        // standard horizontal push so it transitions like the Track screen.
+        options={{ animation: 'simple_push' }}
+      />
+      <Stack.Screen name='Contest' component={ContestScreen} />
+      <Stack.Screen
+        name='ContestFollowers'
+        component={ContestFollowersScreen}
+      />
+      <Stack.Screen name='wallet' component={WalletScreen} />
+      <Stack.Screen name='CashScreen' component={CashScreen} />
+      <Stack.Screen name='CoinDetailsScreen' component={CoinDetailsScreen} />
+      <Stack.Screen name='CoinRedeemScreen' component={CoinRedeemScreen} />
+      <Stack.Screen
+        name='EditCoinDetailsScreen'
+        component={EditCoinDetailsScreen}
+      />
+      <Stack.Screen name='FanClubsExplore' component={FanClubsExploreScreen} />
+      <Stack.Screen name='FanClubSort' component={FanClubSortScreen} />
+
+      <Stack.Group>
+        <Stack.Screen name='EditProfile' component={EditProfileScreen} />
+        <Stack.Screen name='SettingsScreen' component={SettingsScreen} />
+        <Stack.Screen name='AboutScreen' component={AboutScreen} />
+        <Stack.Screen
+          name='ListeningHistoryScreen'
+          component={ListeningHistoryScreen}
+        />
+        <Stack.Screen
+          name='AccountSettingsScreen'
+          component={AccountSettingsScreen}
+        />
+        <Stack.Screen
+          name='InboxSettingsScreen'
+          component={InboxSettingsScreen}
+        />
+        <Stack.Screen
+          name='CommentSettingsScreen'
+          component={CommentSettingsScreen}
+        />
+        <Stack.Screen
+          name='DownloadSettingsScreen'
+          component={DownloadSettingsScreen}
+        />
+        <Stack.Screen
+          name='NotificationSettingsScreen'
+          component={NotificationSettingsScreen}
+        />
+        <Stack.Screen name='ChangeEmail' component={ChangeEmailModalScreen} />
+      </Stack.Group>
+
+      <Stack.Screen
+        name='FilterButton'
+        component={FilterButtonScreen}
+        options={{ ...screenOptions, presentation: 'fullScreenModal' }}
+      />
+      <Stack.Group>
+        <Stack.Screen name='ChatList' component={ChatListScreen} />
+        <Stack.Screen name='ChatUserList' component={ChatUserListScreen} />
+        <Stack.Screen
+          name='SendTokensUserSelection'
+          component={SendTokensUserSelectionScreen}
+        />
+        <Stack.Screen
+          name='Chat'
+          component={ChatScreen}
+          getId={({ params }) =>
+            // @ts-ignore hard to correctly type navigation params (PAY-1141)
+            params?.chatId
+          }
+          options={{ ...screenOptions, fullScreenGestureEnabled: false }}
+        />
+      </Stack.Group>
+    </Stack.Navigator>
+  )
+}

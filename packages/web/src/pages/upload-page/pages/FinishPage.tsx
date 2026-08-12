@@ -1,0 +1,276 @@
+import { useCallback, useMemo } from 'react'
+
+import { useCurrentAccountUser } from '@audius/common/api'
+import { imageBlank as placeholderArt } from '@audius/common/assets'
+import { useUploadCompletionRoute } from '@audius/common/hooks'
+import { Name } from '@audius/common/models'
+import {
+  uploadSelectors,
+  UploadType,
+  ProgressStatus,
+  CommonState,
+  ProgressState,
+  TrackForUpload,
+  TrackFormState,
+  CollectionFormState
+} from '@audius/common/store'
+import {
+  IconArrowRight as IconArrow,
+  IconError,
+  IconCloudUpload as IconUpload,
+  IconValidationCheck,
+  Text,
+  PlainButton,
+  ProgressBar,
+  Box,
+  Flex,
+  Image
+} from '@audius/harmony'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router'
+
+import { make } from 'common/store/analytics/actions'
+import LoadingSpinner from 'components/loading-spinner/LoadingSpinner'
+import { Tile } from 'components/tile'
+
+import { ShareBanner } from '../components/ShareBanner'
+
+import styles from './FinishPage.module.css'
+
+const { getCombinedUploadPercentage } = uploadSelectors
+
+const messages = {
+  uploadInProgress: 'Upload In Progress',
+  uploadComplete: 'Upload Complete',
+  uploadMore: 'Upload More',
+  finishingUpload: 'Finalizing Upload',
+  visitProfile: 'Visit Your Profile',
+  visitTrack: 'Visit Track Page',
+  visitAlbum: 'Visit Album Page',
+  visitPlaylist: 'Visit Playlist Page'
+}
+
+const ProgressIndicator = (props: { status?: ProgressStatus }) => {
+  const { status } = props
+
+  switch (status) {
+    case ProgressStatus.UPLOADING:
+    case ProgressStatus.PROCESSING:
+      return <LoadingSpinner className={styles.progressIndicator} />
+    case ProgressStatus.COMPLETE:
+      return <IconValidationCheck className={styles.progressIndicator} />
+    case ProgressStatus.ERROR:
+      return <IconError className={styles.progressIndicator} color='danger' />
+    default:
+      return <div className={styles.emptyProgressIndicator} />
+  }
+}
+
+type UploadTrackItemProps = {
+  index: number
+  displayIndex?: boolean
+  displayArtwork?: boolean
+  track: TrackForUpload
+  trackProgress?: ProgressState
+}
+
+const UploadTrackItem = (props: UploadTrackItemProps) => {
+  const {
+    index,
+    track,
+    trackProgress,
+    displayIndex = false,
+    displayArtwork = false,
+    ...otherProps
+  } = props
+  const artworkUrl =
+    track.metadata.artwork && 'url' in track.metadata.artwork
+      ? track.metadata.artwork?.url
+      : null
+
+  const hasStems = trackProgress?.stems && trackProgress.stems.length > 0
+
+  return (
+    <Box>
+      <Flex gap='m' alignItems='center' p='s' {...otherProps}>
+        <ProgressIndicator status={trackProgress?.audio?.status} />
+        {displayIndex ? <Text size='s'>{index + 1}</Text> : null}
+        {displayArtwork ? (
+          <Image
+            className={styles.trackItemArtwork}
+            src={artworkUrl || placeholderArt}
+          />
+        ) : null}
+        <Text size='s'>{track.metadata.title}</Text>
+      </Flex>
+      {hasStems ? (
+        <Box ml='3xl'>
+          {trackProgress.stems.map((stemProgress, stemIdx) => {
+            const stemMetadata = track.metadata.stems?.[stemIdx]
+            const stemCategory = stemMetadata?.category || 'stem'
+            const stemFile =
+              stemMetadata && 'file' in stemMetadata ? stemMetadata.file : null
+            const stemFileName = stemFile?.name || stemMetadata?.metadata?.title
+            return (
+              <Flex key={stemIdx} gap='m' alignItems='center' p='s' pl='xl'>
+                <ProgressIndicator status={stemProgress?.audio?.status} />
+                <Text size='s' color='subdued'>
+                  {stemCategory.charAt(0).toUpperCase() + stemCategory.slice(1)}
+                  {stemFileName ? ` - ${stemFileName}` : ''}
+                </Text>
+              </Flex>
+            )
+          })}
+        </Box>
+      ) : null}
+    </Box>
+  )
+}
+
+type FinishPageProps = {
+  formState: TrackFormState | CollectionFormState
+  onContinue: () => void
+}
+
+export const FinishPage = (props: FinishPageProps) => {
+  const { formState, onContinue } = props
+  const { tracks, uploadType } = formState
+  const upload = useSelector((state: CommonState) => state.upload)
+  const { data: accountHandle } = useCurrentAccountUser({
+    select: (user) => user?.handle
+  })
+  const fullUploadPercent = useSelector(getCombinedUploadPercentage)
+  const dispatch = useDispatch()
+
+  const uploadComplete = useMemo(() => {
+    if (
+      !upload.uploadProgress ||
+      upload.uploading ||
+      !upload.success ||
+      upload.error
+    )
+      return false
+
+    return upload.uploadProgress.reduce((acc, progress) => {
+      return (
+        acc &&
+        (progress.image.status === ProgressStatus.COMPLETE ||
+          progress.image.status === ProgressStatus.ERROR) &&
+        (progress.audio.status === ProgressStatus.COMPLETE ||
+          progress.audio.status === ProgressStatus.ERROR)
+      )
+    }, true)
+  }, [upload])
+
+  const handleUploadMoreClick = useCallback(() => {
+    onContinue()
+  }, [onContinue])
+
+  const visitButtonText = useMemo(() => {
+    switch (uploadType) {
+      case UploadType.INDIVIDUAL_TRACK:
+        return messages.visitTrack
+      case UploadType.ALBUM:
+        return messages.visitAlbum
+      case UploadType.PLAYLIST:
+        return messages.visitPlaylist
+      default:
+        if (!formState.tracks || formState.tracks.length > 1) {
+          return messages.visitProfile
+        } else {
+          return messages.visitTrack
+        }
+    }
+  }, [formState.tracks, uploadType])
+
+  const visitButtonPath = useUploadCompletionRoute({
+    id: upload.completionId,
+    uploadType,
+    accountHandle: accountHandle!
+  })
+
+  const handleViewUpload = useCallback(() => {
+    dispatch(make(Name.TRACK_UPLOAD_VIEW_TRACK_PAGE, { uploadType }))
+  }, [dispatch, uploadType])
+
+  const isUnlistedTrack =
+    (formState.tracks &&
+      formState.tracks.length === 1 &&
+      formState.tracks[0].metadata.is_unlisted) ??
+    false
+
+  return (
+    <div className={styles.page}>
+      {uploadComplete ? (
+        <ShareBanner
+          uploadType={uploadType}
+          isUnlistedTrack={isUnlistedTrack}
+        />
+      ) : null}
+      <Tile className={styles.uploadProgress} elevation='mid'>
+        <div className={styles.uploadHeader}>
+          <div className={styles.headerInfo}>
+            <Text id='upload-progress' variant='label' size='s'>
+              {uploadComplete
+                ? messages.uploadComplete
+                : messages.uploadInProgress}
+            </Text>
+            <div className={styles.headerProgressInfo}>
+              <Text variant='label' tag='p' size='s'>
+                {uploadComplete
+                  ? '100%'
+                  : fullUploadPercent === 100 && !uploadComplete
+                    ? messages.finishingUpload
+                    : `${fullUploadPercent}%`}
+              </Text>
+              <ProgressIndicator
+                status={
+                  upload.error
+                    ? ProgressStatus.ERROR
+                    : uploadComplete
+                      ? ProgressStatus.COMPLETE
+                      : ProgressStatus.UPLOADING
+                }
+              />
+            </div>
+          </div>
+          {!uploadComplete ? (
+            <ProgressBar
+              aria-labelledby='upload-progress'
+              sliderClassName={styles.uploadProgressBar}
+              value={fullUploadPercent}
+            />
+          ) : null}
+        </div>
+        <div className={styles.uploadTrackList}>
+          {tracks.map((track, idx) => {
+            const trackProgress = upload.uploadProgress?.[idx]
+            return (
+              <UploadTrackItem
+                key={track.metadata.track_id}
+                track={track}
+                displayIndex={tracks.length > 1}
+                index={idx}
+                trackProgress={trackProgress}
+                displayArtwork={
+                  uploadType === UploadType.INDIVIDUAL_TRACK ||
+                  uploadType === UploadType.INDIVIDUAL_TRACKS
+                }
+              />
+            )
+          })}
+        </div>
+        {uploadComplete && visitButtonPath ? (
+          <div className={styles.uploadFooter}>
+            <PlainButton onClick={handleUploadMoreClick} iconLeft={IconUpload}>
+              {messages.uploadMore}
+            </PlainButton>
+            <PlainButton iconRight={IconArrow} onClick={handleViewUpload}>
+              <Link to={visitButtonPath}>{visitButtonText}</Link>
+            </PlainButton>
+          </div>
+        ) : null}
+      </Tile>
+    </div>
+  )
+}

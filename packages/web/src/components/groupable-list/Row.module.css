@@ -1,0 +1,71 @@
+.row {
+  background: var(--harmony-white);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.row.hasBody {
+  padding: 16px 20px;
+}
+
+.row.isClickable {
+  cursor: pointer;
+  transition: background 0.17s ease-in-out;
+}
+
+.row.isClickable:active {
+  transition: none;
+  background: var(--harmony-n-100);
+}
+
+.iconCaretRight {
+  justify-self: flex-end;
+  width: 16px;
+  height: 16px;
+}
+
+.iconCaretRight path {
+  fill: var(--harmony-n-400);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  font-size: var(--harmony-font-s);
+  font-weight: var(--harmony-font-medium);
+  color: var(--harmony-neutral);
+}
+
+.title i {
+  margin: 0 !important;
+}
+
+.text {
+  margin-left: 8px;
+}
+
+.body {
+  color: var(--harmony-n-600);
+  font-size: var(--harmony-font-xs);
+  font-weight: var(--harmony-font-medium);
+  text-align: left;
+  line-height: 19px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.includeSpacing .body {
+  margin: 8px 0;
+}
+
+.includeSpacing .children {
+  margin-top: 8px;
+}

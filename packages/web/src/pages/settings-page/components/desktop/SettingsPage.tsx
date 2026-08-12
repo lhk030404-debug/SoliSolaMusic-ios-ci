@@ -1,0 +1,947 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
+import {
+  useCurrentAccountUser,
+  useCurrentUserEmail,
+  useQueryContext
+} from '@audius/common/api'
+import { useIsManagedAccount } from '@audius/common/hooks'
+import { settingsMessages } from '@audius/common/messages'
+import {
+  FrostedSurfaceIntensity,
+  Name,
+  Theme,
+  ThemeMode,
+  ThemePalette
+} from '@audius/common/models'
+import { API_TERMS, FAN_CLUB_TERMS } from '@audius/common/src/utils/route'
+import {
+  BrowserNotificationSetting,
+  EmailFrequency,
+  accountActions,
+  settingsPageActions,
+  settingsPageSelectors,
+  themeSelectors,
+  themeActions,
+  signOutActions,
+  musicConfettiActions,
+  useTierAndVerifiedForUser
+} from '@audius/common/store'
+import { route } from '@audius/common/utils'
+import {
+  Button,
+  FilterButton,
+  Flex,
+  IconAppearance,
+  IconEmailAddress,
+  IconError,
+  IconKey,
+  IconRecoveryEmail as IconMail,
+  IconMessage,
+  IconMessages,
+  IconNotificationOn as IconNotification,
+  IconReceive,
+  IconSettings,
+  IconSignOut,
+  IconValidationCheck,
+  IconVerified,
+  Modal,
+  ModalContent,
+  ModalContentText,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+  SegmentedControl,
+  Text,
+  useTheme
+} from '@audius/harmony'
+import cn from 'classnames'
+import { useDispatch } from 'react-redux'
+import { Link, useSearchParams } from 'react-router'
+
+import { useModalState } from 'common/hooks/useModalState'
+import { make, useRecord } from 'common/store/analytics/actions'
+import { ChangeEmailModal } from 'components/change-email/ChangeEmailModal'
+import { ChangePasswordModal } from 'components/change-password/ChangePasswordModal'
+import { Header } from 'components/header/desktop/Header'
+import Page from 'components/page/Page'
+import Toast from 'components/toast/Toast'
+import { useIsMobile } from 'hooks/useIsMobile'
+import { audiusBackendInstance } from 'services/audius-backend/audius-backend-instance'
+import {
+  isPushManagerAvailable,
+  isSafariPushAvailable,
+  getSafariPushBrowser,
+  subscribeSafariPushBrowser,
+  Permission
+} from 'utils/browserNotifications'
+import { isElectron } from 'utils/clientUtil'
+import { push } from 'utils/navigation'
+import { useSelector } from 'utils/reducer'
+import {
+  FROSTED_SURFACE_INTENSITY_KEY,
+  THEME_KEY,
+  THEME_MODE_KEY,
+  THEME_PALETTE_KEY
+} from 'utils/theme/theme'
+
+import packageInfo from '../../../../../package.json'
+
+import { AuthorizedAppsSettingsCard } from './AuthorizedApps'
+import { DeveloperAppsSettingsCard } from './DeveloperApps'
+import { LabelAccountSettingsCard } from './LabelAccount/LabelAccountSettingsCard'
+import { ListeningHistorySettingsCard } from './ListeningHistory'
+import { AccountsManagingYouSettingsCard } from './ManagerMode/AccountsManagingYouSettingsCard'
+import { AccountsYouManageSettingsCard } from './ManagerMode/AccountsYouManageSettingsCard'
+import NotificationSettingsModal from './NotificationSettingsModal'
+import { PayoutWalletSettingsCard } from './PayoutWallet/PayoutWalletSettingsCard'
+import SettingsCard from './SettingsCard'
+import styles from './SettingsPage.module.css'
+import { WormholeConversionSettingsCard } from './WormholeConversionSettingsCard'
+
+const { show } = musicConfettiActions
+const { signOut: signOutAction } = signOutActions
+const { setTheme, setThemePalette, setThemeMode, setFrostedSurfaceIntensity } =
+  themeActions
+const { getTheme, getThemePalette, getThemeMode, getFrostedSurfaceIntensity } =
+  themeSelectors
+const { getBrowserNotificationSettings, getEmailFrequency } =
+  settingsPageSelectors
+const {
+  setBrowserNotificationEnabled,
+  setBrowserNotificationSettingsOff,
+  setBrowserNotificationSettingsOn,
+  setBrowserNotificationPermission,
+  toggleNotificationSetting: toggleNotificationSettingAction,
+  getNotificationSettings,
+  updateEmailFrequency: updateEmailFrequencyAction
+} = settingsPageActions
+const { subscribeBrowserPushNotifications } = accountActions
+
+const {
+  CHECK_PAGE,
+  DOWNLOAD_LINK,
+  PRIVACY_POLICY,
+  PRIVATE_KEY_EXPORTER_SETTINGS_PAGE,
+  TERMS_OF_SERVICE
+} = route
+const { version } = packageInfo
+
+const EMAIL_TOAST_TIMEOUT = 2000
+
+const messages = {
+  title: 'Settings',
+  description: 'Configure your Audius account',
+  verificationSuccessTitle: 'Verification Submitted',
+  verificationSuccessMessage:
+    'Verification request received, pending review. Check back soon!',
+  verificationErrorTitle: 'Verification Failed',
+  verificationErrorMessage: 'Something went wrong. Please try again later.',
+  pending: 'Pending',
+  closeButton: 'Close'
+}
+
+export const SettingsPage = () => {
+  const dispatch = useDispatch()
+  const isManagedAccount = useIsManagedAccount()
+  const { authService, identityService } = useQueryContext()
+  const { spacing } = useTheme()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const { data: accountData } = useCurrentAccountUser({
+    select: (user) => ({
+      handle: user?.handle,
+      userId: user?.user_id,
+      isVerified: user?.is_verified
+    })
+  })
+  const { handle, userId, isVerified } = accountData ?? {}
+  const theme = useSelector(getTheme)
+  const themePalette = useSelector(getThemePalette)
+  const themeMode = useSelector(getThemeMode)
+  const frostedSurfaceIntensity = useSelector(getFrostedSurfaceIntensity)
+  const emailFrequency = useSelector(getEmailFrequency)
+  const notificationSettings = useSelector(getBrowserNotificationSettings)
+  const { tier } = useTierAndVerifiedForUser(userId)
+  const { data: emailData } = useCurrentUserEmail()
+  const isEmailVerified = emailData?.isEmailVerified
+  const showMatrix =
+    tier === 'gold' ||
+    tier === 'platinum' ||
+    process.env.NODE_ENV === 'development'
+
+  const [isSignOutModalVisible, setIsSignOutModalVisible] = useState(false)
+  const [
+    isNotificationSettingsModalVisible,
+    setIsNotificationSettingsModalVisible
+  ] = useState(false)
+  const [isEmailToastVisible, setIsEmailToastVisible] = useState(false)
+  const [isEmailVerificationToastVisible, setIsEmailVerificationToastVisible] =
+    useState(false)
+  const [isEmailVerificationLoading, setIsEmailVerificationLoading] =
+    useState(false)
+  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] =
+    useState(false)
+  const [isChangeEmailModalVisible, setIsChangeEmailModalVisible] =
+    useState(false)
+  const [emailToastText, setEmailToastText] = useState(
+    settingsMessages.emailSent
+  )
+  const [emailVerificationToastText, setEmailVerificationToastText] = useState(
+    settingsMessages.emailVerificationSent
+  )
+  const [, setIsInboxSettingsModalVisible] = useModalState('InboxSettings')
+  const [, setIsCommentSettingsModalVisible] = useModalState('CommentSettings')
+
+  // Check for verification query param and show appropriate modal
+  const verificationStatus = searchParams.get('verification')
+  const [isVerificationSuccessModalOpen, setIsVerificationSuccessModalOpen] =
+    useState(false)
+  const [isVerificationErrorModalOpen, setIsVerificationErrorModalOpen] =
+    useState(false)
+
+  useEffect(() => {
+    if (verificationStatus === 'success') {
+      setIsVerificationSuccessModalOpen(true)
+      searchParams.delete('verification')
+      setSearchParams(searchParams, { replace: true })
+    } else if (verificationStatus === 'error') {
+      setIsVerificationErrorModalOpen(true)
+      searchParams.delete('verification')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }, [verificationStatus, searchParams, setSearchParams])
+
+  const handleCloseVerificationSuccessModal = useCallback(() => {
+    setIsVerificationSuccessModalOpen(false)
+  }, [])
+
+  const handleCloseVerificationErrorModal = useCallback(() => {
+    setIsVerificationErrorModalOpen(false)
+  }, [])
+
+  useEffect(() => {
+    dispatch(getNotificationSettings())
+  }, [dispatch])
+
+  const openSignOutModal = useCallback(() => {
+    setIsSignOutModalVisible(true)
+  }, [setIsSignOutModalVisible])
+
+  const closeSignOutModal = useCallback(() => {
+    setIsSignOutModalVisible(false)
+  }, [setIsSignOutModalVisible])
+
+  const openNotificationSettings = useCallback(() => {
+    setIsNotificationSettingsModalVisible(true)
+  }, [setIsNotificationSettingsModalVisible])
+
+  const closeNotificationSettings = useCallback(() => {
+    setIsNotificationSettingsModalVisible(false)
+  }, [setIsNotificationSettingsModalVisible])
+
+  const signOut = useCallback(() => {
+    dispatch(signOutAction())
+  }, [dispatch])
+
+  const handleSignOut = useCallback(() => {
+    dispatch(make(Name.SETTINGS_LOG_OUT, { callback: signOut }))
+  }, [dispatch, signOut])
+
+  const showEmailToast = useCallback(() => {
+    const fn = async () => {
+      try {
+        const info = await authService.generateRecoveryInfo()
+        await identityService.sendRecoveryInfo(info)
+        setEmailToastText(settingsMessages.emailSent)
+        setIsEmailToastVisible(true)
+        dispatch(make(Name.SETTINGS_RESEND_ACCOUNT_RECOVERY, {}))
+      } catch (e) {
+        console.error(e)
+        setEmailToastText(settingsMessages.emailNotSent)
+        setIsEmailToastVisible(true)
+      }
+      setTimeout(() => {
+        setIsEmailToastVisible(false)
+      }, EMAIL_TOAST_TIMEOUT)
+    }
+    fn()
+  }, [
+    setIsEmailToastVisible,
+    setEmailToastText,
+    identityService,
+    authService,
+    dispatch
+  ])
+
+  const showEmailVerificationToast = useCallback(() => {
+    const fn = async () => {
+      setIsEmailVerificationLoading(true)
+      try {
+        const result = await identityService.resendEmailVerification()
+        setEmailVerificationToastText(
+          result.alreadyVerified
+            ? settingsMessages.emailVerificationAlreadyVerified
+            : settingsMessages.emailVerificationSent
+        )
+        setIsEmailVerificationToastVisible(true)
+      } catch (e) {
+        console.error(e)
+        setEmailVerificationToastText(settingsMessages.emailVerificationNotSent)
+        setIsEmailVerificationToastVisible(true)
+      } finally {
+        setIsEmailVerificationLoading(false)
+      }
+      setTimeout(() => {
+        setIsEmailVerificationToastVisible(false)
+      }, EMAIL_TOAST_TIMEOUT)
+    }
+    fn()
+  }, [
+    setIsEmailVerificationToastVisible,
+    setEmailVerificationToastText,
+    identityService
+  ])
+
+  const handleDownloadDesktopAppClicked = useCallback(() => {
+    dispatch(make(Name.ACCOUNT_HEALTH_DOWNLOAD_DESKTOP, { source: 'settings' }))
+    window.location.href = `https://audius.co${DOWNLOAD_LINK}`
+  }, [dispatch])
+
+  const openChangePasswordModal = useCallback(() => {
+    setIsChangePasswordModalVisible(true)
+  }, [setIsChangePasswordModalVisible])
+
+  const closeChangePasswordModal = useCallback(() => {
+    setIsChangePasswordModalVisible(false)
+  }, [setIsChangePasswordModalVisible])
+
+  const openChangeEmailModal = useCallback(() => {
+    setIsChangeEmailModalVisible(true)
+  }, [setIsChangeEmailModalVisible])
+
+  const closeChangeEmailModal = useCallback(() => {
+    setIsChangeEmailModalVisible(false)
+  }, [setIsChangeEmailModalVisible])
+
+  const openInboxSettingsModal = useCallback(() => {
+    setIsInboxSettingsModalVisible(true)
+  }, [setIsInboxSettingsModalVisible])
+
+  const openCommentSettingsModal = useCallback(() => {
+    setIsCommentSettingsModalVisible(true)
+  }, [setIsCommentSettingsModalVisible])
+  const toggleNotificationSetting = useCallback(
+    (notificationType: BrowserNotificationSetting, isOn: boolean) => {
+      dispatch(toggleNotificationSettingAction(notificationType, isOn))
+    },
+    [dispatch]
+  )
+  const updateEmailFrequency = useCallback(
+    (frequency: EmailFrequency) => {
+      dispatch(updateEmailFrequencyAction(frequency))
+    },
+    [dispatch]
+  )
+  const record = useRecord()
+  const recordExportPrivateKeyLinkClicked = useCallback(() => {
+    record(make(Name.EXPORT_PRIVATE_KEY_LINK_CLICKED, { handle, userId }))
+  }, [record, handle, userId])
+
+  const goToVerification = useCallback(() => {
+    dispatch(push(CHECK_PAGE))
+  }, [dispatch])
+
+  const toggleBrowserPushNotificationPermissions = useCallback(
+    (notificationType: BrowserNotificationSetting, isOn: boolean) => {
+      if (!isOn) {
+        dispatch(setBrowserNotificationEnabled(false))
+        dispatch(setBrowserNotificationSettingsOff())
+      } else if (notificationSettings.permission === Permission.GRANTED) {
+        dispatch(setBrowserNotificationEnabled(true))
+        dispatch(setBrowserNotificationSettingsOn())
+        dispatch(toggleNotificationSettingAction(notificationType, isOn))
+        dispatch(subscribeBrowserPushNotifications())
+      } else {
+        if (isPushManagerAvailable) {
+          dispatch(setBrowserNotificationEnabled(true))
+          dispatch(subscribeBrowserPushNotifications())
+          dispatch(toggleNotificationSettingAction(notificationType, isOn))
+        } else if (isSafariPushAvailable) {
+          const safariPermission = getSafariPushBrowser()
+          if (safariPermission.permission === Permission.GRANTED) {
+            dispatch(subscribeBrowserPushNotifications())
+          } else {
+            const getSafariPermission = async () => {
+              const permissionData = await subscribeSafariPushBrowser(
+                audiusBackendInstance
+              )
+              if (
+                permissionData &&
+                permissionData.permission === Permission.GRANTED
+              ) {
+                dispatch(subscribeBrowserPushNotifications())
+              } else if (
+                permissionData &&
+                permissionData.permission === Permission.DENIED
+              ) {
+                dispatch(setBrowserNotificationPermission(Permission.DENIED))
+              }
+            }
+            getSafariPermission()
+          }
+        }
+      }
+    },
+    [dispatch, notificationSettings.permission]
+  )
+
+  const effectivePalette =
+    themePalette ??
+    (theme === Theme.MATRIX ? ThemePalette.MATRIX : ThemePalette.CLASSIC)
+  const effectiveMode =
+    themeMode ??
+    (theme === Theme.LIGHT
+      ? ThemeMode.LIGHT
+      : theme === Theme.DARK
+        ? ThemeMode.DARK
+        : ThemeMode.AUTO)
+  const effectiveFrostedSurfaceIntensity =
+    frostedSurfaceIntensity ?? FrostedSurfaceIntensity.DEFAULT
+
+  const onPaletteChange = (value: ThemePalette) => {
+    dispatch(setThemePalette({ themePalette: value }))
+    if (value === ThemePalette.MATRIX) {
+      dispatch(setTheme({ theme: Theme.MATRIX }))
+      dispatch(show())
+    }
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(THEME_PALETTE_KEY, value)
+      if (value === ThemePalette.MATRIX) {
+        window.localStorage.setItem(THEME_KEY, Theme.MATRIX)
+      }
+    }
+    dispatch(
+      make(Name.SETTINGS_CHANGE_THEME, {
+        mode: 'palette',
+        palette: value
+      })
+    )
+  }
+
+  const onModeChange = (option: ThemeMode) => {
+    dispatch(setThemeMode({ themeMode: option }))
+    const theme =
+      option === ThemeMode.LIGHT
+        ? Theme.LIGHT
+        : option === ThemeMode.DARK
+          ? Theme.DARK
+          : Theme.AUTO
+    dispatch(setTheme({ theme }))
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(THEME_MODE_KEY, option)
+      window.localStorage.setItem(THEME_KEY, theme)
+    }
+    dispatch(
+      make(Name.SETTINGS_CHANGE_THEME, {
+        mode: option.toLowerCase() as 'dark' | 'light' | 'auto'
+      })
+    )
+  }
+
+  const onFrostedSurfaceIntensityChange = (value: FrostedSurfaceIntensity) => {
+    dispatch(
+      setFrostedSurfaceIntensity({
+        frostedSurfaceIntensity: value
+      })
+    )
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(FROSTED_SURFACE_INTENSITY_KEY, value)
+    }
+  }
+
+  const paletteOptions = useMemo(() => {
+    const options: { value: ThemePalette; label: string }[] = [
+      { value: ThemePalette.DEFAULT, label: settingsMessages.defaultPalette },
+      { value: ThemePalette.CLASSIC, label: settingsMessages.classicPalette }
+    ]
+    if (showMatrix) {
+      options.push({
+        value: ThemePalette.MATRIX,
+        label: settingsMessages.matrixMode
+      })
+    }
+    return options
+  }, [showMatrix])
+
+  const modeOptions = useMemo(
+    () => [
+      { key: ThemeMode.AUTO, text: settingsMessages.autoMode },
+      { key: ThemeMode.LIGHT, text: settingsMessages.lightMode },
+      { key: ThemeMode.DARK, text: settingsMessages.darkMode }
+    ],
+    []
+  )
+
+  const frostedSurfaceIntensityOptions = useMemo(
+    () => [
+      {
+        key: FrostedSurfaceIntensity.OFF,
+        text: settingsMessages.surfaceStyleSolid
+      },
+      {
+        key: FrostedSurfaceIntensity.SUBTLE,
+        text: settingsMessages.surfaceStyleSubtle
+      },
+      {
+        key: FrostedSurfaceIntensity.DEFAULT,
+        text: settingsMessages.surfaceStyleDefault
+      },
+      {
+        key: FrostedSurfaceIntensity.STRONG,
+        text: settingsMessages.surfaceStyleStrong
+      }
+    ],
+    []
+  )
+
+  const isMobile = useIsMobile()
+  const isDownloadDesktopEnabled = !isMobile && !isElectron()
+
+  const header = <Header icon={IconSettings} primary={messages.title} />
+
+  return (
+    <Page
+      title={messages.title}
+      description={messages.description}
+      contentClassName={styles.settingsPageContent}
+      header={header}
+    >
+      <div className={styles.settings}>
+        {!isManagedAccount ? (
+          <SettingsCard
+            icon={<IconAppearance color='accent' />}
+            title={settingsMessages.appearanceTitle}
+            description={settingsMessages.appearanceDescription}
+            isFull={true}
+          >
+            <Flex column gap='l' className={styles.appearanceControls}>
+              <div className={styles.appearanceControlRow}>
+                <Flex
+                  column
+                  gap='s'
+                  className={cn(
+                    styles.appearanceControl,
+                    styles.appearanceThemeControl
+                  )}
+                >
+                  <Text variant='label' size='s' textAlign='left'>
+                    {settingsMessages.themeLabel}
+                  </Text>
+                  <FilterButton<ThemePalette>
+                    label={settingsMessages.themeLabel}
+                    value={effectivePalette}
+                    options={paletteOptions}
+                    onChange={(value) => onPaletteChange(value)}
+                    variant='replaceLabel'
+                    optionsLabel={settingsMessages.themeLabel}
+                  />
+                </Flex>
+                <Flex
+                  column
+                  gap='s'
+                  className={cn(styles.appearanceControl, {
+                    [styles.matrixDisabledControl]:
+                      effectivePalette === ThemePalette.MATRIX
+                  })}
+                >
+                  <Text variant='label' size='s' textAlign='left'>
+                    {settingsMessages.colorModeLabel}
+                  </Text>
+                  <SegmentedControl
+                    fullWidth
+                    disabled={effectivePalette === ThemePalette.MATRIX}
+                    className={cn({
+                      [styles.matrixDisabledSegmentedControl]:
+                        effectivePalette === ThemePalette.MATRIX
+                    })}
+                    label={settingsMessages.colorModeLabel}
+                    options={modeOptions}
+                    selected={effectiveMode}
+                    onSelectOption={(option) => onModeChange(option)}
+                    key={`tab-slider-${effectivePalette}`}
+                  />
+                </Flex>
+              </div>
+              <Flex column gap='s' className={styles.appearanceControl}>
+                <Text variant='label' size='s' textAlign='left'>
+                  {settingsMessages.surfaceStyleLabel}
+                </Text>
+                <SegmentedControl
+                  fullWidth
+                  label={settingsMessages.surfaceStyleLabel}
+                  options={frostedSurfaceIntensityOptions}
+                  selected={effectiveFrostedSurfaceIntensity}
+                  onSelectOption={(option) =>
+                    onFrostedSurfaceIntensityChange(option)
+                  }
+                />
+              </Flex>
+            </Flex>
+          </SettingsCard>
+        ) : null}
+        {!isManagedAccount ? (
+          <SettingsCard
+            icon={<IconMessages color='accent' />}
+            title={settingsMessages.inboxSettingsCardTitle}
+            description={settingsMessages.inboxSettingsCardDescription}
+          >
+            <Button
+              variant='secondary'
+              onClick={openInboxSettingsModal}
+              fullWidth
+            >
+              {settingsMessages.inboxSettingsButtonText}
+            </Button>
+          </SettingsCard>
+        ) : null}
+        <SettingsCard
+          icon={<IconMessage color='accent' />}
+          title={settingsMessages.commentSettingsCardTitle}
+          description={settingsMessages.commentSettingsCardDescription}
+        >
+          <Button
+            variant='secondary'
+            onClick={openCommentSettingsModal}
+            fullWidth
+          >
+            {settingsMessages.commentSettingsButtonText}
+          </Button>
+        </SettingsCard>
+        <SettingsCard
+          icon={<IconNotification color='accent' />}
+          title={settingsMessages.notificationsCardTitle}
+          description={settingsMessages.notificationsCardDescription}
+        >
+          <Button
+            variant='secondary'
+            onClick={openNotificationSettings}
+            fullWidth
+          >
+            {settingsMessages.notificationsButtonText}
+          </Button>
+        </SettingsCard>
+        {!isManagedAccount ? (
+          <SettingsCard
+            icon={<IconMail color='accent' />}
+            title={settingsMessages.accountRecoveryCardTitle}
+            description={settingsMessages.accountRecoveryCardDescription}
+          >
+            <Toast
+              text={emailToastText}
+              open={isEmailToastVisible}
+              className={styles.cardToast}
+              anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+              transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+            >
+              <Button onClick={showEmailToast} variant='secondary' fullWidth>
+                {settingsMessages.accountRecoveryButtonText}
+              </Button>
+            </Toast>
+          </SettingsCard>
+        ) : null}
+        {!isManagedAccount ? (
+          <SettingsCard
+            icon={<IconEmailAddress color='accent' />}
+            title={settingsMessages.emailVerificationCardTitle}
+            description={settingsMessages.emailVerificationCardDescription}
+          >
+            <Flex direction='column' gap='s'>
+              <Flex alignItems='center' gap='xs'>
+                {isEmailVerified ? (
+                  <IconValidationCheck size='s' />
+                ) : (
+                  <IconError size='s' color='subdued' />
+                )}
+                <Text variant='body' size='s' color='subdued'>
+                  {isEmailVerified
+                    ? settingsMessages.emailVerifiedStatus
+                    : settingsMessages.emailNotVerifiedStatus}
+                </Text>
+              </Flex>
+              {!isEmailVerified ? (
+                <Toast
+                  text={emailVerificationToastText}
+                  open={isEmailVerificationToastVisible}
+                  className={styles.cardToast}
+                  anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
+                  transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+                >
+                  <Button
+                    onClick={showEmailVerificationToast}
+                    variant='secondary'
+                    fullWidth
+                    isLoading={isEmailVerificationLoading}
+                    disabled={isEmailVerificationLoading}
+                  >
+                    {settingsMessages.emailVerificationButtonText}
+                  </Button>
+                </Toast>
+              ) : null}
+            </Flex>
+          </SettingsCard>
+        ) : null}
+        {!isManagedAccount ? (
+          <SettingsCard
+            icon={<IconVerified color='accent' size='l' />}
+            title={settingsMessages.verificationCardTitle}
+            description={settingsMessages.verificationCardDescription}
+          >
+            <Button
+              disabled={isVerified}
+              onClick={goToVerification}
+              variant='secondary'
+              fullWidth
+            >
+              {settingsMessages.verificationCardButtonText}
+            </Button>
+          </SettingsCard>
+        ) : null}
+        {!isManagedAccount ? (
+          <SettingsCard
+            icon={<IconEmailAddress color='accent' />}
+            title={settingsMessages.changeEmailCardTitle}
+            description={settingsMessages.changeEmailCardDescription}
+          >
+            <Button
+              onClick={openChangeEmailModal}
+              variant='secondary'
+              fullWidth
+            >
+              {settingsMessages.changeEmailButtonText}
+            </Button>
+          </SettingsCard>
+        ) : null}
+        {!isManagedAccount ? (
+          <SettingsCard
+            icon={<IconKey color='accent' />}
+            title={settingsMessages.changePasswordCardTitle}
+            description={settingsMessages.changePasswordCardDescription}
+          >
+            <Button
+              onClick={openChangePasswordModal}
+              variant='secondary'
+              fullWidth
+            >
+              {settingsMessages.changePasswordButtonText}
+            </Button>
+          </SettingsCard>
+        ) : null}
+        <LabelAccountSettingsCard />
+        <AccountsManagingYouSettingsCard />
+        <AccountsYouManageSettingsCard />
+        {isDownloadDesktopEnabled ? (
+          <SettingsCard
+            icon={<IconReceive color='accent' />}
+            title={settingsMessages.desktopAppCardTitle}
+            description={settingsMessages.desktopAppCardDescription}
+          >
+            <Button
+              onClick={handleDownloadDesktopAppClicked}
+              variant='secondary'
+              fullWidth
+            >
+              {settingsMessages.desktopAppButtonText}
+            </Button>
+          </SettingsCard>
+        ) : null}
+
+        <AuthorizedAppsSettingsCard />
+        <DeveloperAppsSettingsCard />
+        <ListeningHistorySettingsCard />
+        <PayoutWalletSettingsCard />
+        <WormholeConversionSettingsCard />
+      </div>
+      <div className={styles.version}>
+        <Button
+          variant='secondary'
+          iconLeft={IconSignOut}
+          onClick={openSignOutModal}
+          css={{ marginBottom: spacing.l }}
+        >
+          {settingsMessages.signOut}
+        </Button>
+        <span>{`${settingsMessages.version} ${version}`}</span>
+        <span>
+          {settingsMessages.copyright} -{' '}
+          <Link
+            className={styles.link}
+            to={TERMS_OF_SERVICE}
+            target='_blank'
+            rel='noreferrer'
+          >
+            {settingsMessages.terms}
+          </Link>{' '}
+          -{' '}
+          <Link
+            className={styles.link}
+            to={PRIVACY_POLICY}
+            target='_blank'
+            rel='noreferrer'
+          >
+            {settingsMessages.privacy}
+          </Link>{' '}
+          -{' '}
+          <Link
+            className={styles.link}
+            to={API_TERMS}
+            target='_blank'
+            rel='noreferrer'
+          >
+            {settingsMessages.apiTerms}
+          </Link>
+          -{' '}
+          <Link
+            className={styles.link}
+            to={FAN_CLUB_TERMS}
+            target='_blank'
+            rel='noreferrer'
+          >
+            {settingsMessages.fanClubTerms}
+          </Link>
+        </span>
+        {!isManagedAccount ? (
+          <Link
+            className={cn(styles.link, styles.showPrivateKey)}
+            to={PRIVATE_KEY_EXPORTER_SETTINGS_PAGE}
+            onClick={recordExportPrivateKeyLinkClicked}
+          >
+            {settingsMessages.showPrivateKey}
+          </Link>
+        ) : null}
+      </div>
+      <Modal
+        isOpen={isSignOutModalVisible}
+        onClose={closeSignOutModal}
+        size='small'
+      >
+        <ModalHeader>
+          <ModalTitle
+            title={
+              <>
+                Hold Up! <i className='emoji waving-hand-sign' />
+              </>
+            }
+          />
+        </ModalHeader>
+        <ModalContent>
+          <ModalContentText>
+            {settingsMessages.signOutModalText}
+          </ModalContentText>
+          <ModalFooter>
+            <Button variant='secondary' onClick={closeSignOutModal} fullWidth>
+              Nevermind
+            </Button>
+            <Button variant='primary' onClick={handleSignOut} fullWidth>
+              Sign Out
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalVisible}
+        onClose={closeChangePasswordModal}
+      />
+      <ChangeEmailModal
+        isOpen={isChangeEmailModalVisible}
+        onClose={closeChangeEmailModal}
+      />
+      <NotificationSettingsModal
+        isOpen={isNotificationSettingsModalVisible}
+        toggleBrowserPushNotificationPermissions={
+          toggleBrowserPushNotificationPermissions
+        }
+        toggleNotificationSetting={toggleNotificationSetting}
+        updateEmailFrequency={updateEmailFrequency}
+        settings={notificationSettings}
+        emailFrequency={emailFrequency}
+        onClose={closeNotificationSettings}
+      />
+      <Modal
+        isOpen={isVerificationSuccessModalOpen}
+        onClose={handleCloseVerificationSuccessModal}
+        size='small'
+      >
+        <ModalHeader>
+          <ModalTitle title={messages.verificationSuccessTitle} />
+        </ModalHeader>
+        <ModalContent>
+          <Flex
+            direction='column'
+            alignItems='center'
+            justifyContent='center'
+            gap='l'
+            pv='l'
+          >
+            <Flex alignItems='center' gap='s'>
+              <IconVerified size='xl' />
+              <Text size='xl' variant='label'>
+                {messages.pending}
+              </Text>
+            </Flex>
+            <Flex justifyContent='center'>
+              <ModalContentText>
+                {messages.verificationSuccessMessage}
+              </ModalContentText>
+            </Flex>
+          </Flex>
+        </ModalContent>
+        <ModalFooter>
+          <Button
+            variant='primary'
+            onClick={handleCloseVerificationSuccessModal}
+            fullWidth
+          >
+            {messages.closeButton}
+          </Button>
+        </ModalFooter>
+      </Modal>
+      <Modal
+        isOpen={isVerificationErrorModalOpen}
+        onClose={handleCloseVerificationErrorModal}
+        size='small'
+      >
+        <ModalHeader>
+          <ModalTitle
+            title={messages.verificationErrorTitle}
+            Icon={IconError}
+          />
+        </ModalHeader>
+        <ModalContent>
+          <Flex
+            direction='column'
+            alignItems='center'
+            justifyContent='center'
+            gap='l'
+            pv='l'
+          >
+            <Flex justifyContent='center'>
+              <ModalContentText>
+                {messages.verificationErrorMessage}
+              </ModalContentText>
+            </Flex>
+          </Flex>
+        </ModalContent>
+        <ModalFooter>
+          <Button
+            variant='primary'
+            onClick={handleCloseVerificationErrorModal}
+            fullWidth
+          >
+            {messages.closeButton}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </Page>
+  )
+}

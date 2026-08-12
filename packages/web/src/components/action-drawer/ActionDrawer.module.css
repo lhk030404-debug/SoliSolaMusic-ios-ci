@@ -1,0 +1,58 @@
+.container {
+  overflow: hidden;
+  border-radius: 40px;
+}
+
+.content {
+  padding-top: 16px;
+  padding-bottom: 64px;
+}
+
+.row,
+.title {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--harmony-n-100);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--harmony-text-default);
+}
+
+.row {
+  cursor: pointer;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.23px;
+  line-height: 26px;
+  color: var(--harmony-text-default);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--harmony-n-100);
+}
+
+.row:active {
+  background-color: var(--harmony-n-50);
+}
+
+.actionIcon {
+  min-width: 42px;
+  display: inline-flex;
+}
+
+.destructiveAction {
+  color: var(--harmony-red);
+}
+.darkAction.destructiveAction {
+  color: var(--harmony-red);
+}
+
+.darkAction {
+  color: var(--harmony-static-white);
+}
