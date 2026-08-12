@@ -103,7 +103,7 @@ jobs:
           gem install bundler --version 2.5.16 --no-document
           bundle _2.5.16_ config set path vendor/bundle
           bundle _2.5.16_ install
-          RCT_NEW_ARCH_ENABLED=0 bundle _2.5.16_ exec pod install
+          RCT_NEW_ARCH_ENABLED=0 bundle _2.5.16_ exec pod install --deployment
       - uses: actions/upload-artifact@v4
         with:
           name: g01-ios-pod-lock-harvest

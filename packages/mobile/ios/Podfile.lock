@@ -2046,6 +2046,8 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController (~> 2.7.4)
+  - RNLocalize (3.7.0):
+    - React-Core
   - RNPermissions (5.4.4):
     - React-Core
   - RNReactNativeHapticFeedback (2.3.3):
@@ -2415,6 +2417,7 @@ DEPENDENCIES:
   - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
+  - RNLocalize (from `../../../node_modules/react-native-localize`)
   - RNPermissions (from `../../../node_modules/react-native-permissions`)
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
@@ -2657,6 +2660,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
+  RNLocalize:
+    :path: "../../../node_modules/react-native-localize"
   RNPermissions:
     :path: "../../../node_modules/react-native-permissions"
   RNReactNativeHapticFeedback:
@@ -2793,6 +2798,7 @@ SPEC CHECKSUMS:
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: 1070e4e691b23028309d796cc30652d9875138c7
   RNImageCropPicker: 64b6bec9ec185ee59b71a93d7058816bd0e1916e
+  RNLocalize: 4372ecce8b0d483980847e04f6567ad342ca97d6
   RNPermissions: 0a18cdcfdd1773b969f817ce20d47c2b74724af8
   RNReactNativeHapticFeedback: b837dd570ef9c316ed9f93274a2cdb152a8d78ab
   RNReanimated: b61d01db005bc4114b04e7a88c3f32cbd3865dac

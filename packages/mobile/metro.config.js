@@ -11,6 +11,7 @@ const {
 const clientPath = path.resolve(__dirname, '../web')
 const commonPath = path.resolve(__dirname, '../../packages/common')
 const harmonyPath = path.resolve(__dirname, '../../packages/harmony')
+const localizationPath = path.resolve(__dirname, '../../packages/localization')
 const splPath = path.resolve(__dirname, '../../packages/spl')
 const sdkPath = path.resolve(__dirname, '../../packages/sdk')
 const ethPath = path.resolve(__dirname, '../../packages/eth')
@@ -92,6 +93,7 @@ const config = {
     clientPath,
     commonPath,
     harmonyPath,
+    localizationPath,
     sdkPath,
     ethPath,
     fixedDecimalPath,
