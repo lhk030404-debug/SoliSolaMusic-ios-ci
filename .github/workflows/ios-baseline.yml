@@ -2,12 +2,22 @@ name: Public G01 Integration
 
 on:
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Validation scope
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - quality
+          - ios
 
 permissions:
   contents: read
 
 concurrency:
-  group: public-g01-integration-${{ github.ref }}
+  group: public-g01-integration-${{ github.ref }}-${{ inputs.scope || 'all' }}
   cancel-in-progress: false
 
 env:
@@ -17,6 +27,7 @@ env:
 
 jobs:
   web-mobile-quality:
+    if: ${{ inputs.scope != 'ios' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -64,6 +75,7 @@ jobs:
         run: npm run build:dev
 
   ios:
+    if: ${{ inputs.scope != 'quality' }}
     runs-on: macos-26
     timeout-minutes: 120
     steps:
