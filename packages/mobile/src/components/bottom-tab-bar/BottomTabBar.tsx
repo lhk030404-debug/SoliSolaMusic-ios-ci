@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { playbackActions, playbackSelectors } from '@audius/common/store'
 import type {
   BottomTabNavigationEventMap,
   BottomTabBarProps as RNBottomTabBarProps
@@ -10,7 +11,6 @@ import { Animated } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { playbackActions, playbackSelectors } from '@audius/common/store'
 import {
   Flex,
   IconExplore,
